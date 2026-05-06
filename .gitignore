@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Build
+dist/
+build/
+*.whl
+*.tar.gz
+src/pd_ocr_trainer_spa/static/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Tooling
+.coverage
+htmlcov/
+.tool-versions
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
