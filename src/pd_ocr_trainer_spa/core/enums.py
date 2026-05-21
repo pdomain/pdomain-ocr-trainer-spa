@@ -30,3 +30,17 @@ class JobState(str, Enum):
     succeeded = "succeeded"
     failed = "failed"
     cancelled = "cancelled"
+
+
+class TypefaceEnum(str, Enum):
+    """Closed typeface enum (spec 01-data-models §1.1)."""
+
+    roman = "roman"
+    italic = "italic"
+    smallcaps = "smallcaps"
+    blackletter = "blackletter"
+    fraktur = "fraktur"
+    clogaelach = "clogaelach"
+    greek = "greek"
+    greek_classical = "greek-classical"
+    typeface = "typeface"

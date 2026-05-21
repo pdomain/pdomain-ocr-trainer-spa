@@ -15,7 +15,34 @@ from pydantic import BaseModel
 from pd_ocr_trainer_spa.core.enums import (  # noqa: TC001 — pydantic resolves these at model-build time
     JobState,
     TaskEnum,
+    TypefaceEnum,
 )
+
+
+class ProfileCounts(BaseModel):
+    """Per-task page / crop counts for a profile (spec 01-data-models §1)."""
+
+    detection_train_pages: int = 0
+    detection_val_pages: int = 0
+    recognition_train_crops: int = 0
+    recognition_val_crops: int = 0
+    typeface_train_crops: int = 0
+    typeface_val_crops: int = 0
+    glyph_train_crops: int = 0
+    glyph_val_crops: int = 0
+
+
+class Profile(BaseModel):
+    """A training-data profile — the unit of isolation between runs (spec 01 §1)."""
+
+    name: str
+    display_name: str
+    language: str | None = None
+    typeface: TypefaceEnum | None = None
+    is_base: bool = False
+    has_training_data: bool = False
+    has_validation_data: bool = False
+    counts: ProfileCounts = ProfileCounts()
 
 
 class ModelPaths(BaseModel):
