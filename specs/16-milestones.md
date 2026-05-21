@@ -6,25 +6,33 @@ acceptance tests passing.
 
 > **Required reading before starting any milestone:**
 > [`00-overview.md`](00-overview.md), [`OPEN_QUESTIONS.md`](../OPEN_QUESTIONS.md),
-> the per-area specs listed in the milestone.
+> [`17-decisions.md`](17-decisions.md), the per-area specs listed in
+> the milestone.
 
 Milestones M0–M3 are infrastructure (no domain UI). M4–M9 each
 ship a vertical slice (one page + the routes behind it). M10+ are
 ROADMAP-driven (HF, classifier tasks, glyph).
 
+> **Re-spec note (2026-05-21).** This roadmap was rewritten onto the
+> `pd-ui` + `pd-ocr-ops` + `pd-ocr-training` stack. Where a per-area
+> spec (`02`–`19`) or a decision (`D-T1`–`D-T23`) disagrees with a
+> milestone's file list or prose, the spec/decision wins. The
+> milestone *plan doc* synced to GH issues is
+> `docs/plans/2026-05-21-pd-ocr-trainer-spa-milestones.md`.
+
 ---
 
-## M0 — Repo scaffold
+## M0 — Repo scaffold  ✅ shipped (retirement plan #282)
 
-**Outcome.** A repo that lints, type-checks, builds an empty wheel,
-boots `pd-ocr-trainer-ui` and serves a static "Hello" SPA. No
-domain logic.
+**Outcome.** A repo that lints, type-checks, boots
+`pd-ocr-trainer-ui` and serves a static "Hello" SPA. No domain
+logic.
 
 **Files to create.**
 
 ```
 pd-ocr-trainer-spa/
-├── pyproject.toml
+├── pyproject.toml          # + [tool.uv.sources] ../ paths; pd-ocr-trainer-spa[train] extra
 ├── uv.lock
 ├── Makefile
 ├── mise.toml
@@ -38,43 +46,42 @@ pd-ocr-trainer-spa/
 ├── src/pd_ocr_trainer_spa/
 │   ├── __init__.py
 │   ├── __main__.py
+│   ├── _version.py
 │   ├── bootstrap.py
 │   ├── settings.py
-│   ├── api/healthz.py
-│   ├── api/env_js.py
+│   ├── api/{healthz,env_js}.py
 │   └── static/.gitkeep
 ├── frontend/
 │   ├── package.json
-│   ├── package-lock.json
+│   ├── pnpm-lock.yaml
+│   ├── pnpm-workspace.yaml   # allowBuilds: { esbuild: true }
+│   ├── .npmrc                # pd-index-npm registry for @concavetrillion/*
 │   ├── vite.config.ts
 │   ├── vitest.config.ts
-│   ├── tsconfig.{json,app.json,node.json}
-│   ├── tailwind.config.ts
-│   ├── postcss.config.js
-│   ├── eslint.config.ts
-│   ├── components.json
+│   ├── tsconfig*.json
 │   ├── index.html
-│   └── src/{main.tsx, App.tsx, index.css, routes.ts, api/{client,types}.ts, test/setup.ts}
+│   └── src/{main.tsx, App.tsx, ...}
 └── tests/
     ├── conftest.py
-    └── unit/{test_healthz.py, test_settings.py}
+    └── test_routes_root.py
 ```
+
+No `tailwind.config.ts` / `postcss.config.js` / `components.json` —
+styling comes from `pd-ui` (D-T19), not Tailwind/shadcn.
 
 **Specs that govern.**
 - [`00-overview.md`](00-overview.md), [`02-backend.md`](02-backend.md) §1–§3,
-  [`03-frontend.md`](03-frontend.md) §1–§2, [`15-deployment-dev.md`](15-deployment-dev.md).
+  [`03-frontend.md`](03-frontend.md) §1–§2, [`14-testing.md`](14-testing.md) §6,
+  [`15-deployment-dev.md`](15-deployment-dev.md).
 
 **Acceptance tests.**
-- `make setup && make test` green.
-- `make frontend-test` green (one smoke test).
-- `make frontend-build` produces `dist/` and copies into static/.
-- `make build` produces a wheel; `python -m zipfile -l <whl>` shows
-  `pd_ocr_trainer_spa/static/index.html`.
+- `make ci` green (backend lint/typecheck/test + frontend install/test).
+- `tests/test_routes_root.py` passes with monkeypatch — no real
+  frontend build required (the workspace SPA-serving contract).
+- `pd-ui`, `pd-ocr-ops`, `pd-ocr-training` listed as dependencies.
 - `pd-ocr-trainer-ui --no-browser --port 8081 --host 127.0.0.1`
-  responds 200 to `/healthz` and serves index.html at `/`.
-- `make openapi-export` produces `frontend/openapi.json` and
-  `frontend/src/api/types.ts`.
-- ESLint and ruff pass clean. Pre-commit installed and passing.
+  responds 200 at `/healthz` and serves index.html at `/`.
+- GitHub repo created and configured (`allow_squash_merge=false`).
 
 **Pre-conditions.** None.
 
@@ -83,48 +90,60 @@ pd-ocr-trainer-spa/
 ## M1 — Settings + adapters + AppState seam
 
 **Outcome.** `build_app(settings)` wires every adapter Protocol with
-its v1 impl. `Fake*` siblings exist for tests. `AppState.hydrate_from_disk`
+its v1 impl, mounts the `pd-ocr-ops` suite routes
+(`mount_routes`, D-T21), and constructs a `pd-ocr-ops` `LongJobRunner`
+(D-T20). `Fake*` siblings exist for tests. `AppState.hydrate_from_disk`
 runs on boot but populates nothing yet (no profiles to discover).
 
 **Files.**
-- `src/pd_ocr_trainer_spa/core/{app_state,paths,errors}.py`
+- `src/pd_ocr_trainer_spa/core/{app_state,paths,errors,notifications}.py`
 - `src/pd_ocr_trainer_spa/adapters/storage/{__init__,filesystem,s3}.py`
 - `src/pd_ocr_trainer_spa/adapters/auth/{__init__,none}.py`
-- `src/pd_ocr_trainer_spa/adapters/training/{__init__,local_subprocess,modal,shared_container,fake}.py`
-- `src/pd_ocr_trainer_spa/adapters/dataset_sources/{__init__,local,huggingface,fake}.py`
-- `src/pd_ocr_trainer_spa/adapters/model_registry/{__init__,filesystem,huggingface_hub,fake}.py`
+- `src/pd_ocr_trainer_spa/adapters/dataset_sources/{__init__,local,huggingface}.py`
+- `src/pd_ocr_trainer_spa/adapters/model_registry/{__init__,filesystem,huggingface_hub}.py`
+- `src/pd_ocr_trainer_spa/training/{config_build,worker_cmd,events}.py` — the
+  torch-free training glue (the concrete `ITrainingRunner` runs only
+  in the M6 worker subprocess; the SPA imports the Protocol + config
+  models from `pd-ocr-training`, D-T1).
 - `src/pd_ocr_trainer_spa/middleware/{request_id,error_handler}.py`
-- `tests/unit/adapters/...`
+- `tests/unit/adapters/...` — `Fake*` adapters + a fake `LongJobRunner`.
 
-**Specs.** [`02-backend.md`](02-backend.md) §4, [`14-testing.md`](14-testing.md) §2.1.
+There is no `adapters/training/` package and no SPA-local job
+runner — long jobs go through the `pd-ocr-ops` `LongJobRunner`.
+
+**Specs.** [`02-backend.md`](02-backend.md) §3–§5, [`14-testing.md`](14-testing.md) §2.1.
 
 **Acceptance.**
-- Every adapter Protocol unit-tested with the fake impl.
-- `local_subprocess` and `huggingface_*` impls raise `NotImplementedYet`
-  when called without a target — but their *modules import* clean.
+- Every adapter Protocol unit-tested with its fake impl.
+- The `s3` / `huggingface` adapters raise `NotImplementedYet` when
+  called — but their modules import clean.
 - Path-traversal guard test on `IStorage.filesystem`.
+- `config_build` maps a `Run.args` dict to a valid `pd-ocr-training`
+  `DetectionConfig` / `RecognitionConfig`.
 
 ---
 
-## M2 — Job runner + SSE
+## M2 — Job runner integration + SSE
 
-**Outcome.** `JobRunner` exists and works; `/api/jobs/{id}/events`
-serves SSE end-to-end with replay. No real run kinds yet — tests
-use synthetic events.
+**Outcome.** The SPA's `/api/jobs/{id}` + `/api/jobs/{id}/events`
+endpoints wrap the `pd-ocr-ops` `LongJobRunner` (D-T20): `GET
+/api/jobs/{id}` projects `JobStatus` onto the SPA `Job` model, and
+the SSE route streams `stream_events`. No real run kinds yet — tests
+drive the lifecycle with a fake `LongJobRunner` scripting synthetic
+`JobEvent`s. The SPA does **not** hand-roll a `core/job_runner.py`.
 
 **Files.**
-- `src/pd_ocr_trainer_spa/core/{job_runner,notifications}.py`
 - `src/pd_ocr_trainer_spa/api/jobs.py`
-- `frontend/src/api/jobs.ts` (subscribeToJob)
+- `frontend/src/api/jobs.ts` — the SSE subscription helper (or the
+  `pd-ui` `useLongJob` hook where it fits).
 - `tests/integration/api/test_jobs_sse.py`
-- `tests/unit/core/test_job_runner.py`
 
-**Specs.** [`10-jobs-and-sse.md`](10-jobs-and-sse.md), [`02-backend.md`](02-backend.md) §5.5.
+**Specs.** [`10-jobs-and-sse.md`](10-jobs-and-sse.md), [`02-backend.md`](02-backend.md) §6.5.
 
 **Acceptance.**
 - Submit a synthetic job; subscribe; receive every scripted event in order.
 - Reconnect with `Last-Event-ID:`; missed events replay.
-- Cancel; `cancelled` event fires; subsequent events suppressed.
+- Cancel; a terminal `state` event fires; subsequent events suppressed.
 
 ---
 
@@ -153,17 +172,19 @@ ProfilesPage in the SPA renders the list + dialog.
 
 ## M4 — Datasets kanban (recognition first)
 
-**Outcome.** Working kanban for `(profile, recognition)` only.
-Drag/drop, multi-select, copy-to-datasets, "yellow changed"
-highlight, refresh. Detection / classifier kanbans ride along the
-same component but their endpoint impls land in M5+.
+**Outcome.** Working kanban for `(profile, recognition)` only:
+client-side staged drag/drop + multi-select, the batch `apply`
+commit (D-T23), the "changed" highlight, rescan. Detection /
+classifier kanbans reuse the same `pd-ui` component; their endpoint
+impls land in M5+.
 
 **Files.**
 - `src/pd_ocr_trainer_spa/domain/datasets.py`
 - `src/pd_ocr_trainer_spa/api/datasets.py`
-- `frontend/src/pages/DatasetsPage.tsx`
-- `frontend/src/components/{KanbanBoard,KanbanColumn,KanbanCard,PageChip}.tsx`
-- `frontend/src/stores/selection.ts`
+- `frontend/src/pages/DatasetsPage.tsx` — composes the `pd-ui`
+  `KanbanBoard` (D-T4); `KanbanBoard`/`KanbanColumn`/`PageChip` are
+  `pd-ui` components, not SPA-local.
+- `frontend/src/...` — the staged-overlay client state.
 - tests across all the above.
 
 **Specs.** [`05-dataset-kanban.md`](05-dataset-kanban.md), [`01-data-models.md`](01-data-models.md) §2,
@@ -194,8 +215,8 @@ ship; ProfileDetailPage gains a "Defaults" tab.
 **Specs.** [`04-profiles-and-config.md`](04-profiles-and-config.md) §3, [`05-dataset-kanban.md`](05-dataset-kanban.md) §10.
 
 **Acceptance.**
-- Detection kanban can move pages between unassigned/train/val and
-  copy-to-datasets writes valid `labels.json`.
+- Detection kanban can stage pages between unassigned/train/val and
+  the `apply` commit writes valid `labels.json`.
 - Training-defaults round-trip for both detection and recognition.
 
 **Pre-conditions.** M4.
@@ -212,19 +233,25 @@ Crash-recovery (running-at-boot → failed) verified.
 **Files.**
 - `src/pd_ocr_trainer_spa/domain/runs.py` (Run model + on-disk persistence + hydrate)
 - `src/pd_ocr_trainer_spa/api/runs.py`
-- `src/pd_ocr_trainer_spa/adapters/training/parsers.py`
+- `src/pd_ocr_trainer_spa/worker/train.py` — the training worker
+  subprocess that drives `pd-ocr-training`'s `LocalTrainingRunner`
+  and emits the `@@PDEVENT@@` stdout protocol (D-T1).
 - `frontend/src/pages/{RunsPage,RunDetailPage}.tsx`
-- `frontend/src/components/{RunForm,RunStatusBadge,RunProgressBar,LogViewer,LossChart}.tsx`
-- `tests/fixtures/training_logs/*.txt`
-- `tests/fixtures/stub_trainer.py`
+- `frontend/src/components/{RunForm,LossChart}.tsx` — `LogViewer`,
+  `JobStatusPip`, and `Progress` are `pd-ui` components (D-T4, D-T22),
+  not SPA-local.
+- `tests/fixtures/training_logs/*.pdevents.txt`
+- `tests/fixtures/stub_worker.py`
 - `tests/e2e/test_run_lifecycle.py`
 
 **Specs.** [`06-training-runs.md`](06-training-runs.md), [`10-jobs-and-sse.md`](10-jobs-and-sse.md), [`14-testing.md`](14-testing.md) §5.
 
 **Acceptance.**
 - Acceptance scenarios 1–6 from
-  [`06-training-runs.md`](06-training-runs.md) §10 (using FakeTrainingRunner).
-- Slow test: real `local_subprocess` + `stub_trainer.py` end-to-end.
+  [`06-training-runs.md`](06-training-runs.md) §10 (using the fake
+  `LongJobRunner`).
+- Slow test: real `LongJobRunner.submit_with_process` +
+  `stub_worker.py` end-to-end.
 - Driver-contract testids inventory for run-detail present.
 
 **Pre-conditions.** M5.
@@ -314,7 +341,7 @@ mixing across `local + hf` works.
 
 **Acceptance.**
 - A recognition run with `sources=[hf:<repo>@main]` materializes,
-  trains (via stub_trainer), and writes a sidecar with the HF
+  trains (via the stub worker), and writes a sidecar with the HF
   source recorded.
 - Banner fires when `HF_TOKEN_PATH` is missing.
 
@@ -349,17 +376,19 @@ HF mock. Dataset publish + model publish flows in the UI.
 typeface kanban variant.
 
 **Files.**
-- New `train_typeface.py` in pd-ocr-trainer (or pd-ocr-trainer-core).
+- New typeface-classification training task in `pd-ocr-training`,
+  behind the `ITrainingRunner` Protocol.
 - SPA: typeface kanban view, run form, eval slicing per class.
 
-**Specs.** [`06-training-runs.md`](06-training-runs.md) §5.3, [`07-evaluation-and-metrics.md`](07-evaluation-and-metrics.md) §5.
+**Specs.** [`06-training-runs.md`](06-training-runs.md) §5.3, [`07-evaluation-and-metrics.md`](07-evaluation-and-metrics.md) §5,
+[`18-deferred-hf-datasets.md`](18-deferred-hf-datasets.md).
 
 **Acceptance.**
 - Round-trip: ingest typeface-classification/v1 dataset, train,
   eval, publish.
 
-**Pre-conditions.** M11. Trainer-side `train_typeface.py` must exist
-([Q3](../OPEN_QUESTIONS.md)).
+**Pre-conditions.** M11. The typeface-classification training task
+must exist in `pd-ocr-training` ([Q9](../OPEN_QUESTIONS.md)).
 
 ---
 
@@ -403,6 +432,7 @@ multi-head model.
 - Backwards compatibility with the legacy trainer is a function of
   *coexistence*, not interop: both write the same disk format
   in-place, neither tries to read the other's running state.
-- M10 onward is gated by upstream readiness (the legacy
-  `train_typeface.py`, `pd-book-tools.GlyphAnnotations`, etc.). The
-  SPA waits.
+- M10 onward is gated by upstream readiness (the
+  typeface/glyph training tasks in `pd-ocr-training`,
+  `pd-book-tools.GlyphAnnotations`, `pd-ocr-synth` dataset shapes,
+  etc.). The SPA waits.
