@@ -5,6 +5,10 @@ import { DatasetsPage } from "./pages/DatasetsPage";
 import { RunListPage } from "./pages/RunListPage";
 import { RunDetailPage } from "./pages/RunDetailPage";
 import { NewRunPage } from "./pages/NewRunPage";
+import { ModelsPage } from "./pages/ModelsPage";
+import { ModelDetailPage } from "./pages/ModelDetailPage";
+import { EvalFormPage } from "./pages/EvalFormPage";
+import { EvalResultPage } from "./pages/EvalResultPage";
 
 function App() {
   return (
@@ -23,6 +27,10 @@ function App() {
           <Route path="/runs" element={<RunListPage />} />
           <Route path="/runs/new" element={<NewRunPage />} />
           <Route path="/runs/:runId" element={<RunDetailPage />} />
+          <Route path="/models" element={<ModelsPage />} />
+          <Route path="/models/:name" element={<ModelDetailPage />} />
+          <Route path="/eval" element={<EvalFormPage />} />
+          <Route path="/eval/:runId/result" element={<EvalResultPage />} />
         </Routes>
       </div>
     </BrowserRouter>

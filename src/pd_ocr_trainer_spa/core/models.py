@@ -54,14 +54,41 @@ class ModelPaths(BaseModel):
     config: str | None = None
 
 
+class TrainedOnSource(BaseModel):
+    """One source the model was trained on (sidecar ``trained_on`` entry, spec 08 §3)."""
+
+    repo: str
+    revision: str | None = None
+    rows: int | None = None
+    weight: float = 1.0
+    source: str = "local"
+
+
+class SidecarEvalSummary(BaseModel):
+    """The optional ``eval`` block of a sidecar (spec 08 §3)."""
+
+    best_run_id: str
+    overall: dict[str, float] = {}
+
+
 class ModelSidecar(BaseModel):
-    """Trained-model metadata sidecar (verbatim port of the legacy roadmap shape)."""
+    """Trained-model metadata sidecar (spec 08 §3; append-only by convention, D-T16).
+
+    ``language``/``typeface`` are optional so legacy models without those slots
+    still round-trip; the registry back-fills them from the profile when it can.
+    """
 
     name: str
     task: str
-    language: str
-    typeface: str
+    language: str | None = None
+    typeface: str | None = None
     doctr_arch: str | None = None
+    trainer_version: str | None = None
+    trained_at: datetime | None = None
+    trained_on: list[TrainedOnSource] = []
+    args: dict[str, object] = {}
+    qualifier: str | None = None
+    eval: SidecarEvalSummary | None = None
 
 
 class ModelPublication(BaseModel):
@@ -194,3 +221,67 @@ class Job(BaseModel):
     error: str | None = None
     started_at: datetime | None = None
     finished_at: datetime | None = None
+
+
+# ---------------------------------------------------------------------------
+# Evaluation (spec 07-evaluation-and-metrics §3)
+# ---------------------------------------------------------------------------
+
+
+class ClassMetrics(BaseModel):
+    """Per-class precision/recall/F1 (classification eval)."""
+
+    n: int
+    precision: float
+    recall: float
+    f1: float
+
+
+class EvalMetrics(BaseModel):
+    """Task-shaped metrics; only the fields relevant to ``task`` are populated."""
+
+    # Recognition
+    cer: float | None = None
+    wer: float | None = None
+    exact_match_rate: float | None = None
+    # Detection
+    precision: float | None = None
+    recall: float | None = None
+    f1: float | None = None
+    iou_50: float | None = None
+    iou_50_95: float | None = None
+    # Classification
+    accuracy: float | None = None
+    f1_macro: float | None = None
+    per_class: dict[str, ClassMetrics] | None = None
+
+
+class EvalSlice(BaseModel):
+    """One glyph-feature or per-class slice of an eval (spec 07 §3)."""
+
+    feature: str
+    n_pos: int
+    n_neg: int
+    n_excluded: int = 0
+    cer_pos: float | None = None
+    cer_neg: float | None = None
+    wer_pos: float | None = None
+    wer_neg: float | None = None
+    delta_cer: float | None = None
+    low_support: bool = False
+
+
+class EvalResult(BaseModel):
+    """The typed result of an eval run, persisted to ``runs/<id>/result.json``."""
+
+    run_id: str
+    profile: str
+    task: TaskEnum
+    model_name: str
+    val_source: str
+    overall: EvalMetrics
+    slices: list[EvalSlice] = []
+    sample_count: int = 0
+    excluded_count: int = 0
+    duration_seconds: float = 0.0
+    finished_at: datetime

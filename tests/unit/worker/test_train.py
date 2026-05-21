@@ -118,6 +118,56 @@ def test_run_worker_applies_dataset_env(tmp_path: Path, monkeypatch) -> None:
     assert os.environ["PD_OCR_TRAINER_ML_TRAINING_DIR"].endswith("ml-training")
 
 
+def test_run_worker_writes_sidecar_on_done(tmp_path: Path) -> None:
+    """A successful run writes <model_name>.metadata.json under shared_models_dir."""
+    run_dir = tmp_path / "runs" / "run-1"
+    run_dir.mkdir(parents=True, exist_ok=True)
+    shared = tmp_path / "shared-models" / "clogaelach" / "recognition"
+    name = "pd-ga-clogaelach-recognition-2026-05-21"
+    manifest = {
+        "id": "run-1",
+        "profile": "clogaelach",
+        "task": "recognition",
+        "model_name": name,
+        "args": {},
+    }
+    (run_dir / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+    (run_dir / "args.json").write_text(
+        json.dumps({"epochs": 1, "shared_models_dir": str(shared), "name": name}),
+        encoding="utf-8",
+    )
+    (run_dir / "stdout.log").touch()
+
+    runner = _FakeRunner([{"kind": "done", "message": "ok"}])
+    code = worker.run_worker(run_dir, runner=runner)
+    assert code == 0
+    sidecar = shared / name / f"{name}.metadata.json"
+    assert sidecar.exists()
+    payload = json.loads(sidecar.read_text(encoding="utf-8"))
+    assert payload["name"] == name
+    assert payload["task"] == "recognition"
+
+
+def test_run_worker_no_sidecar_on_error(tmp_path: Path) -> None:
+    """A failed run does not write a sidecar."""
+    run_dir = tmp_path / "runs" / "run-1"
+    run_dir.mkdir(parents=True, exist_ok=True)
+    shared = tmp_path / "shared-models" / "clogaelach" / "recognition"
+    name = "pd-ga-clogaelach-recognition-2026-05-21"
+    (run_dir / "manifest.json").write_text(
+        json.dumps({"id": "r", "profile": "p", "task": "recognition",
+                    "model_name": name, "args": {}}),
+        encoding="utf-8",
+    )
+    (run_dir / "args.json").write_text(
+        json.dumps({"shared_models_dir": str(shared), "name": name}), encoding="utf-8",
+    )
+    (run_dir / "stdout.log").touch()
+    runner = _FakeRunner([{"kind": "error", "message": "boom"}])
+    worker.run_worker(run_dir, runner=runner)
+    assert not (shared / name / f"{name}.metadata.json").exists()
+
+
 def test_emit_event_format() -> None:
     """emit_event writes a single @@PDEVENT@@-prefixed JSON line."""
     import io

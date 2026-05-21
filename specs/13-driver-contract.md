@@ -193,40 +193,70 @@ regardless of the underlying pd-ui markup.
 | testid | Element |
 |---|---|
 | `models-page` | Page root |
+| `models-refresh` | Refresh button |
+| `models-filter-profile` | Profile filter input |
+| `models-filter-task` | Task filter select |
+| `models-filter-legacy` | Legacy filter select |
+| `models-loading` | Loading indicator |
+| `models-error` | Error banner |
+| `models-empty` | Empty-state message |
 | `models-table` | Table |
 | `models-row-{name}` | Row |
-| `models-row-{name}-rename` | Rename button |
-| `models-row-{name}-publish` | Publish button (gated) |
+| `models-row-{name}-link` | Model-name link to detail |
+| `models-row-{name}-sidecar-missing` | "sidecar missing" badge |
+| `models-row-{name}-eval` | Open-Eval link |
+| `models-row-{name}-rename` | Rename link |
+| `models-row-{name}-publish` | Publish button (gated, M11) |
 | `models-row-{name}-delete` | Delete button |
 | `models-detail-page` | Page root |
+| `models-detail-loading` | Loading indicator |
+| `models-detail-error` | Error banner |
+| `models-detail-open-eval` | Open-Eval link |
+| `models-detail-rename` | Rename button |
+| `models-detail-delete` | Delete button |
 | `models-detail-sidecar-json` | Sidecar JSON viewer |
+| `models-detail-sidecar-missing` | "sidecar missing" notice |
+| `models-detail-regenerate` | Regenerate-sidecar button |
 | `models-detail-eval-summary` | Best-eval summary |
+| `models-detail-trained-on` | Trained-from source list |
 | `models-detail-rename-dialog` | Rename dialog |
 | `models-detail-rename-input` | New-name input |
-| `models-detail-publish-dialog` | Publish dialog |
-| `models-detail-publish-repo` | Repo input |
-| `models-detail-publish-visibility-{value}` | Visibility radios (`private`, `public`) |
-| `models-detail-publish-submit` | Submit |
+| `models-detail-rename-submit` | Rename-dialog submit |
+| `models-detail-publish-dialog` | Publish dialog (M11) |
+| `models-detail-publish-repo` | Repo input (M11) |
+| `models-detail-publish-visibility-{value}` | Visibility radios (`private`, `public`) (M11) |
+| `models-detail-publish-submit` | Submit (M11) |
 
 ### 4.6 Eval form + result
 
 | testid | Element |
 |---|---|
 | `eval-form-page` | Page root |
+| `eval-form-error` | Error banner |
 | `eval-form-profile` | Profile combobox |
 | `eval-form-task-{task}` | Task radios |
 | `eval-form-model` | Model dropdown |
-| `eval-form-source-{kind}` | Validation-source radios |
+| `eval-form-show-all-models` | "Show all models" toggle |
+| `eval-form-source-{kind}` | Validation-source radios (`local`, `custom`) |
+| `eval-form-source-custom-path` | Custom-path input |
 | `eval-form-slice-glyph-features` | Slice toggle |
 | `eval-form-persist-predictions` | Persist toggle |
 | `eval-form-submit` | Run eval |
 | `eval-result-page` | Result page root |
+| `eval-result-loading` | Loading indicator |
+| `eval-result-error` | Error banner |
+| `eval-result-pending` | "eval not finished" notice |
+| `eval-result-refresh` | Refresh button (pending state) |
+| `eval-metrics-table` | Metrics-table root |
+| `eval-metrics-overall` | Overall-metrics sub-table |
+| `eval-metrics-slices` | Slices sub-table |
 | `eval-result-overall-cer` | Overall CER metric |
 | `eval-result-overall-wer` | Overall WER metric |
+| `eval-result-overall-{metric}` | Other overall metric cells |
 | `eval-result-slice-{feature}` | One row per slice (`feature` is the encoded slice id) |
 | `eval-result-download-json` | Download JSON button |
 | `eval-result-download-md` | Download Markdown button |
-| `eval-result-compare` | Open compare dialog |
+| `eval-result-compare` | Open compare dialog (M13) |
 
 ---
 
