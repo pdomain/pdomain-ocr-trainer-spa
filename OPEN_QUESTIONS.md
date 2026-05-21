@@ -271,13 +271,15 @@ must parse those into `JobEvent`s.
   does not hand-roll a job runner") and forks job-lifecycle code.
 
 **Recommendation.** **(A)** — a stdout-line parser in `pd-ocr-ops` is
-the smallest change and keeps the job contract in one place. File it
-as a `pd-ocr-ops` `kind:feature-request`; the `@@PDEVENT@@` line
-format in `02-backend.md` §5.2 is the proposed wire contract.
+the smallest change and keeps the job contract in one place. The
+`@@PDEVENT@@` line format in `02-backend.md` §5.2 is the proposed
+wire contract.
+
+**Tracking.** Filed as `ConcaveTrillion/pd-ocr-ops#76`.
 
 **Blocks.** M6 progress streaming (training runs are submittable
 without it, but show no live progress until it lands). Cross-repo:
-the work itself is a `pd-ocr-ops` issue.
+the work itself is `pd-ocr-ops#76`.
 
 ---
 
