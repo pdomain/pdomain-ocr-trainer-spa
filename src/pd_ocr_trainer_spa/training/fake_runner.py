@@ -11,6 +11,7 @@ import uuid
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
+from pd_ocr_ops.gpu.local_jobs import UnknownJobError
 from pd_ocr_ops.gpu.types import JobEvent, JobStatus
 
 if TYPE_CHECKING:
@@ -77,8 +78,19 @@ class FakeLongJobRunner:
         del spec, cmd
         return self._register(kind)
 
+    def all_job_ids(self) -> list[str]:
+        """Introspection seam — every registered job_id (for active-count).
+
+        The pd-ocr-ops ``LongJobRunner`` Protocol has no enumeration method;
+        ``api/jobs.py`` duck-types this when present. ``LocalLongJobRunner``
+        gaining an equivalent is a documented M2 follow-up.
+        """
+        return list(self._jobs)
+
     async def status(self, job_id: str) -> JobStatus:
         """Return the current JobStatus, applying any scripted terminal state."""
+        if job_id not in self._jobs:
+            raise UnknownJobError(f"Job not found: {job_id!r}")
         status = self._jobs[job_id]
         if job_id in self._cancelled:
             return status
@@ -94,7 +106,7 @@ class FakeLongJobRunner:
     async def cancel(self, job_id: str) -> None:
         """Flip the job to a cancelled terminal state and suppress later events."""
         if job_id not in self._jobs:
-            return
+            raise UnknownJobError(f"Job not found: {job_id!r}")
         self._cancelled.add(job_id)
         self._jobs[job_id] = self._jobs[job_id].model_copy(
             update={"state": "cancelled", "finished_at": self._now()}
@@ -102,6 +114,8 @@ class FakeLongJobRunner:
 
     async def stream_events(self, job_id: str) -> AsyncIterator[JobEvent]:
         """Replay the scripted events until a terminal state (or cancellation)."""
+        if job_id not in self._jobs:
+            raise UnknownJobError(f"Job not found: {job_id!r}")
         for event in self._events.get(job_id, []):
             if job_id in self._cancelled:
                 return

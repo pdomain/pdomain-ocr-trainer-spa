@@ -11,8 +11,9 @@ from collections import deque
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
+from fastapi import Request  # noqa: TC002 — runtime import: FastAPI resolves get_app_state's annotation
+
 if TYPE_CHECKING:
-    from fastapi import Request
     from pd_ocr_ops.gpu.protocols import LongJobRunner
 
     from pd_ocr_trainer_spa.adapters.auth import IAuth
