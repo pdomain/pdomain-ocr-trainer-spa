@@ -175,7 +175,7 @@ class Run(BaseModel):
     finished_at: datetime | None
     exit_code: int | None
     artefact_paths: list[str]     # absolute paths emitted on success (model files, sidecar, dataset snapshot)
-    job_id: str | None            # the JobRunner job streaming logs for this run, if any
+    job_id: str | None            # the pd-ocr-ops LongJobRunner job for this run, if any
 
 class RunKind(str, Enum):
     train = "train"
@@ -212,35 +212,35 @@ exit code `-1` and a synthetic `stderr.log` line "process gone").
 
 ## 4. Job
 
-Mirrors `pd-ocr-labeler-spa/specs/02-backend.md` job-runner shape
-exactly; see [`10-jobs-and-sse.md`](10-jobs-and-sse.md) for events.
+The SPA `Job` is a **projection of the `pd-ocr-ops` `JobStatus`**
+(D-T20). The SPA does not own a job runner; `api/jobs.py` projects
+`LongJobRunner.status(job_id)` onto this model. See
+[`10-jobs-and-sse.md`](10-jobs-and-sse.md) §3 for the projection and
+§4 for the event stream.
 
 ```python
 class Job(BaseModel):
-    id: str
-    run_id: str | None
+    id: str                       # = JobStatus.job_id
+    run_id: str | None            # resolved from the runs registry by job_id
     kind: str                     # "train.detection", "publish.dataset", ...
     state: JobState
-    progress: JobProgress | None
-    error: JobError | None
+    progress: float               # 0.0 ≤ v ≤ 1.0 (= JobStatus.progress)
+    error: str | None             # = JobStatus.error (plain string; last stderr line)
+    started_at: datetime | None
+    finished_at: datetime | None
 
 class JobState(str, Enum):
-    pending = "pending"
+    """Mirrors pd-ocr-ops JobStatus.state exactly."""
+    queued = "queued"
     running = "running"
-    complete = "complete"
+    succeeded = "succeeded"
     failed = "failed"
     cancelled = "cancelled"
-
-class JobProgress(BaseModel):
-    current: int
-    total: int | None             # None == indeterminate
-    message: str
-
-class JobError(BaseModel):
-    code: str                     # machine-readable, e.g. "training.cuda_oom"
-    message: str
-    detail: dict | None = None
 ```
+
+The structured event payloads (`progress` / `metric` / `log` /
+`state`) are the `pd-ocr-ops` `JobEvent` shape — defined in
+[`10-jobs-and-sse.md`](10-jobs-and-sse.md) §2, not duplicated here.
 
 ---
 
@@ -316,13 +316,12 @@ class AppState:
     settings: Settings
     storage: IStorage
     auth: IAuth
-    training_runner: ITrainingRunner
     dataset_sources: list[IDatasetSource]
     model_registry: IModelRegistry
+    job_runner: LongJobRunner               # pd-ocr-ops; owns job lifecycle (D-T20)
 
     profiles: dict[str, Profile]            # by normalized name
     runs: dict[str, Run]                    # by run id
-    jobs: JobRegistry                       # see 10-jobs-and-sse.md
     notifications: deque[Notification]      # ring buffer
 
     # cache: read-through; invalidated on directory mtime change
