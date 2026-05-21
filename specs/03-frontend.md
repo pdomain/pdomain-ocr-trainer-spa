@@ -300,8 +300,10 @@ The app is wrapped in the pd-ui `AppShell`:
 - **`Field` / `FieldRow`** — labelled form-row primitive: a label, a
   control slot, an optional help/`Accordion` slot, and an error slot
   driven by `422 ErrorEnvelope` `details[].loc`.
-- **`JobStatusPip`** — a job-state pip (queued / running / done /
-  failed / cancelled), a job-aware variant of pd-ui `StatusPip`.
+- **`JobStatusPip`** — a job-state pip (queued / running / succeeded /
+  failed / cancelled — `JobState` per pd-ocr-ops; render "Done" via the
+  `label` prop when UX calls for it), a job-aware variant of pd-ui
+  `StatusPip`.
 
 The trainer's `DatasetsPage` shows **two `KanbanBoard`s** — one for the
 detection dataset, one for recognition — per the design's "dual kanban".
