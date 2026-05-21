@@ -19,6 +19,7 @@ from pd_ocr_trainer_spa.adapters.builders import (
     build_storage,
 )
 from pd_ocr_trainer_spa.api import (
+    banners,
     datasets,
     env_js,
     jobs,
@@ -92,6 +93,7 @@ def build_app(settings: Settings) -> FastAPI:
         pass
 
     app.include_router(env_js.router)
+    app.include_router(banners.router)
     app.include_router(jobs.router)
     app.include_router(profiles.router)
     app.include_router(datasets.router)

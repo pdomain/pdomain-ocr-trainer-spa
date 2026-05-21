@@ -9,6 +9,8 @@ import { ModelsPage } from "./pages/ModelsPage";
 import { ModelDetailPage } from "./pages/ModelDetailPage";
 import { EvalFormPage } from "./pages/EvalFormPage";
 import { EvalResultPage } from "./pages/EvalResultPage";
+import { AppChrome } from "./components/AppChrome";
+import { AppToaster } from "./components/AppToaster";
 
 function App() {
   return (
@@ -16,6 +18,7 @@ function App() {
       future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
     >
       <div data-testid="app-root">
+        <AppChrome />
         <Routes>
           <Route path="/" element={<Navigate to="/profiles" replace />} />
           <Route path="/profiles" element={<ProfilesPage />} />
@@ -33,6 +36,7 @@ function App() {
           <Route path="/eval/:runId/result" element={<EvalResultPage />} />
         </Routes>
       </div>
+      <AppToaster />
     </BrowserRouter>
   );
 }

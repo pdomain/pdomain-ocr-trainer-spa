@@ -2,15 +2,19 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Badge, Button, Card } from "@concavetrillion/pd-ui/primitives";
+import type { BadgeVariant } from "@concavetrillion/pd-ui/primitives";
 import { fetchRuns } from "../api/runs";
 import type { Run, RunStatus } from "../api/runs";
 
-const STATUS_VARIANT: Record<RunStatus, string> = {
-  pending: "neutral",
-  running: "info",
-  succeeded: "success",
+// pd-ui Badge exposes only default | primary | danger — map run statuses
+// onto that palette. The status text itself stays the precise signal
+// (spec 12 §6 — never colour alone).
+const STATUS_VARIANT: Record<RunStatus, BadgeVariant> = {
+  pending: "default",
+  running: "primary",
+  succeeded: "primary",
   failed: "danger",
-  cancelled: "warning",
+  cancelled: "default",
 };
 
 function formatDuration(start: string, end: string | null): string {
