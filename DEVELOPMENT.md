@@ -129,3 +129,77 @@ pd-ocr-trainer-ui --port 8081
 ```bash
 make doctor   # prints Python/Node versions, CUDA/MPS availability, HF token status
 ```
+
+---
+
+## Switching from the legacy trainer
+
+The new SPA replaces the legacy `pd-ocr-trainer` NiceGUI app. During
+cutover the two can run **side by side against the same `ml-training/`
+tree** — they read the dataset directories but stage their own
+mutations, and they are isolated from each other by two separate
+namespaces: **ports** and **environment-variable prefixes**.
+
+### The two apps never collide
+
+| | Legacy `pd-ocr-trainer` | New `pd-ocr-trainer-spa` |
+|---|---|---|
+| UI stack | NiceGUI | FastAPI + React/Vite SPA |
+| Entry point | `pd-ocr-trainer` | `pd-ocr-trainer-ui` |
+| Env-var prefix | `PD_OCR_TRAINER_` | `PD_OCR_TRAINER_SPA_` |
+| Default port | `8000` | `8081` |
+| Host env var | `PD_OCR_TRAINER_HOST` | `PD_OCR_TRAINER_SPA_HOST` |
+| Port env var | `PD_OCR_TRAINER_PORT` | `PD_OCR_TRAINER_SPA_PORT` |
+| App-data dir | `PD_OCR_TRAINER_APP_DATA_ROOT` | `PD_OCR_TRAINER_SPA_APP_DATA_ROOT` |
+
+Because the env-var prefixes differ by the `_SPA` segment, a variable
+set for one app is **never** read by the other — there is no shared
+key. A stray `PD_OCR_TRAINER_PORT=8000` does not move the SPA off
+`8081`, and vice versa. The two default ports (`8000` vs `8081`) also
+differ, so the bare `make dev` / `pd-ocr-trainer-ui` invocations bind
+distinct sockets with zero configuration.
+
+### Pointing both at the same `ml-training/`
+
+The dataset trees are **shared on purpose** — both apps should see the
+same projects. Point each app at the same directories using its own
+prefix:
+
+```bash
+# Legacy trainer — terminal 1
+PD_OCR_TRAINER_ML_TRAINING_DIR=/data/ml-training \
+PD_OCR_TRAINER_ML_VALIDATION_DIR=/data/ml-validation \
+PD_OCR_TRAINER_SHARED_MODELS_DIR=/data/shared-models \
+PD_OCR_TRAINER_PORT=8000 \
+  pd-ocr-trainer                       # → http://127.0.0.1:8000
+
+# New SPA — terminal 2
+PD_OCR_TRAINER_SPA_ML_TRAINING_DIR=/data/ml-training \
+PD_OCR_TRAINER_SPA_ML_VALIDATION_DIR=/data/ml-validation \
+PD_OCR_TRAINER_SPA_SHARED_MODELS_DIR=/data/shared-models \
+PD_OCR_TRAINER_SPA_PORT=8081 \
+  pd-ocr-trainer-ui                    # → http://127.0.0.1:8081
+```
+
+Verification that they do not collide:
+
+- `curl -sf http://127.0.0.1:8000/` and
+  `curl -sf http://127.0.0.1:8081/` both succeed — two live servers,
+  two ports.
+- `pd-ocr-trainer-spa`'s `/env.js` reports its own version and
+  `driverContractVersion`; the legacy NiceGUI app serves no `/env.js`.
+
+### Coexistence caveats
+
+- **App-data directories should stay separate.** Each app keeps its
+  own settings/job state under its `*_APP_DATA_ROOT`; leave these at
+  their (distinct) defaults, or set them to different paths. They are
+  *not* a shared store.
+- **Dataset moves are not transactional across apps.** Both apps stage
+  kanban moves locally and apply them to the same `ml-training/` /
+  `ml-validation/` trees. Apply moves from one app at a time and
+  rescan the other afterwards to pick up the on-disk change.
+- **Trained-model outputs are shared.** A run finished in either app
+  writes its weights + sidecar under the shared `SHARED_MODELS_DIR`,
+  so the SPA's `/models` page lists models trained by the legacy app
+  and vice versa.
