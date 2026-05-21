@@ -16,6 +16,14 @@ ADR added to [`specs/17-decisions.md`](specs/17-decisions.md).
 
 ### Q3. Source of training entry points: import or extract?
 
+> **✅ Superseded — resolved by the retirement re-spec (2026-05-21).**
+> Training code is neither imported from the legacy `pd-ocr-trainer`
+> nor extracted into a `-core` package: it now lives in the
+> `pd-ocr-training` library behind the `ITrainingRunner` Protocol
+> (D-T1). The SPA worker imports `pd_ocr_training.LocalTrainingRunner`;
+> the web process imports only the `torch`-free config models. None
+> of options (A)/(B)/(C) below apply. **Resolution:** D-T1.
+
 **Context.** The SPA invokes
 `python -m pd_ocr_trainer.train_<task>` from a subprocess
 (D-T1). Two ways to get those scripts:
@@ -88,6 +96,12 @@ vars users set once and forget.
 ---
 
 ### Q26. doctr clone — same external as legacy or vendored?
+
+> **✅ Superseded — resolved by the retirement re-spec (2026-05-21).**
+> DocTR is a normal dependency of `pd-ocr-training`, declared in that
+> package's `pyproject.toml`. The SPA neither clones nor vendors
+> doctr, and any `CUSTOM:` vocab handling is a `pd-ocr-training`
+> concern. Options (A)/(B)/(C) no longer apply. **Resolution:** D-T9.
 
 **Context.** Legacy trainer requires the user to clone
 `mindee/doctr` and patch `train_pytorch.py`. D-T9 keeps that
@@ -227,6 +241,46 @@ need emerges.
 
 ---
 
+### Q27. `pd-ocr-ops` `LongJobRunner` subprocess-stdout event parser
+
+**Context.** D-T20 puts long-job lifecycle on the `pd-ocr-ops`
+`LongJobRunner`. `LocalLongJobRunner.submit_with_process` spawns and
+supervises the training worker subprocess, but as of 2026-05-21 it
+only records the exit code and the last stderr line — it does **not**
+parse the subprocess's stdout into `job_events`. `_append_event` is
+private; there is no public emit/parse API. So `stream_events()`
+yields only terminal state, and the SPA's live progress bar + log
+stream would be blank for the whole run.
+
+[`02-backend.md`](specs/02-backend.md) §5.2 proposes the worker emit
+one `@@PDEVENT@@ {json}` stdout line per `TrainingEvent`; something
+must parse those into `JobEvent`s.
+
+**Options.**
+
+- **(A)** `pd-ocr-ops` adds a documented subprocess-stdout →
+  `JobEvent` parser keyed on the `@@PDEVENT@@` prefix, wired into
+  `_supervise`. The canonical contract lives in `pd-ocr-ops`; every
+  `pd-*` SPA reusing `submit_with_process` gets progress for free.
+- **(B)** `pd-ocr-ops` exposes a public `emit_event(job_id, ...)` API
+  and the worker calls back over HTTP/IPC. More moving parts; needs a
+  reachable endpoint.
+- **(C)** The SPA does not use `submit_with_process`; it manages the
+  worker subprocess itself, parses stdout, and uses `LongJobRunner`
+  only as a status registry. Rejected — contradicts D-T20 ("the SPA
+  does not hand-roll a job runner") and forks job-lifecycle code.
+
+**Recommendation.** **(A)** — a stdout-line parser in `pd-ocr-ops` is
+the smallest change and keeps the job contract in one place. File it
+as a `pd-ocr-ops` `kind:feature-request`; the `@@PDEVENT@@` line
+format in `02-backend.md` §5.2 is the proposed wire contract.
+
+**Blocks.** M6 progress streaming (training runs are submittable
+without it, but show no live progress until it lands). Cross-repo:
+the work itself is a `pd-ocr-ops` issue.
+
+---
+
 ## Nice-to-have (block M10+ or polish)
 
 ### Q4. TypefaceEnum.typeface validation timing
@@ -336,18 +390,16 @@ event per training step for a 50-epoch run with 1000 steps each.
 
 ### Q14. parser_drift soft warning threshold
 
-**Context.** When the progress regex fails to match for 30 s of
-stdout, fire `training.parser_drift`. 30 s arbitrary.
+> **✅ Superseded — resolved by the retirement re-spec (2026-05-21).**
+> `pd-ocr-training` emits structured `TrainingEvent`s, so the SPA no
+> longer regex-parses stdout for progress. The `training.parser_drift`
+> failure mode is retired; the residual "no progress" case (a worker
+> that never reaches its first `epoch` event) surfaces as
+> `training.import_error` / `training.worker_died`. No threshold to
+> pick. **Resolution:** [`06-training-runs.md`](specs/06-training-runs.md) §4, §9.
 
-**Options.**
-
-- **(A)** 30 s elapsed.
-- **(B)** 100 stdout lines without a match.
-- **(C)** Both, whichever first.
-
-**Recommendation.** **(C)** — covers slow-stdout and fast-spam.
-
-**Blocks.** M6 polish.
+**Context (historical).** When the progress regex failed to match
+for 30 s of stdout, fire `training.parser_drift`. 30 s arbitrary.
 
 ---
 
@@ -514,23 +566,24 @@ the user who knows what they're doing.
 
 | ID | Question | Severity | Blocks |
 |---|---|---|---|
-| Q3 | trainer-core extract or import | Critical | M6 |
+| Q3 | trainer-core extract or import | ✅ Superseded (D-T1) | — |
 | Q5 | profile.toml mirror conflict | Critical | M3 |
 | Q7 | env-var prefix verbosity | Critical | M1 |
-| Q26 | doctr clone strategy | Critical (doc) | M6 (doc) |
+| Q26 | doctr clone strategy | ✅ Superseded (D-T9) | — |
 | Q1 | dnd-kit confirmation | Important | M4 |
 | Q2 | recharts confirmation | Important | M6, M7 |
 | Q11 | copy-to-datasets always-async | Important | M4 |
 | Q12 | training queue cap | Important | M6 |
 | Q15 | HF read/publish flag split | Important | M10, M11 |
 | Q24 | build peer driver repo | Important | none |
+| Q27 | pd-ocr-ops stdout event parser | Important | M6 progress |
 | Q4 | typeface enum validation timing | Nice-to-have | M3 / M11 |
 | Q6 | explicit sidecar_schema field | Nice-to-have | M7 |
 | Q8 | HF publish path | Nice-to-have | M11 |
 | Q9 | typeface classifier arch | Nice-to-have | M12 |
 | Q10 | glyph classifier multi-head | Nice-to-have | M14 |
 | Q13 | progress.jsonl cap | Nice-to-have | none |
-| Q14 | parser_drift threshold | Nice-to-have | M6 polish |
+| Q14 | parser_drift threshold | ✅ Superseded (re-spec) | — |
 | Q16 | regression-alert spec location | Nice-to-have | none |
 | Q17 | hf_default_owner default | Nice-to-have | M11 |
 | Q18 | source weight normalization | Nice-to-have | M10 |
@@ -541,6 +594,8 @@ the user who knows what they're doing.
 | Q23 | command palette in v1 | Nice-to-have | M8 polish |
 | Q25 | MPS slow-arch warning | Nice-to-have | M10 polish |
 
-The four **Critical** ones (Q3, Q5, Q7, Q26) are the only blockers
-for starting M0. Everything else can flow under the spec author's
-recommendations until you say otherwise.
+The two remaining **Critical** ones (Q5, Q7) are the only blockers
+for starting M0 — Q3 and Q26 were resolved by the 2026-05-21
+retirement re-spec. Q27 (the `pd-ocr-ops` stdout event parser) is a
+cross-repo dependency for M6 live progress. Everything else can flow
+under the spec author's recommendations until you say otherwise.

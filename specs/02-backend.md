@@ -1,11 +1,19 @@
 # 02 — Backend
 
 FastAPI module layout, the `build_app(settings)` factory, every
-adapter Protocol, and the full route map.
+adapter Protocol, the training-worker subprocess boundary, and the
+full route map.
 
 > Required reading: [`00-overview.md`](00-overview.md),
 > [`01-data-models.md`](01-data-models.md). For long jobs see
 > [`10-jobs-and-sse.md`](10-jobs-and-sse.md).
+>
+> **Re-spec note (2026-05-21).** This spec was rewritten onto the
+> `pd-ui` + `pd-ocr-ops` + `pd-ocr-training` stack. Decisions D-T1,
+> D-T9, D-T10, D-T19–D-T22 in [`17-decisions.md`](17-decisions.md)
+> are authoritative; where this spec and a decision disagree, the
+> decision wins. The original SPA-local `core/job_runner.py` and the
+> SPA-local `ITrainingRunner` Protocol are superseded.
 
 ---
 
@@ -19,7 +27,6 @@ src/pd_ocr_trainer_spa/
 ├── settings.py                # Settings (pydantic-settings)
 ├── core/
 │   ├── app_state.py           # AppState dataclass + get_app_state dep
-│   ├── job_runner.py          # see 10-jobs-and-sse.md
 │   ├── notifications.py       # ring buffer + SSE bus (see 11-notifications.md)
 │   ├── paths.py               # OS-aware roots (verbatim port of dataset_store path logic)
 │   └── errors.py              # ErrorCode + HTTPException helpers
@@ -28,16 +35,19 @@ src/pd_ocr_trainer_spa/
 │   ├── storage/filesystem.py  # default impl
 │   ├── storage/s3.py          # NotImplementedYet
 │   ├── auth/__init__.py       # IAuth Protocol + none
-│   ├── training/__init__.py   # ITrainingRunner Protocol
-│   ├── training/local_subprocess.py
-│   ├── training/modal.py      # NotImplementedYet
-│   ├── training/shared_container.py  # NotImplementedYet
 │   ├── dataset_sources/__init__.py
 │   ├── dataset_sources/local.py
-│   ├── dataset_sources/huggingface.py
+│   ├── dataset_sources/huggingface.py   # NotImplementedYet (D-T2)
 │   ├── model_registry/__init__.py
 │   ├── model_registry/filesystem.py
 │   └── model_registry/huggingface_hub.py
+├── training/
+│   ├── config_build.py        # Run.args → pd_ocr_training DetectionConfig / RecognitionConfig
+│   ├── worker_cmd.py           # build_worker_cmd(run, settings) → list[str]
+│   └── events.py               # TrainingEvent (worker stdout) ↔ Job event mapping
+├── worker/
+│   ├── __init__.py
+│   └── train.py                # `python -m pd_ocr_trainer_spa.worker.train` — the training subprocess
 ├── domain/
 │   ├── profiles.py            # Profile, ProfileCounts, profile.toml IO
 │   ├── datasets.py            # DatasetView assembly, kanban move logic
@@ -45,12 +55,12 @@ src/pd_ocr_trainer_spa/
 │   ├── models.py              # TrainedModel discovery, sidecar IO
 │   └── publish.py             # HF publish orchestration
 ├── api/
-│   ├── healthz.py             # GET /healthz
+│   ├── healthz.py             # (delegated — see §3; pd-ocr-ops owns /healthz)
 │   ├── env_js.py              # GET /env.js (build version, feature flags)
 │   ├── profiles.py            # /api/profiles/...
 │   ├── datasets.py            # /api/profiles/{p}/datasets/...
 │   ├── runs.py                # /api/runs/...
-│   ├── jobs.py                # /api/jobs/{id}/events SSE
+│   ├── jobs.py                # /api/jobs/{id} + /api/jobs/{id}/events SSE (wraps LongJobRunner)
 │   ├── eval.py                # /api/eval/...
 │   ├── models.py              # /api/models/...
 │   ├── sources.py             # /api/sources/...
@@ -63,6 +73,24 @@ src/pd_ocr_trainer_spa/
 │   └── .gitkeep
 └── _version.py                # hatch-vcs writes this on build
 ```
+
+**Two import boundaries matter (D-T1, D-T9):**
+
+- The **long-lived FastAPI process** imports `pd-ocr-ops` (suite +
+  `LongJobRunner`) and the **`torch`-free** half of `pd-ocr-training`
+  — only the typed config models `DetectionConfig` /
+  `RecognitionConfig` / `TrainingEvent` and the `ITrainingRunner`
+  Protocol. It never imports `torch`, DocTR, or
+  `pd_ocr_training.LocalTrainingRunner`.
+- The **`worker/train.py` subprocess** is the only place that imports
+  `pd_ocr_training.LocalTrainingRunner` (and therefore `torch` /
+  DocTR). It is launched, supervised, and killed by the `pd-ocr-ops`
+  `LongJobRunner`; the web process stays `torch`-free.
+
+`pd_ocr_training.datasets` (`ExportManager`) has **import-time
+filesystem side effects** and still carries `PD_OCR_TRAINER_*` env
+prefixes — see §4.4. Import it lazily, inside the worker or inside a
+function, never at web-process module scope.
 
 ---
 
@@ -84,8 +112,11 @@ class Settings(BaseSettings):
     # Adapters
     storage_kind: Literal["filesystem", "s3"] = "filesystem"
     auth_kind: Literal["none"] = "none"
-    training_runner_kind: Literal["local_subprocess", "modal", "shared_container"] = "local_subprocess"
+    job_runner_kind: Literal["local", "modal", "shared_container"] = "local"
     model_registry_kind: Literal["filesystem", "huggingface_hub"] = "filesystem"
+
+    # Jobs / GPU
+    jobs_db_path: Path | None = None      # default: pd-ocr-ops suite paths.jobs_db_path()
 
     # HF
     hf_token_path: Path | None = None     # default: ~/.huggingface/token
@@ -94,14 +125,14 @@ class Settings(BaseSettings):
 
     # Server
     host: str = "127.0.0.1"
-    port: int = 8081                       # different default from labeler-spa (8080) so both can coexist
-    cors_allow_origins: list[str] = ["http://localhost:5173"]   # vite dev
+    port: int = 8081                       # different default from labeler-spa (8080) — D-T8
+    cors_allow_origins: list[str] = ["http://localhost:5174"]   # vite dev — D-T8
     log_level: str = "INFO"
 
     # Feature flags
     enable_typeface_training: bool = True
     enable_glyph_training: bool = True
-    enable_hf_publish: bool = False        # gated behind explicit opt-in until M-HF-Publish ships
+    enable_hf_publish: bool = False        # gated until M-HF-Publish ships (D-T2)
 
     @model_validator(mode="after")
     def _resolve_paths(self) -> "Settings":
@@ -110,10 +141,12 @@ class Settings(BaseSettings):
 ```
 
 Defaults match the legacy trainer's `dataset_store.py:18-54` — same
-OS-aware fallbacks, same env var precedence. Renamed prefix from
-`PD_OCR_TRAINER_*` to `PD_OCR_TRAINER_SPA_*` so both binaries can run
-in the same shell with different roots if the user wants.
-([Q7](../OPEN_QUESTIONS.md))
+OS-aware fallbacks, same env var precedence. Prefix is
+`PD_OCR_TRAINER_SPA_` (D-T7) so the new binary coexists with the
+legacy trainer. `job_runner_kind` selects which `pd-ocr-ops`
+`LongJobRunner` implementation backs long jobs (`local` is the only
+one wired for core parity; `modal` / `shared_container` are
+`pd-ocr-ops` concerns, not SPA adapters). ([Q7](../OPEN_QUESTIONS.md))
 
 ---
 
@@ -133,19 +166,22 @@ def build_app(settings: Settings) -> FastAPI:
 
     storage = _build_storage(settings)
     auth = _build_auth(settings)
-    training_runner = _build_training_runner(settings)
     dataset_sources = _build_dataset_sources(settings)
     model_registry = _build_model_registry(settings)
+    job_runner = _build_job_runner(settings)        # pd-ocr-ops LongJobRunner (D-T20)
 
     state = AppState(
         settings=settings,
-        storage=storage, auth=auth, training_runner=training_runner,
+        storage=storage, auth=auth,
         dataset_sources=dataset_sources, model_registry=model_registry,
+        job_runner=job_runner,
     )
-    state.hydrate_from_disk()
+    state.hydrate_from_disk()                       # reconciles running-at-boot runs — D-T3
     app.state.app_state = state
 
-    app.include_router(healthz.router)
+    # pd-ocr-ops suite plumbing: registry, UI-prefs, sibling-spawn, /healthz (D-T21)
+    mount_routes(app, _suite_adapters(settings))
+
     app.include_router(env_js.router)
     app.include_router(profiles.router, prefix="/api/profiles", tags=["profiles"])
     app.include_router(datasets.router, prefix="/api/profiles", tags=["datasets"])
@@ -165,6 +201,18 @@ def build_app(settings: Settings) -> FastAPI:
 
 `__main__.py` reads env vars, constructs `Settings()`, and runs
 `uvicorn.run(build_app(settings), host=..., port=...)`.
+
+`mount_routes` is `pd_ocr_ops.suite.mount_routes` (D-T21). It owns
+`/healthz`, `/api/suite/installed`, `/api/suite/launch`,
+`/api/suite/prefs*`, and `/api/icons/*`. The SPA does **not** define
+`/healthz` or any `/api/suite/*` route itself; `api/healthz.py` is a
+thin shim only if a SPA-specific readiness probe is later needed.
+`pd-ocr-ops` `mount_routes` deliberately exposes **no** job/SSE
+routes, so the SPA owns `/api/jobs/*` itself (§5.5).
+
+`_build_job_runner` returns a `pd-ocr-ops` `LongJobRunner`. For
+`job_runner_kind="local"` it is `LocalLongJobRunner(db_path=
+settings.jobs_db_path or <suite default>)`.
 
 ---
 
@@ -193,34 +241,59 @@ class IAuth(Protocol):
 
 The `none` impl returns a fixed `AuthedUser(id="local", roles=["admin"])`.
 
-### 4.3 `ITrainingRunner`
+### 4.3 Training — `ITrainingRunner` is imported, not defined here
 
-```python
-class ITrainingRunner(Protocol):
-    def start(
-        self,
-        run: Run,
-        on_event: Callable[[JobEvent], None],
-        cancellation: CancellationToken,
-    ) -> int: ...
-    """
-    Spawn the training subprocess (or remote job). Stream stdout/stderr
-    line-by-line into on_event as JobEvent.log(...). Emit progress
-    events when parseable. Return the exit code on terminal.
-    Honour cancellation: best-effort SIGTERM then SIGKILL after grace.
-    """
-```
+The SPA does **not** declare its own training Protocol. Training is
+owned by `pd-ocr-training`:
 
-The `local_subprocess` impl spawns
-`python -m pd_ocr_trainer.train_<task> --args-from runs/<id>/args.json`
-(or whatever the trainer's preferred CLI shape is — see
-[Q3](../OPEN_QUESTIONS.md) on extracting `pd-ocr-trainer-core`).
-Stdout/stderr go to `runs/<id>/{stdout,stderr}.log`. Progress is
-parsed with a regex per training script (each emits
-`epoch X/Y` or similar). The parser config lives next to the
-training command in `adapters/training/parsers.py`.
+- `pd_ocr_training.ITrainingRunner` — `@runtime_checkable` Protocol
+  with two **generator** methods:
 
-`modal` and `shared_container` impls raise `NotImplementedYet`.
+  ```python
+  def train_detection(self, profile: str, config: DetectionConfig) -> Iterator[TrainingEvent]
+  def train_recognition(self, profile: str, config: RecognitionConfig) -> Iterator[TrainingEvent]
+  ```
+
+  `profile` is the run identifier (used as the checkpoint name when
+  `config.name` is `None`). The iterator is lazy, never raises, and
+  its final event is `kind="done"` or `kind="error"`.
+
+- `DetectionConfig` / `RecognitionConfig` — `torch`-free pydantic
+  models (full field lists in
+  [`04-profiles-and-config.md`](04-profiles-and-config.md) §3.2).
+  `RecognitionConfig.vocab` is a plain `str` — a DocTR vocab name or
+  the literal `"CUSTOM:<chars>"`; no validation in the config layer.
+
+- `TrainingEvent` — pydantic model:
+  `kind: Literal["log","epoch","metric","done","error"]`,
+  `message: str`, `progress: float | None` (normalized `[0,1]`, set
+  on `epoch` events), `data: dict | None`.
+
+- `pd_ocr_training.LocalTrainingRunner` — the concrete
+  `ITrainingRunner`. It runs the blocking DocTR training in an
+  **in-process daemon thread** and bridges its callback into the
+  iterator. It has **no cancellation hook**: abandoning the iterator
+  leaves the thread (and the GPU) held until training finishes
+  naturally. This is the decisive reason training runs in a worker
+  subprocess (D-T1) — the subprocess *is* the cancellation boundary.
+
+**SPA `training/` package** — the SPA's only training code is glue,
+no `torch`:
+
+- `config_build.py` — `build_detection_config(run) -> DetectionConfig`
+  and `build_recognition_config(run) -> RecognitionConfig`, mapping a
+  persisted `Run.args` dict onto the typed config. For recognition it
+  resolves `vocab_library` + `custom_characters` into the final
+  `vocab` string (`"CUSTOM:<chars>"` or a named vocab) before the run
+  is even submitted.
+- `worker_cmd.py` — `build_worker_cmd(run, settings) -> list[str]`,
+  the argv handed to the `LongJobRunner` (see §5).
+- `events.py` — parses the worker's stdout event protocol (§5.2) back
+  into the SPA `Job` event shape consumed by the SSE route.
+
+`modal` / `shared_container` execution targets are `pd-ocr-ops`
+`LongJobRunner` implementations, not SPA adapters; selecting one is
+`Settings.job_runner_kind`.
 
 ### 4.4 `IDatasetSource`
 
@@ -232,9 +305,29 @@ class IDatasetSource(Protocol):
     """Materialize the source data into a local DocTR-compatible directory and return its path."""
 ```
 
-`local` impl wraps the existing `dataset_store.py` IO.
-`huggingface` impl wraps `datasets.load_dataset` + the DocTR adapter
-(per ROADMAP milestone (a)).
+`local` impl wraps `pd_ocr_training.datasets.ExportManager` — the
+dataset directory layout is:
+
+```
+<ml_training_dir>/<profile>/<task>/images/*.{png,jpg}
+<ml_training_dir>/<profile>/<task>/labels.json
+<ml_validation_dir>/<profile>/<task>/...   (same shape)
+```
+
+`<task>` ∈ `("detection", "recognition")`; `<profile>` default
+`"all"` (legacy `"base-ocr"` auto-mapped). A task folder counts as a
+dataset only if `<task>/labels.json` exists. `labels.json` is a flat
+`{image_filename: label_value}` JSON object; `ExportManager` treats
+the value shape as opaque.
+
+⚠️ `ExportManager` performs `mkdir` at **import time** and reads the
+legacy `PD_OCR_TRAINER_ML_TRAINING_DIR` / `..._ML_VALIDATION_DIR` env
+vars (not the SPA prefix). The `local` adapter must set those env
+vars from `Settings` before importing the module, and import it
+lazily. ([Q7](../OPEN_QUESTIONS.md))
+
+`huggingface` impl is **deferred — post-core-parity** (D-T2); the
+file is `NotImplementedYet`.
 
 ### 4.5 `IModelRegistry`
 
@@ -246,30 +339,112 @@ class IModelRegistry(Protocol):
     def publish(self, model: TrainedModel, repo: str, on_event: Callable[[JobEvent], None]) -> ModelPublication: ...
 ```
 
-`filesystem` impl manages `<shared-models>/<profile>/<task>/...`
-exactly the way `dataset_store.model_output_dir()` does today.
-`huggingface_hub` impl wraps `HfApi.upload_large_folder` and the
-existing `push_to_hf_hub` codepath in `train_detect.py` /
-`train_recog.py`. ([Q8](../OPEN_QUESTIONS.md))
+`filesystem` impl manages `<shared-models>/<profile>/<task>/...`.
+`huggingface_hub` impl wraps `HfApi.upload_large_folder`; gated by
+`Settings.enable_hf_publish` (D-T2). ([Q8](../OPEN_QUESTIONS.md))
 
 ---
 
-## 5. Full route map
+## 5. Training-worker subprocess
 
-> Conventions: all paths under `/api`. JSON in/out except where SSE is
-> noted. `404` if any path-segment entity is unknown. `409` for
+A training run executes as a worker subprocess whose lifecycle is
+owned by the `pd-ocr-ops` `LongJobRunner` (D-T1, D-T20). The full
+run lifecycle is [`06-training-runs.md`](06-training-runs.md); the
+job/SSE transport is [`10-jobs-and-sse.md`](10-jobs-and-sse.md).
+This section fixes the **backend ↔ worker contract**.
+
+### 5.1 Submission
+
+`POST /api/runs` (§5.4) writes `runs/<id>/{manifest,args}.json`,
+builds the worker argv, and submits it:
+
+```python
+cmd = build_worker_cmd(run, settings)
+#   → [sys.executable, "-m", "pd_ocr_trainer_spa.worker.train",
+#      "--run-dir", str(settings.runs_dir / run.id)]
+job_id = await job_runner.submit_with_process(
+    kind=f"train.{run.task}",          # "train.detection" | "train.recognition" | ...
+    spec={"run_id": run.id},
+    cmd=cmd,
+)
+```
+
+`LocalLongJobRunner.submit_with_process` spawns the subprocess,
+captures stdout/stderr, sets job state `running`, and supervises it:
+exit 0 → `succeeded`; non-zero → `failed` with `error` = last stderr
+line. `cancel(job_id)` is SIGTERM + grace + SIGKILL on the
+subprocess — the hard cancellation `LocalTrainingRunner` cannot
+provide in-process.
+
+### 5.2 Worker stdout event protocol
+
+`worker/train.py`:
+
+1. Reads `runs/<id>/args.json` + `manifest.json`.
+2. Builds the typed config via `training/config_build.py`.
+3. Sets `HF_HOME`, `CUDA_VISIBLE_DEVICES`, and
+   `PD_OCR_TRAINER_*` dataset-dir env vars from the manifest.
+4. Instantiates `pd_ocr_training.LocalTrainingRunner` and iterates
+   `train_detection` / `train_recognition` to completion (it **must**
+   drain the iterator fully — abandoning it strands the GPU).
+5. For every `TrainingEvent`, writes **one line** to stdout:
+
+   ```
+   @@PDEVENT@@ {"kind":"epoch","message":"...","progress":0.03,"data":{...}}
+   ```
+
+   and the human-readable `message` to `runs/<id>/stdout.log`. Raw
+   subprocess stderr goes to `runs/<id>/stderr.log`.
+6. Exits `0` after a `done` event, non-zero after `error` (the
+   `error` event's message is the final stderr line, so the
+   `LongJobRunner` surfaces it on the `JobStatus`).
+
+The `@@PDEVENT@@`-prefixed JSON line is the **structured progress
+channel**. `pd-ocr-ops` `LongJobRunner` parses these lines from the
+supervised subprocess stdout into `JobEvent`s exposed by
+`stream_events(job_id)`; the `TrainingEvent.kind` values map to
+`JobEvent.kind` as: `epoch`/`metric` → `progress`/`metric`,
+`log` → `log`, `done`/`error` → `state`.
+
+> **Cross-repo prerequisite.** As of 2026-05-21 `LocalLongJobRunner`
+> supervises a subprocess but does **not yet** parse its stdout into
+> `job_events` (`_append_event` is private; no public emit/parse
+> API). This re-spec therefore depends on a `pd-ocr-ops` enhancement:
+> a documented subprocess-stdout → `JobEvent` parser keyed on the
+> `@@PDEVENT@@` prefix. Until that lands, `stream_events()` yields
+> only terminal state and the SPA progress bar/log stream are blank
+> mid-run. Tracked as a `pd-ocr-ops` feature request — see
+> [Q27](../OPEN_QUESTIONS.md). The `@@PDEVENT@@` line format above is
+> the proposed contract for that parser.
+
+### 5.3 Crash recovery
+
+If the FastAPI process dies mid-run, the worker subprocess is an
+orphan and the `LongJobRunner` job registry (SQLite) survives but its
+in-memory process handle does not. `AppState.hydrate_from_disk`
+reconciles: any `Run` left in `running` with no live job is marked
+`failed`, `exit_code = -1`, and a synthetic line appended to
+`stderr.log` (D-T3). On-disk `runs/<id>/progress.jsonl` preserves the
+chart series.
+
+---
+
+## 6. Full route map
+
+> Conventions: all paths under `/api`. JSON in/out except where SSE
+> is noted. `404` if any path-segment entity is unknown. `409` for
 > conflicting concurrent state. `422` for Pydantic validation. `500`
 > only on truly unexpected internal errors. All errors are
-> `ErrorEnvelope` (see §6).
+> `ErrorEnvelope` (see §7).
 
-### 5.1 Health / build info
+### 6.1 Health / build info
 
 | Method | Path | Body | Returns | Notes |
 |---|---|---|---|---|
-| GET | `/healthz` | — | `{"status":"ok"}` | Used by Docker probes. |
+| GET | `/healthz` | — | `{"status":"ok"}` | Owned by `pd-ocr-ops` `mount_routes` (D-T21). |
 | GET | `/env.js` | — | JS file | Inlines `__APP_ENV__ = {version, features}` for the SPA. |
 
-### 5.2 Profiles (`api/profiles.py`)
+### 6.2 Profiles (`api/profiles.py`)
 
 | Method | Path | Body | Returns |
 |---|---|---|---|
@@ -281,53 +456,74 @@ existing `push_to_hf_hub` codepath in `train_detect.py` /
 | POST | `/api/profiles/migrate-legacy` | — | `{moved_paths: [...]}` |
 
 `POST /api/profiles/migrate-legacy` triggers
-`migrate_legacy_dataset_layout()`. Legacy
-`base-ocr` → `all` rename happens implicitly on first
-`/api/profiles` GET; explicit endpoint exists for tests.
+`migrate_legacy_dataset_layout()`. Legacy `base-ocr` → `all` rename
+happens implicitly on first `/api/profiles` GET; explicit endpoint
+exists for tests.
 
-### 5.3 Datasets (`api/datasets.py`)
+### 6.3 Datasets (`api/datasets.py`)
 
-All under `/api/profiles/{profile}` prefix. Concrete paths:
+All under `/api/profiles/{profile}` prefix. Kanban reassignment is
+staged client-side and committed atomically (D-T23):
 
 | Method | Path | Body | Returns |
 |---|---|---|---|
 | GET | `/api/profiles/{profile}/datasets/{task}/kanban` | — | `KanbanView` (3 columns × N rows) |
-| POST | `/api/profiles/{profile}/datasets/{task}/move` | `MoveRequest{from, to, page_keys[]}` | `KanbanView` |
-| POST | `/api/profiles/{profile}/datasets/{task}/move-pages` | batch variant | same |
-| POST | `/api/profiles/{profile}/datasets/{task}/move-crops` | batch variant | same |
+| POST | `/api/profiles/{profile}/datasets/{task}/apply` | `ApplyAssignmentRequest{assignments: [{page_key, target_split}]}` | `KanbanView` |
 | POST | `/api/profiles/{profile}/datasets/{task}/include-toggles` | `{include_detection: bool, include_recognition: bool}` | `KanbanView` |
 | POST | `/api/profiles/{profile}/datasets/{task}/scan` | — | `KanbanView` (forces re-scan of export root + on-disk) |
 
-The kanban semantics live in [`05-dataset-kanban.md`](05-dataset-kanban.md).
+`apply` commits the full staged target-split assignment in one batch
+(D-T23); there is no per-drag endpoint. The kanban semantics live in
+[`05-dataset-kanban.md`](05-dataset-kanban.md).
 
-### 5.4 Runs (`api/runs.py`)
+### 6.4 Runs (`api/runs.py`)
 
 | Method | Path | Body | Returns |
 |---|---|---|---|
 | GET | `/api/runs` | — | `list[Run]` (paginated; default 100) |
 | GET | `/api/runs/{run_id}` | — | `Run` |
-| POST | `/api/runs` | `CreateRunRequest{profile, task, kind, args, dataset_sources}` | `Run` (202; includes `job_id`) |
+| POST | `/api/runs` | `CreateRunRequest{profile, task, kind, args, sources?, ...}` | `Run` (202; includes `job_id`) |
 | POST | `/api/runs/{run_id}/cancel` | — | `Run` (status → `cancelled` once subprocess dies) |
 | GET | `/api/runs/{run_id}/log` | `?stream=stdout|stderr&from_byte=N` | `text/plain` (tail) |
+| GET | `/api/runs/{run_id}/progress` | — | `application/x-ndjson` (on-disk `progress.jsonl`) |
 | DELETE | `/api/runs/{run_id}` | — | `204`. Refuses if running. |
 
-### 5.5 Jobs (`api/jobs.py`)
+`POST /api/runs` submits the training worker via
+`LongJobRunner.submit_with_process` (§5.1).
+`POST /api/runs/{run_id}/cancel` is a thin wrapper that finds the
+run's active job and calls `LongJobRunner.cancel`.
+
+### 6.5 Jobs (`api/jobs.py`)
 
 | Method | Path | Body | Returns |
 |---|---|---|---|
-| GET | `/api/jobs/{job_id}` | — | `Job` |
+| GET | `/api/jobs/{job_id}` | — | `Job` (projected from `LongJobRunner.status`) |
 | GET | `/api/jobs/{job_id}/events` | — | `text/event-stream` (SSE) |
+| POST | `/api/jobs/{job_id}/cancel` | — | `202 Job` |
+| GET | `/api/jobs/active-count` | — | `{count, by_kind}` |
 
-SSE event shapes: see [`10-jobs-and-sse.md`](10-jobs-and-sse.md).
+`pd-ocr-ops` `mount_routes` exposes **no** job routes, so the SPA
+defines these itself, wrapping the `LongJobRunner`:
 
-### 5.6 Eval (`api/eval.py`)
+- `GET /api/jobs/{job_id}` projects `LongJobRunner.status(job_id)`
+  (`JobStatus{job_id, kind, state, progress, started_at,
+  finished_at, error}`) onto the SPA `Job` model.
+- `GET /api/jobs/{job_id}/events` is a `StreamingResponse` that
+  `async for`s over `LongJobRunner.stream_events(job_id)` and
+  re-emits each `JobEvent` as a `text/event-stream` frame.
+- `UnknownJobError` from the runner → `404 job.unknown`.
+
+SSE event shapes and reconnect behaviour: see
+[`10-jobs-and-sse.md`](10-jobs-and-sse.md).
+
+### 6.6 Eval (`api/eval.py`)
 
 | Method | Path | Body | Returns |
 |---|---|---|---|
 | POST | `/api/eval` | `EvalRequest{profile, task, model_name?, val_source?}` | `Run` (kind=`eval`) |
 | GET | `/api/eval/{run_id}/result` | — | `EvalResult` (CER/WER overall + sliced; see [`07-evaluation-and-metrics.md`](07-evaluation-and-metrics.md)) |
 
-### 5.7 Models (`api/models.py`)
+### 6.7 Models (`api/models.py`)
 
 | Method | Path | Body | Returns |
 |---|---|---|---|
@@ -337,14 +533,14 @@ SSE event shapes: see [`10-jobs-and-sse.md`](10-jobs-and-sse.md).
 | POST | `/api/models/{name}/rename` | `{new_name}` | `TrainedModel` |
 | DELETE | `/api/models/{name}` | — | `204`. |
 
-### 5.8 Sources (`api/sources.py`)
+### 6.8 Sources (`api/sources.py`)
 
 | Method | Path | Body | Returns |
 |---|---|---|---|
 | GET | `/api/sources` | — | `list[DatasetSourceInfo]` |
 | GET | `/api/sources/{name}/profiles/{profile}/datasets/{task}/preview` | — | first ~50 rows for kanban preview when `huggingface` source is configured |
 
-### 5.9 Publish (`api/publish.py`)
+### 6.9 Publish (`api/publish.py`)
 
 | Method | Path | Body | Returns |
 |---|---|---|---|
@@ -354,16 +550,19 @@ SSE event shapes: see [`10-jobs-and-sse.md`](10-jobs-and-sse.md).
 Both gated by `Settings.enable_hf_publish`. Returns `403
 publish.disabled` when off.
 
-### 5.10 Settings (`api/settings.py`)
+### 6.10 Settings (`api/settings.py`)
 
 | Method | Path | Body | Returns |
 |---|---|---|---|
 | GET | `/api/settings` | — | `PublicSettings` (paths, feature flags, vocabs cache info) |
-| GET | `/api/settings/vocabs` | — | `dict[str, str]` (DocTR `VOCABS` map; cached per ui.py:74) |
+| GET | `/api/settings/vocabs` | — | `dict[str, str]` (DocTR `VOCABS` map) |
+
+The vocab list is resolved inside the worker / a lazy helper, never
+by importing `torch`/DocTR into the web process.
 
 ---
 
-## 6. Errors
+## 7. Errors
 
 ```python
 class ErrorEnvelope(BaseModel):
@@ -377,13 +576,13 @@ class FieldError(BaseModel):
     msg: str
 ```
 
-Error codes are stable strings; the SPA surface maps them to
-toast messages and field-level errors. See
+Error codes are stable strings; the SPA surface maps them to toast
+messages and field-level errors. See
 [`11-notifications.md`](11-notifications.md).
 
 ---
 
-## 7. OpenAPI export gate
+## 8. OpenAPI export gate
 
 ```
 make openapi-export
@@ -396,10 +595,18 @@ re-running. Mirrors labeler-spa.
 
 ---
 
-## 8. Citations
+## 9. Citations
 
 - Path / profile constants: `pd-ocr-trainer/src/pd_ocr_trainer/dataset_store.py:18-54`.
 - Profile listing: `dataset_store.py:104-122`.
 - Legacy migration: `dataset_store.py:192-200+`.
-- VOCABS cache: `pd-ocr-trainer/src/pd_ocr_trainer/ui.py:74-100`.
-- Training subprocess pattern: `train_detect.py` and `train_recog.py`.
+- `ITrainingRunner` / `TrainingEvent` / config models:
+  `pd-ocr-training/pd_ocr_training/protocols.py:58-247`.
+- `LocalTrainingRunner` (in-process thread, no cancellation):
+  `pd-ocr-training/pd_ocr_training/local.py:253-420`.
+- `ExportManager` dataset layout + import-time side effects:
+  `pd-ocr-training/pd_ocr_training/datasets.py:19-58, 242-609`.
+- `LongJobRunner` Protocol + `LocalLongJobRunner.submit_with_process`:
+  `pd-ocr-ops/pd_ocr_ops/gpu/protocols.py:27-45`,
+  `pd-ocr-ops/pd_ocr_ops/gpu/local_jobs.py:104-272`.
+- Suite `mount_routes`: `pd-ocr-ops/pd_ocr_ops/suite/routes.py:14`.
