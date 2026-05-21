@@ -18,7 +18,7 @@ from pd_ocr_trainer_spa.adapters.builders import (
     build_model_registry,
     build_storage,
 )
-from pd_ocr_trainer_spa.api import env_js, jobs, profiles
+from pd_ocr_trainer_spa.api import datasets, env_js, jobs, profiles
 from pd_ocr_trainer_spa.core.app_state import AppState
 from pd_ocr_trainer_spa.core.errors import AppError
 from pd_ocr_trainer_spa.middleware.error_handler import app_error_handler
@@ -86,6 +86,7 @@ def build_app(settings: Settings) -> FastAPI:
     app.include_router(env_js.router)
     app.include_router(jobs.router)
     app.include_router(profiles.router)
+    app.include_router(datasets.router)
 
     # SPA catch-all — MUST be last so /api/* routes are not shadowed
     @app.get("/{full_path:path}", include_in_schema=False)

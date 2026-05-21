@@ -9,6 +9,7 @@ from __future__ import annotations
 from datetime import (
     datetime,  # noqa: TC003 — pydantic resolves the annotation at model-build time
 )
+from typing import Literal
 
 from pydantic import BaseModel
 
@@ -82,6 +83,70 @@ class TrainedModel(BaseModel):
     paths: ModelPaths
     sidecar: ModelSidecar
     published_to: list[ModelPublication] = []
+
+
+KanbanColumnId = Literal["unassigned", "train", "val"]
+
+
+class KanbanPageChip(BaseModel):
+    """A single draggable item in the kanban — a page (detection) or crop (recognition).
+
+    spec 05-dataset-kanban §2.
+    """
+
+    key: str
+    page_name: str
+    crop_name: str | None = None
+    label_text: str | None = None
+    is_changed: bool = False
+    change_summary: str | None = None
+
+
+class KanbanProjectRow(BaseModel):
+    """A project's row within a kanban column (spec 05 §2)."""
+
+    project_id: str
+    source: Literal["pending", "on_disk"]
+    page_count: int
+    is_changed: bool = False
+    style_tags: list[str] = []
+    pages: list[KanbanPageChip] = []
+
+
+class KanbanColumn(BaseModel):
+    """One kanban column's ordered project rows (spec 05 §2)."""
+
+    rows: list[KanbanProjectRow] = []
+
+
+class KanbanView(BaseModel):
+    """The committed server-truth kanban for one ``(profile, task)`` pair (spec 05 §2)."""
+
+    profile: str
+    task: TaskEnum
+    columns: dict[KanbanColumnId, KanbanColumn]
+    include_detection: bool = True
+    include_recognition: bool = True
+
+
+class AssignmentEntry(BaseModel):
+    """One staged chip-to-split assignment (spec 05 §3)."""
+
+    key: str
+    target_split: KanbanColumnId
+
+
+class ApplyAssignmentRequest(BaseModel):
+    """The whole target-split assignment committed by ``apply`` (spec 05 §3)."""
+
+    assignments: list[AssignmentEntry] = []
+
+
+class IncludeTogglesRequest(BaseModel):
+    """Body for ``POST .../include-toggles`` — the only persisted kanban state (spec 05 §5)."""
+
+    include_detection: bool
+    include_recognition: bool
 
 
 class Job(BaseModel):
