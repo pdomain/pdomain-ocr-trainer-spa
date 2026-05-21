@@ -1,0 +1,15 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`LossChart > renders the empty state with no series 1`] = `
+<div>
+  <div
+    data-testid="run-detail-loss-chart"
+  >
+    <p
+      data-testid="run-detail-loss-chart-empty"
+    >
+      No metrics yet.
+    </p>
+  </div>
+</div>
+`;

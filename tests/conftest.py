@@ -36,3 +36,39 @@ def app(settings: Settings):
 def client(app):
     """TestClient for the FastAPI app."""
     return TestClient(app)
+
+
+@pytest.fixture
+def fake_runner(app):
+    """The app's wired-in FakeLongJobRunner (Settings.job_runner_kind='fake')."""
+    return app.state.app_state.job_runner
+
+
+@pytest.fixture
+def trained_profile(settings: Settings):
+    """Create a complete profile with recognition + detection training data.
+
+    Returns the profile name; the profile has a language + typeface (so model
+    names derive cleanly) and one ``labels.json`` entry per supported task.
+    """
+    import json
+
+    from pd_ocr_trainer_spa.core.enums import TypefaceEnum
+    from pd_ocr_trainer_spa.domain.profiles import create_profile
+
+    create_profile(
+        settings,
+        name="clogaelach",
+        language="ga",
+        typeface=TypefaceEnum.clogaelach,
+    )
+    for task, value in (
+        ("recognition", "an focal"),
+        ("detection", {"polygons": [[[0, 0], [1, 0], [1, 1], [0, 1]]]}),
+    ):
+        task_dir = settings.ml_training_dir / "clogaelach" / task
+        task_dir.mkdir(parents=True, exist_ok=True)
+        (task_dir / "labels.json").write_text(
+            json.dumps({"item-1": value}), encoding="utf-8"
+        )
+    return "clogaelach"

@@ -27,7 +27,6 @@ from pd_ocr_trainer_spa.core.models import Job
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
 
-    from pd_ocr_ops.gpu.protocols import LongJobRunner
     from pd_ocr_ops.gpu.types import JobEvent, JobStatus
 
     from pd_ocr_trainer_spa.core.app_state import AppState
@@ -144,17 +143,36 @@ def _sse_frame(event: JobEvent) -> str:
     )
 
 
+def _persist_progress(state: AppState, run_id: str | None, event: JobEvent) -> None:
+    """Append a ``progress`` / ``metric`` event to the run's ``progress.jsonl``.
+
+    Replay-safe: ``append_progress`` is keyed by the event ``seq`` upstream of
+    de-dup; here we simply mirror live SSE events for chart replay (spec 06 §4).
+    """
+    if run_id is None or event.kind not in {"progress", "metric"}:
+        return
+    from pd_ocr_trainer_spa.domain.runs import append_progress
+
+    record: dict[str, object] = {"type": event.kind, "seq": event.seq}
+    record.update(event.payload)
+    append_progress(state.settings, run_id, record)
+
+
 async def _event_stream(
-    runner: LongJobRunner,
+    state: AppState,
     job_id: str,
     last_event_id: int | None,
 ) -> AsyncIterator[str]:
     """Yield SSE frames for a job, honouring ``Last-Event-ID:`` replay skip."""
+    runner = state.job_runner
+    run_id = _resolve_run_id(state, job_id)
     yield f"retry: {_SSE_RETRY_MS}\n\n"
     # pd-ocr-ops Protocol-shape quirk: stream_events is declared `async def
     # -> AsyncIterator` but every impl is an async generator (directly
     # iterable). See docs/conventions/lint-deviations.md.
     async for event in runner.stream_events(job_id):  # pyright: ignore[reportGeneralTypeIssues]
+        if last_event_id is None or event.seq > last_event_id:
+            _persist_progress(state, run_id, event)
         if last_event_id is not None and event.seq <= last_event_id:
             continue
         yield _sse_frame(event)
@@ -188,7 +206,7 @@ async def stream_job_events(
             last_event_id = None
 
     return StreamingResponse(
-        _event_stream(runner, job_id, last_event_id),
+        _event_stream(state, job_id, last_event_id),
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )

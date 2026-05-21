@@ -2,6 +2,9 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { ProfilesPage } from "./pages/ProfilesPage";
 import { ProfileDetailPage } from "./pages/ProfileDetailPage";
 import { DatasetsPage } from "./pages/DatasetsPage";
+import { RunListPage } from "./pages/RunListPage";
+import { RunDetailPage } from "./pages/RunDetailPage";
+import { NewRunPage } from "./pages/NewRunPage";
 
 function App() {
   return (
@@ -17,6 +20,9 @@ function App() {
             path="/profiles/:name/datasets/:task"
             element={<DatasetsPage />}
           />
+          <Route path="/runs" element={<RunListPage />} />
+          <Route path="/runs/new" element={<NewRunPage />} />
+          <Route path="/runs/:runId" element={<RunDetailPage />} />
         </Routes>
       </div>
     </BrowserRouter>

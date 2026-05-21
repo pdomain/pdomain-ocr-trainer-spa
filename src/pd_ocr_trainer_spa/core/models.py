@@ -149,6 +149,35 @@ class IncludeTogglesRequest(BaseModel):
     include_recognition: bool
 
 
+RunKind = Literal["train", "eval", "publish-dataset", "publish-model"]
+RunStatus = Literal["pending", "running", "succeeded", "failed", "cancelled"]
+
+
+class Run(BaseModel):
+    """A training/eval/publish run (spec 01-data-models §3, spec 06).
+
+    ``id`` is the ULID and the directory name under ``runs/``. ``args`` is the
+    resolved task-specific args dict; ``job_id`` links to the pd-ocr-ops
+    ``LongJobRunner`` job that owns the worker subprocess.
+    """
+
+    id: str
+    profile: str
+    task: TaskEnum
+    kind: RunKind = "train"
+    status: RunStatus = "pending"
+    model_name: str
+    args: dict[str, object] = {}
+    notes: str | None = None
+    device: int | None = None
+    seed: int | None = None
+    started_at: datetime
+    finished_at: datetime | None = None
+    exit_code: int | None = None
+    artefact_paths: list[str] = []
+    job_id: str | None = None
+
+
 class Job(BaseModel):
     """SPA projection of the pd-ocr-ops ``JobStatus`` (spec 01 §4 / 10 §3).
 

@@ -156,6 +156,37 @@ regardless of the underlying pd-ui markup.
 | `run-detail-log-wrap-toggle` | Wrap toggle |
 | `run-detail-log-search` | Find-in-log input |
 | `run-detail-log-line-{n}` | One per visible line (virtualized) |
+| `run-detail-loss-chart-empty` | Empty-state placeholder (no metrics yet) |
+| `run-detail-loading` | Loading placeholder |
+| `run-detail-error` | Error placeholder |
+
+### 4.4a Run list
+
+| testid | Element |
+|---|---|
+| `run-list-page` | Page root |
+| `run-list-refresh` | Refresh button |
+| `run-list-filter-profile` | Profile substring filter input |
+| `run-list-filter-status` | Status filter dropdown |
+| `run-list-table` | Run table |
+| `run-list-row-{run_id}` | One row per run |
+| `run-list-row-{run_id}-status` | Row status badge |
+| `run-list-row-{run_id}-link` | Row model-name link to `/runs/{run_id}` |
+| `run-list-empty` | Empty-state placeholder |
+| `run-list-loading` | Loading placeholder |
+| `run-list-error` | Error placeholder |
+
+### 4.4b New run form
+
+| testid | Element |
+|---|---|
+| `new-run-page` | Page root |
+| `new-run-profile` | Profile selector |
+| `new-run-task` | Task selector |
+| `new-run-qualifier` | Model-name qualifier input |
+| `new-run-args-field-{key}` | One per training-args field (RunArgsEditor) |
+| `new-run-start` | Start-run button |
+| `new-run-error` | Form-level error block |
 
 ### 4.5 Models page + detail
 
