@@ -1,7 +1,8 @@
 ---
 status: active
-synced: ~
-milestone: ~
+synced: 2026-05-21
+milestone: 1
+repo: ConcaveTrillion/pd-ocr-trainer-spa
 ---
 
 # pd-ocr-trainer-spa Milestone Roadmap
