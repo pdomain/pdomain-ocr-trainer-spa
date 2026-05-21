@@ -20,14 +20,16 @@ given implementation task.
 | 07 | [`07-evaluation-and-metrics.md`](07-evaluation-and-metrics.md) | Eval, CER/WER, glyph-feature slicing |
 | 08 | [`08-models.md`](08-models.md) | Model registry, sidecar, naming, on-disk + HF publishing |
 | 09 | [`09-hf-integration.md`](09-hf-integration.md) | DatasetSource adapter, HF read/publish, auth, caching |
-| 10 | [`10-jobs-and-sse.md`](10-jobs-and-sse.md) | Job runner, SSE event shapes, cancellation |
+| 10 | [`10-jobs-and-sse.md`](10-jobs-and-sse.md) | Consuming the pd-ocr-ops LongJobRunner; SSE event shapes; cancellation |
 | 11 | [`11-notifications.md`](11-notifications.md) | Toast queue, busy overlays, error surfacing |
 | 12 | [`12-hotkeys-a11y.md`](12-hotkeys-a11y.md) | Keybindings, focus management, kanban a11y |
 | 13 | [`13-driver-contract.md`](13-driver-contract.md) | data-testid + URL invariants for any future Playwright driver |
 | 14 | [`14-testing.md`](14-testing.md) | pytest + Vitest + Playwright strategy; testing without GPU |
-| 15 | [`15-deployment-dev.md`](15-deployment-dev.md) | Build, devcontainer, install, GPU/MPS, doctr submodule |
-| 16 | [`16-milestones.md`](16-milestones.md) | M0…M9 milestone breakdown |
+| 15 | [`15-deployment-dev.md`](15-deployment-dev.md) | Build, devcontainer, install, GPU/MPS |
+| 16 | [`16-milestones.md`](16-milestones.md) | M0…M14 milestone breakdown |
 | 17 | [`17-decisions.md`](17-decisions.md) | ADRs / decisions log |
+| 18 | [`18-deferred-hf-datasets.md`](18-deferred-hf-datasets.md) | ⏸ Deferred — HF-datasets roadmap (post-core-parity) |
+| 19 | [`19-deferred-glyph-classifier.md`](19-deferred-glyph-classifier.md) | ⏸ Deferred — glyph eval slicing + feature classifier (post-core-parity) |
 
 ## Conventions
 
