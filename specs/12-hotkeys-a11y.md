@@ -53,14 +53,19 @@ operation.
 | `Esc` | Clear selection |
 | `t` / `v` / `u` | Move selected chips to Train / Val / Unassigned |
 | `Enter` | Open chip's detail (project ID page list, or crop preview) |
-| `r` | Refresh (= scan endpoint) |
-| `s` | Save assignments (= copy-to-datasets) |
+| `r` | Rescan (= scan endpoint) |
+| `a` | Apply staged moves (= apply endpoint) |
+| `d` | Discard staged moves |
+
+`t` / `v` / `u` stage moves into client state (D-T23); they do
+**not** hit the server — `a` (Apply) commits.
 
 Focus model: each chip is a roving-tabindex `[role="listitem"]`
 inside a `[role="list"]` per column. The column itself is
 `[role="region" aria-label="Training" aria-keyshortcuts="j k h l"]`.
-Drag-and-drop via dnd-kit's keyboard sensor: `Space` to grab,
-arrows to move, `Space` to drop, `Esc` to abort.
+Keyboard drag-and-drop is provided by the `pd-ui` `KanbanBoard`
+(D-T4) via dnd-kit's `KeyboardSensor`: `Space` to grab, arrows to
+move, `Space` to drop, `Esc` to abort.
 
 ### 3.2 Run detail (scope `run-detail`)
 
@@ -110,11 +115,11 @@ overridden.
 
 - Route changes restore focus to the first heading (`<h1>`) of the
   new page after the data is ready.
-- Modal dialogs trap focus (shadcn primitive enforces this). On
-  close, focus returns to the trigger element.
+- Modal dialogs trap focus (the `pd-ui` dialog primitive enforces
+  this). On close, focus returns to the trigger element.
 - Toasts never steal focus.
-- The kanban column-header buttons (`Refresh`, `Clear`) are
-  reachable via `Tab` before the chips list.
+- The kanban toolbar / footer buttons (`Rescan`, `Apply`,
+  `Discard`) are reachable via `Tab` before the chips list.
 
 ---
 
@@ -140,10 +145,11 @@ overridden.
 ## 7. Colour and contrast
 
 - All status colours have a non-colour signifier (icon or text).
-- Tailwind config keeps WCAG AA contrast (≥ 4.5:1) on body text.
+- The `pd-ui` `tokens.css` palette keeps WCAG AA contrast
+  (≥ 4.5:1) on body text — no direct Tailwind (D-T19).
 - Dark mode parity: every page tested in both themes; the test
-  suite asserts no hard-coded colour-class outside the `tokens.css`
-  semantic tokens.
+  suite asserts no hard-coded colour outside the `pd-ui`
+  `tokens.css` semantic tokens.
 
 ---
 
@@ -185,7 +191,8 @@ operable (`Tab` between sections, `Esc` to close).
    without scrolling the page.
 3. With a chip focused, press `Space`. dnd-kit emits a "picked
    up" announcement. Arrow keys move the ghost between columns.
-   `Space` again drops; the move endpoint fires.
+   `Space` again drops; the chip is staged client-side (no
+   request). Press `a` to Apply.
 4. With a run running, press `c`. Confirmation dialog appears,
    focus trapped. Confirm → cancel fires, focus returns to the
    `Cancel` button.

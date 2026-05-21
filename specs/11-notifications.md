@@ -14,7 +14,7 @@ primitive.
 | Class | Lifetime | UI primitive | Examples |
 |---|---|---|---|
 | **Toast** | Auto-dismiss 5s (info), 10s (success), persistent (error/warn) | `sonner` toast | "Run started", "Sidecar regenerated", "Save failed: …" |
-| **Busy overlay** | While a synchronous action is in flight | `<BusyOverlay>` portal | Profile create, kanban move, copy-to-datasets |
+| **Busy overlay** | While a synchronous action is in flight | `<BusyOverlay>` portal | Profile create, kanban `apply` |
 | **Banner** | Until resolved or dismissed | top-of-page strip | "HF token missing", "Disk almost full", "App version mismatch" |
 
 Toasts are ephemeral; the user accepts data loss on tab close.
@@ -147,21 +147,24 @@ JobsBadge.
 
 ## 5. SSE-driven notifications
 
-Job-state transitions emit toasts:
+Terminal job transitions emit toasts. The terminal event is a
+`pd-ocr-ops` `JobEvent` of `kind="state"` whose `payload.state` is
+`succeeded` / `failed` / `cancelled`
+([`10-jobs-and-sse.md`](10-jobs-and-sse.md) §4):
 
-| Job event | Toast |
+| Terminal `payload.state` | Toast |
 |---|---|
-| `complete` (training) | `success`: "Training finished — `<model_name>`" with `Open Model` action. |
-| `complete` (eval) | `success`: "Eval done — CER `<n>`, WER `<n>`" with `Open Result` action. |
-| `complete` (publish-dataset) | `success`: "Published `<repo>` @ `<rev>`" with `Open on HF` action. |
-| `failed` | `error`: title from `code`, description from `message`. Persistent until dismissed. |
+| `succeeded` (training) | `success`: "Training finished — `<model_name>`" with `Open Model` action. |
+| `succeeded` (eval) | `success`: "Eval done — CER `<n>`, WER `<n>`" with `Open Result` action. |
+| `succeeded` (publish-dataset) | `success`: "Published `<repo>` @ `<rev>`" with `Open on HF` action. |
+| `failed` | `error`: title derived from the run's error code, description from `JobStatus.error`. Persistent until dismissed. |
 | `cancelled` | `info`: "Run cancelled." Quiet 5 s auto-dismiss. |
 
-Toasts fire from `useNotificationStream`, a top-level hook
-mounted in `App.tsx` that subscribes to all active job IDs (from
-`/api/jobs/active-count` plus the run-detail page's per-run
-subscription). Subscription deduplicates: a toast for a given
-`(job_id, type)` pair fires once per session.
+Toasts fire from `useNotificationStream`, a top-level hook mounted
+in `App.tsx` that watches active job IDs (from
+`/api/jobs/active-count` plus the run-detail page's `useLongJob`
+subscription). It deduplicates: a toast for a given `(job_id,
+terminal-state)` pair fires once per session.
 
 ---
 
@@ -199,15 +202,17 @@ render an action button without sonner's default linking.
 
 ## 8. Acceptance behaviour
 
-1. POST a kanban move that fails with `409 profile.has_data`. A
-   single error toast appears; the kanban state rolls back.
+1. Click kanban `Apply` with a staged move that fails server-side.
+   A single error toast appears; the board shows post-`apply`
+   truth (failed keys back in their committed column).
 2. Start a training run. Toast: "Training started". Bounce to
    run page. After completion, second toast: "Training finished".
 3. Without an HF token, navigate anywhere. The
    `hf-token-missing` banner is visible at the top. Click
    dismiss; the banner stays gone for this tab.
-4. Force a CUDA-OOM during training (mocked via the
-   `local_subprocess` runner). The `training.cuda_oom` toast
+4. Force a CUDA-OOM during training (mocked via a fake
+   `LongJobRunner` scripting a `failed` terminal event). The
+   `training.cuda_oom` toast
    appears with a "Clone run with smaller batch" action; clicking
    it opens a prefilled run form.
 

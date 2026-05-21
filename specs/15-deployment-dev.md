@@ -183,40 +183,31 @@ different name so both can coexist.
 ## 8. GPU / MPS notes
 
 Detection + recognition training reaches DocTR through
-`pd_ocr_trainer.train_*`. The SPA delegates **all** GPU concerns
-to that subprocess. The SPA backend itself never imports torch
-( beyond tiny inspection paths under `core/runtime.py` for the
-device-discovery endpoint, which is gated behind a try/except).
+`pd-ocr-training`, run inside the worker subprocess
+([`02-backend.md`](02-backend.md) §5, D-T1). The long-lived FastAPI
+process **never imports `torch`** — only the worker does.
 
-- CUDA: works as it does for the legacy trainer.
-- MPS: per `pd-ocr-trainer/README.md` "Mac / Apple Silicon (MPS)
-  support" is in-progress in the trainer; the SPA opportunistically
-  offers `mps` in the device dropdown when `torch.backends.mps.is_available()`,
-  but the operations that fall back to CPU are still slow. Banner
-  warning if the user picks `mps` and selects an arch known to be
-  slow on CPU fallback ([Q25](../OPEN_QUESTIONS.md)).
-- CPU: supported but only useful for tiny smoke runs.
-
-The device-discovery endpoint (`GET /api/runtime/devices`) imports
-torch lazily and caches the result; first hit may take a few
-hundred ms.
+- Device discovery (`GET /api/runtime/devices`) goes through
+  `pd-ocr-ops` (`pd_ocr_ops.gpu`, `pick_device`), not a SPA-local
+  torch probe. The endpoint result is cached.
+- CUDA: the worker uses whatever `pd-ocr-training` + DocTR support;
+  `CreateRunRequest.device` pins a GPU index.
+- MPS: opportunistically offered in the device dropdown when the
+  platform reports it available; some DocTR ops fall back to CPU
+  and stay slow. A banner warns if the user pins `mps` with an arch
+  known to be slow on CPU fallback ([Q25](../OPEN_QUESTIONS.md)).
+- CPU: supported, but only useful for tiny smoke runs.
 
 ---
 
-## 9. doctr submodule
+## 9. DocTR dependency
 
-The legacy trainer requires the user to clone
-`mindee/doctr` next to the repo and patch `train_pytorch.py` to
-support the `CUSTOM:` vocab prefix (see `pd-ocr-trainer/README.md`).
-
-The SPA depends on the same patched doctr clone. Two options:
-
-- **(A)** Same external clone as legacy. Document under
-  DEVELOPMENT.md; `make doctor` checks the path.
-- **(B)** Vendor a fork in the SPA repo as a git submodule.
-
-Recommendation: **(A)** for v1 — vendoring breaks the legacy
-trainer if both are on the same machine. ([Q26](../OPEN_QUESTIONS.md))
+There is **no doctr clone or submodule** (D-T9). DocTR is a normal
+dependency of `pd-ocr-training`, declared in that package's
+`pyproject.toml`; `uv` resolves it transitively. Any `CUSTOM:` vocab
+handling is entirely a `pd-ocr-training` concern — the SPA neither
+clones, vendors, nor patches doctr. ([Q26](../OPEN_QUESTIONS.md) is
+resolved.)
 
 ---
 
@@ -298,8 +289,9 @@ repos:
    `pd_ocr_trainer_spa/static/index.html` present.
 4. `uv tool install ./dist/...whl` → `pd-ocr-trainer-ui --port 8081`
    serves both API and SPA from one process.
-5. `make doctor` reports CUDA: yes/no, MPS: yes/no, HF token: yes/no,
-   doctr clone path: present/missing.
+5. `make doctor` reports CUDA: yes/no, MPS: yes/no, HF token:
+   yes/no, and the resolved `pd-ocr-training` / `pd-ocr-ops`
+   versions.
 
 ---
 
@@ -307,5 +299,6 @@ repos:
 
 - Wheel-with-SPA pattern: `pd-ocr-labeler-spa/specs/15-deployment-dev.md`.
 - Two-pass npm install: same spec + commit `eba093e`.
-- doctr clone + patch: `pd-ocr-trainer/README.md`.
+- DocTR as a `pd-ocr-training` dependency: D-T9
+  ([`17-decisions.md`](17-decisions.md)).
 - Release strategy: workspace memory `project_release_strategy.md`.

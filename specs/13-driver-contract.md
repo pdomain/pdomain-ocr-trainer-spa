@@ -120,18 +120,23 @@ buttons / inputs / `<a>` without a `data-testid`.
 | `kanban-page` | Page root |
 | `kanban-task-tabs` | Detection / Recognition / Typeface / Glyph tabs |
 | `kanban-task-tab-{task}` | One per tab |
-| `kanban-toolbar-refresh` | Refresh button |
+| `kanban-toolbar-rescan` | Rescan button |
 | `kanban-toolbar-include-detection` | Detection checkbox |
 | `kanban-toolbar-include-recognition` | Recognition checkbox |
 | `kanban-toolbar-filter-input` | project_id substring filter |
 | `kanban-toolbar-style-tag-filter` | Style-tag dropdown |
 | `kanban-column-{column}` | `column ∈ unassigned, train, val` |
-| `kanban-column-{column}-clear` | Clear button (not on `unassigned`) |
 | `kanban-column-{column}-row-{project}` | Project row in this column |
 | `kanban-column-{column}-row-{project}-handle` | Drag handle for the whole project row |
 | `kanban-column-{column}-chip-{project}-{name}` | Page or crop chip |
-| `kanban-footer-copy-to-datasets` | Primary save button |
+| `kanban-footer-pending-count` | Pending-moves indicator |
+| `kanban-footer-discard` | Discard staged moves |
+| `kanban-footer-apply` | Primary apply button |
 | `kanban-footer-status` | Status text |
+
+The kanban chrome is composed around the `pd-ui` `KanbanBoard`
+component (D-T4); these testids are the SPA's stable contract
+regardless of the underlying pd-ui markup.
 
 ### 4.4 Run detail
 
