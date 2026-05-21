@@ -1,38 +1,66 @@
-# 03 — Frontend (React/Vite/TS)
+# 03 — Frontend (React/Vite/TS on pd-ui)
 
-The SPA half of `pd-ocr-trainer-spa`. Built with Vite, served from
-the FastAPI wheel in production, served via Vite dev-server with
-proxy in development.
+The SPA half of `pd-ocr-trainer-spa`. Built with Vite, served from the
+FastAPI wheel in production, served via the Vite dev-server with an
+`/api` proxy in development.
 
 This spec covers the **shell**: routing, state stores, generated API
-client, app chrome, and the page tree. Per-feature specs deepen each
-piece.
+client, app chrome, and the page tree — and maps every legacy
+`pd-ocr-trainer` NiceGUI element to a component. Per-feature specs
+deepen each piece.
 
-> Required reading: [`00-overview.md`](00-overview.md), [`02-backend.md`](02-backend.md).
+> Required reading: [`00-overview.md`](00-overview.md),
+> [`02-backend.md`](02-backend.md), [`17-decisions.md`](17-decisions.md).
 
 ---
 
-## 1. Project layout
+## 1. Component strategy — pd-ui first
+
+The frontend is built on the shared **`pd-ui`** component library
+(`@concavetrillion/pd-ui`, consumed from the `pd-index-npm` registry).
+No Tailwind, no shadcn/ui — pd-ui supplies the design tokens
+(`tokens.css` / `primitives.css`), primitives, and app shell.
+([D-T19](17-decisions.md))
+
+**Every interactive element of the legacy trainer maps to a pd-ui
+component** (table in §6). Two component families needed by the trainer
+do not yet exist in pd-ui and are added to it
+([D-T4](17-decisions.md)) rather than built SPA-local:
+
+- `KanbanBoard` / `KanbanColumn` / `PageChip` — drag-and-drop board.
+- `LogViewer` — virtualized streaming-text viewer.
+- `Field` / `FieldRow` — labelled form-row primitive.
+- `JobStatusPip` — job-state pip.
+
+These are tracked as cross-repo additions to the `pd-ui` spec; the
+trainer-spa kanban/log/config milestones depend on them being built
+first (see [`16-milestones.md`](16-milestones.md)).
+
+Only two components stay **SPA-local** — both app-specific composition,
+not reusable primitives:
+
+- `LossChart` — a thin `recharts` wrapper over a run's `progress.jsonl`.
+- `ModelExportPanel` — the model-name + export controls in run detail.
+
+---
+
+## 2. Project layout
 
 ```
 frontend/
 ├── package.json
-├── package-lock.json
 ├── index.html             # loads /env.js then /src/main.tsx
 ├── vite.config.ts         # @vitejs/plugin-react; proxy /api
 ├── vitest.config.ts
 ├── tsconfig.json
 ├── tsconfig.app.json      # strict, ES2022, jsx=react-jsx
 ├── tsconfig.node.json
-├── tailwind.config.ts
-├── postcss.config.js
 ├── eslint.config.ts
-├── components.json        # shadcn/ui config
 ├── src/
 │   ├── main.tsx
-│   ├── App.tsx
-│   ├── index.css
-│   ├── routes.ts          # canonical route table (testable)
+│   ├── App.tsx            # AppShell + RouterProvider
+│   ├── index.css          # imports pd-ui tokens.css / primitives.css
+│   ├── routes.tsx         # canonical route table (testable)
 │   ├── api/
 │   │   ├── client.ts
 │   │   ├── types.ts       # AUTO-GENERATED from openapi.json
@@ -40,158 +68,142 @@ frontend/
 │   │   ├── jobs.ts        # SSE hookup
 │   │   └── *.test.ts
 │   ├── stores/
-│   │   ├── ui-prefs.ts    # selectedProfile, kanban filters, log auto-scroll, splitter (zustand-persist)
-│   │   ├── selection.ts   # ephemeral kanban selection set
+│   │   ├── ui-prefs.ts        # selectedProfile, kanban filters, log auto-scroll (zustand-persist)
+│   │   ├── kanban-staging.ts  # pending split assignment until Apply (D-T23)
+│   │   ├── selection.ts       # ephemeral kanban multi-select set
 │   │   └── *.test.ts
 │   ├── hooks/
 │   │   ├── useProfiles.ts
 │   │   ├── useKanban.ts
 │   │   ├── useRun.ts
 │   │   ├── useRunLog.ts
-│   │   ├── useJobProgress.ts
-│   │   ├── useNotificationStream.ts
-│   │   ├── useHotkey.ts
 │   │   └── *.test.tsx
 │   ├── pages/
-│   │   ├── ProfilesPage.tsx           # list + create + edit profiles
-│   │   ├── ProfileDetailPage.tsx      # single profile, tabs: Datasets / Runs / Models
-│   │   ├── DatasetsPage.tsx           # kanban for one (profile, task)
-│   │   ├── RunsPage.tsx               # run list (all profiles)
-│   │   ├── RunDetailPage.tsx          # one run: log + progress + artefacts
-│   │   ├── ModelsPage.tsx             # model registry
-│   │   ├── ModelDetailPage.tsx        # one model: sidecar + publish
-│   │   ├── EvalPage.tsx               # configure + launch eval
-│   │   ├── EvalResultPage.tsx         # CER/WER + glyph slicing
-│   │   ├── PublishPage.tsx            # HF publish (gated)
-│   │   ├── SettingsPage.tsx           # read-only config view
+│   │   ├── ProfilesPage.tsx       # list + create + edit profiles
+│   │   ├── ProfileDetailPage.tsx  # one profile; nested: datasets / train / runs
+│   │   ├── DatasetsPage.tsx       # dual kanban (detection + recognition)
+│   │   ├── TrainPage.tsx          # detection + recognition config cards + Start
+│   │   ├── RunsPage.tsx           # run history list
+│   │   ├── RunDetailPage.tsx      # one run: live log + progress + artefacts + export
+│   │   ├── SettingsPage.tsx       # read-only config view
 │   │   └── *.test.tsx
 │   ├── components/
-│   │   ├── HeaderBar.tsx              # version, profile selector, jobs badge
-│   │   ├── SidebarNav.tsx             # left nav: Profiles / Datasets / Runs / Models / Eval / Publish
-│   │   ├── ProfileSelector.tsx
-│   │   ├── ProfileEditDialog.tsx      # language + typeface + display_name
-│   │   ├── KanbanBoard.tsx            # see 05-dataset-kanban.md
-│   │   ├── KanbanColumn.tsx
-│   │   ├── KanbanCard.tsx             # project-row OR page-chip variant
-│   │   ├── PageChip.tsx
-│   │   ├── RunForm.tsx                # task-aware form (detection|recognition|typeface|glyph)
-│   │   ├── RunArgsEditor.tsx          # vocab, epochs, batch, augment toggles
-│   │   ├── RunStatusBadge.tsx
-│   │   ├── RunProgressBar.tsx
-│   │   ├── LogViewer.tsx              # virtualized; auto-scroll toggle (see 06)
-│   │   ├── LossChart.tsx              # recharts; consumes progress.jsonl
-│   │   ├── ModelCard.tsx
-│   │   ├── ModelSidecarView.tsx
-│   │   ├── EvalMetricsTable.tsx       # CER/WER overall + glyph-feature slices
-│   │   ├── PublishDialog.tsx
-│   │   ├── BusyOverlay.tsx
-│   │   ├── JobsBadge.tsx              # header badge: live job count
-│   │   ├── NotificationToaster.tsx    # sonner wrapper
-│   │   └── ui/                        # shadcn primitives
+│   │   ├── ProfileEditDialog.tsx  # pd-ui Dialog + Field/FieldRow
+│   │   ├── DetectionConfigCard.tsx
+│   │   ├── RecognitionConfigCard.tsx
+│   │   ├── RunControls.tsx        # Start / Stop buttons
+│   │   ├── LossChart.tsx          # SPA-local; recharts
+│   │   ├── ModelExportPanel.tsx   # SPA-local; model name + export
+│   │   └── *.test.tsx
 │   ├── lib/
-│   │   ├── format.ts                  # bytes, durations, percentages
-│   │   ├── runArgs.ts                 # task → arg-schema map
-│   │   ├── progressParse.ts           # "epoch X/Y loss=Z" → JobProgress
-│   │   ├── modelName.ts               # parse + format pd-<lang>-<typeface>-<task>-<date>
+│   │   ├── format.ts              # bytes, durations, percentages
+│   │   ├── runConfig.ts           # task → config-schema map
+│   │   ├── modelName.ts           # parse/format pd-<lang>-<typeface>-<task>-<date>
 │   │   └── *.test.ts
-│   ├── styles/
-│   │   └── tokens.css
 │   └── test/
-│       ├── setup.ts                   # msw + jsdom
-│       ├── server.ts                  # msw handlers
-│       └── factories.ts               # makeProfile / makeRun / makeKanbanView fixtures
+│       ├── setup.ts               # msw + jsdom
+│       ├── server.ts              # msw handlers
+│       └── factories.ts           # makeProfile / makeRun / makeKanbanView fixtures
 └── public/
     └── favicon.svg
 ```
 
+No `tailwind.config.ts`, no `components.json`, no `src/components/ui/`,
+no `src/styles/tokens.css` — pd-ui owns all of that.
+
 ---
 
-## 2. Routing
+## 3. Routing
 
-Single-route-tree; React Router v7 data routers. `routes.ts` exports
-the route definitions so tests can assert structure.
+React Router v7 data router. `routes.tsx` exports the route definitions
+so tests can assert structure.
 
 ```ts
 export const routes = [
   { path: "/", element: <Navigate to="/profiles" replace /> },
   { path: "/profiles", element: <ProfilesPage /> },
   { path: "/profiles/:profile", element: <ProfileDetailPage />, children: [
-    { index: true, element: <Navigate to="datasets/recognition" replace /> },
-    { path: "datasets/:task", element: <DatasetsPage /> },
+    { index: true, element: <Navigate to="datasets" replace /> },
+    { path: "datasets", element: <DatasetsPage /> },
+    { path: "train", element: <TrainPage /> },
     { path: "runs", element: <RunsPage /> },
-    { path: "models", element: <ModelsPage /> },
   ]},
   { path: "/runs", element: <RunsPage /> },
   { path: "/runs/:run_id", element: <RunDetailPage /> },
-  { path: "/models", element: <ModelsPage /> },
-  { path: "/models/:name", element: <ModelDetailPage /> },
-  { path: "/eval", element: <EvalPage /> },
-  { path: "/eval/:run_id/result", element: <EvalResultPage /> },
-  { path: "/publish", element: <PublishPage /> },
   { path: "/settings", element: <SettingsPage /> },
 ];
 ```
 
 URL invariants under [`13-driver-contract.md`](13-driver-contract.md):
 
-- `/runs/{run_id}` is **stable** — log links, training-finished
-  toasts, model sidecar back-references all point here.
-- `/profiles/{profile}/datasets/{task}` mirrors the backend resource
-  shape; deep-linkable.
+- `/runs/{run_id}` is **stable** — log links, training-finished toasts,
+  and model-export back-references all point here.
+- `/profiles/{profile}/datasets` and `.../train` mirror the backend
+  resource shape; deep-linkable.
+
+Deferred routes — `/models`, `/eval`, `/publish` — are **not** in the
+core-parity route table; they arrive with the deferred-milestone specs
+(retirement plan Task 13).
 
 ---
 
-## 3. State stores
+## 4. State stores
 
-### 3.1 Server state (`@tanstack/react-query`)
+### 4.1 Server state (`@tanstack/react-query`)
 
 One query key per resource:
 
 ```ts
 queryKey: ["profiles"]
 queryKey: ["profile", name]
-queryKey: ["kanban", profile, task]
+queryKey: ["kanban", profile]            // dual-task kanban view
 queryKey: ["runs", { status?, profile?, task?, page }]
 queryKey: ["run", run_id]
-queryKey: ["models", { profile?, task? }]
-queryKey: ["model", name]
-queryKey: ["eval-result", run_id]
-queryKey: ["sources"]
 queryKey: ["public-settings"]
-queryKey: ["vocabs"]                      // long stale time; matches backend cache
+queryKey: ["vocabs"]                     // long stale time
 ```
 
-Mutation success → **explicit** `invalidateQueries` for affected
-keys. No global refetch-on-window-focus (would interrupt running
-jobs in heavy-CPU contexts).
+Mutation success → **explicit** `invalidateQueries` for affected keys.
+No refetch-on-window-focus (would interrupt running jobs in heavy-CPU
+contexts).
 
-### 3.2 UI state (`zustand` + `persist`)
+### 4.2 UI prefs (`zustand` + `persist`)
 
 ```ts
 interface UIPrefsStore {
-  selectedProfile: string;                // last-selected; null on first load
-  setSelectedProfile: (name: string) => void;
-
+  selectedProfile: string | null;
+  setSelectedProfile: (name: string | null) => void;
   kanbanFilters: { showOnlyMissing: boolean; styleTagFilter: string | null };
   setKanbanFilters: (f: Partial<UIPrefsStore["kanbanFilters"]>) => void;
-
   logViewer: { autoScroll: boolean; wrap: boolean };
   setLogViewer: (s: Partial<UIPrefsStore["logViewer"]>) => void;
-
-  splitter: { leftPx: number };
-  setSplitter: (s: Partial<UIPrefsStore["splitter"]>) => void;
 }
 ```
 
 Persist key: `pd-ocr-trainer-spa.ui-prefs.v1`.
 
-### 3.3 Ephemeral selection (`zustand`, **not** persisted)
+### 4.3 Kanban staging (`zustand`, **not** persisted) — D-T23
+
+Holds the pending split assignment while the user drags. Cleared on
+Apply (commit) or Discard (reset to server state) and on profile change.
+
+```ts
+interface KanbanStagingStore {
+  staged: Record<string /* page_key */, "train" | "val" | "unassigned">;
+  isDirty: boolean;                       // any divergence from server state
+  move(pageKeys: string[], to: "train" | "val" | "unassigned"): void;
+  reset(): void;                          // Discard
+  diff(serverState): KanbanDiff;          // pending changes for the UI
+}
+```
+
+### 4.4 Ephemeral selection (`zustand`, not persisted)
 
 Kanban multi-select set; cleared on profile change.
 
 ```ts
 interface SelectionStore {
-  selectedKeys: Set<string>;              // "<split>:<project>:<page_or_crop>"
+  selectedKeys: Set<string>;
   anchorKey: string | null;               // for shift-range
   toggle(key: string): void;
   add(keys: string[]): void;
@@ -202,9 +214,9 @@ interface SelectionStore {
 
 ---
 
-## 4. Generated API client
+## 5. Generated API client
 
-`make openapi-export` (see [`02-backend.md`](02-backend.md) §7) writes
+`make openapi-export` (see [`02-backend.md`](02-backend.md)) writes
 `frontend/openapi.json` and runs `openapi-typescript` →
 `frontend/src/api/types.ts`. CI gates on `git diff --exit-code`.
 
@@ -221,84 +233,155 @@ export async function createRun(req: CreateRunRequest): Promise<CreateRunRespons
 }
 ```
 
-`api/jobs.ts` exposes a `subscribeToJob(jobId, on_event)` helper that
-wraps `EventSource` and yields typed `JobEvent` objects.
+`api/jobs.ts` is a thin layer over the pd-ui `useLongJob` hook, which
+owns the SSE/polling subscription to a job's event stream
+([D-T10](17-decisions.md), [D-T20](17-decisions.md)).
 
 ---
 
-## 5. App chrome
+## 6. App chrome and component mapping
+
+### 6.1 App chrome
+
+The app is wrapped in the pd-ui `AppShell`:
 
 ```
 ┌────────────────────────────────────────────────────────────────────┐
-│ HeaderBar                                                          │
-│ ┌──────┐ pd-ocr-trainer  [profile: clogaelach▼]  [jobs: 1●]  v0.x │
-│ │ logo │                                                           │
-│ └──────┘                                                           │
+│ AppShell · header  (TopNav + Breadcrumb)                           │
+│  pd-ocr-trainer  [profile: clogaelach ▼]   [⊞ launcher]  v0.x      │
 ├──────────┬─────────────────────────────────────────────────────────┤
-│ Sidebar  │ <Outlet />                                              │
+│ rail     │ main: <Outlet />                                        │
 │ Profiles │                                                         │
 │ Datasets │                                                         │
+│ Train    │                                                         │
 │ Runs     │                                                         │
-│ Models   │                                                         │
-│ Eval     │                                                         │
-│ Publish  │                                                         │
 │ Settings │                                                         │
 └──────────┴─────────────────────────────────────────────────────────┘
 ```
 
-`HeaderBar` always shows the active profile picker; switching
-updates `UIPrefsStore.selectedProfile` and navigates to
-`/profiles/{name}/datasets/recognition` if the user is on a
-profile-scoped sub-route.
+- `AppShell` props: `appId="pd-ocr-trainer-spa"`, `appDisplayName`,
+  `appIconUrl`, `launcherSlot="header"`, `deployMode="local"`,
+  `uiPrefsConfig`.
+- The active-profile `Select` lives in the `TopNav`. Switching it
+  updates `UIPrefsStore.selectedProfile` and, when on a profile-scoped
+  route, navigates to `/profiles/{name}/datasets`.
+- Cross-app launching uses `useSuiteSiblings`; active suite jobs surface
+  via the pd-ui `JobsDrawer` / `useSuiteJobs`.
 
-`JobsBadge` reads `["jobs", "active-count"]` (a thin GET that returns
-`{count: int}`) every 5 s when any job is known to be running, off
-otherwise.
+### 6.2 Legacy element → component mapping
+
+| Legacy NiceGUI element | Component |
+|---|---|
+| App header/banner | pd-ui `AppShell` + `TopNav` + `LauncherSlot` (`useSuiteSiblings`) |
+| Profile card (active-profile picker) | pd-ui `Select` in `TopNav`; `ProfilesPage` uses `Card` + `Field`/`FieldRow` |
+| Profile edit (language / typeface / display_name) | `ProfileEditDialog` — pd-ui `Dialog` + `Field`/`FieldRow` + `Select` |
+| Detection config card | `DetectionConfigCard` — pd-ui `Card` + `Accordion` (help) + `Field`/`FieldRow` + `Input`/`Select` + `Button` |
+| Recognition config card | `RecognitionConfigCard` — same; `vocab` is a `Field` with `Select` + a `CUSTOM:` text `Input` |
+| Start / Stop training buttons | `RunControls` — pd-ui `Button` (`run-start-button` testid) |
+| Training run / progress | pd-ui `Progress` + `JobStatusPip` + `useLongJob` (SSE) |
+| Live training-output log | pd-ui **`LogViewer`** |
+| Dataset kanban (drag-drop) | pd-ui **`KanbanBoard` / `KanbanColumn` / `PageChip`** |
+| Model name / export controls | **SPA-local `ModelExportPanel`** in `RunDetailPage` |
+| Loss curve | **SPA-local `LossChart`** (recharts) |
+
+### 6.3 New pd-ui components (specced here, built in pd-ui)
+
+- **`KanbanBoard` / `KanbanColumn` / `PageChip`** — pd-ui owns the
+  `dnd-kit` integration (PointerSensor for mouse, KeyboardSensor for
+  a11y) and per-column virtualization. The trainer supplies render-props
+  for chip content and column headers, plus the data. Move events are
+  routed into the SPA's `kanban-staging` store; the board renders the
+  staged arrangement and a pending-diff affordance; "Apply" / "Discard"
+  are SPA-owned actions ([D-T23](17-decisions.md)).
+- **`LogViewer`** — pd-ui owns virtualization (`@tanstack/react-virtual`)
+  and the auto-scroll / wrap toggles. Fed a stream of lines; the trainer
+  wires it to `useLongJob` events. Client buffer cap configurable; the
+  full log stays on disk for the run-detail tail endpoint.
+- **`Field` / `FieldRow`** — labelled form-row primitive: a label, a
+  control slot, an optional help/`Accordion` slot, and an error slot
+  driven by `422 ErrorEnvelope` `details[].loc`.
+- **`JobStatusPip`** — a job-state pip (queued / running / done /
+  failed / cancelled), a job-aware variant of pd-ui `StatusPip`.
+
+The trainer's `DatasetsPage` shows **two `KanbanBoard`s** — one for the
+detection dataset, one for recognition — per the design's "dual kanban".
+
+### 6.4 SPA-local components
+
+- **`LossChart`** — `recharts` line chart over a run's `progress.jsonl`;
+  downsamples to ~500 points for long runs. App-specific; not a pd-ui
+  candidate ([D-T14](17-decisions.md)).
+- **`ModelExportPanel`** — model-name (`pd-<lang>-<typeface>-<task>-<date>`,
+  [D-T6](17-decisions.md)) + export-to-`dist/` controls, shown on
+  `RunDetailPage`. App-specific composition.
 
 ---
 
-## 6. Page-level conventions
+## 7. Page-level conventions
 
-- All pages use a single `<PageShell title="..." actions={...}>`
-  wrapper (header bar + breadcrumb + action slot).
-- Long-running actions never block the route; they kick off a `Run`
-  and the user is bounced to `/runs/{run_id}` with a "running" toast.
-- Empty states have a single illustration + an explicit
-  call-to-action (CTA) button. No silent empty tables.
-- Form submission uses `react-query` mutations; on
-  `422 ErrorEnvelope` the form maps `details[].loc` to per-field
-  errors. ([`02-backend.md`](02-backend.md) §6.)
-
----
-
-## 7. Performance constraints
-
-- The kanban page can render thousands of page chips. Use
-  `@tanstack/react-virtual` per column.
-- `LogViewer` virtualizes lines and only formats visible ones. Buffer
-  cap = 50k lines on the client; older lines are GC'd (server retains
-  full log on disk for the run-detail tail endpoint).
-- `LossChart` (recharts) downsamples to ~500 points if the run has
-  more progress events. Full data stays available via the JSONL endpoint.
+- Pages render inside the `AppShell` `main` slot; each page sets its
+  `TopNav` breadcrumb + an action slot.
+- Long-running actions never block the route: starting training kicks
+  off a run and bounces the user to `/runs/{run_id}` with a "running"
+  toast.
+- Empty states have one illustration + an explicit CTA button. No
+  silent empty tables.
+- Form submission uses `react-query` mutations; on `422 ErrorEnvelope`
+  the form maps `details[].loc` to per-`FieldRow` errors
+  ([`02-backend.md`](02-backend.md)).
 
 ---
 
-## 8. Testing posture
+## 8. Performance constraints
 
-- **Vitest + @testing-library/react.** Unit tests per hook +
-  component. msw mocks at the network boundary; never mock react-query
-  directly.
-- **Playwright** for top-of-funnel flows: create profile → drag pages
-  in kanban → start training (with a `local_subprocess` runner that
-  invokes `sleep 1`) → see run terminal → see model in registry.
-  Detail in [`14-testing.md`](14-testing.md).
+- `KanbanBoard` columns can render thousands of page chips — pd-ui
+  virtualizes per column.
+- `LogViewer` virtualizes lines and formats only visible ones; client
+  buffer cap (~50k lines); the server retains the full log on disk.
+- `LossChart` downsamples to ~500 points; full data via the JSONL
+  endpoint.
 
 ---
 
-## 9. Citations
+## 9. `data-testid` contract
 
-- Routing convention: `pd-ocr-labeler-spa/specs/03-frontend.md`.
-- Stores convention: `pd-ocr-labeler-spa/specs/03-frontend.md` §3.
-- pgdp-prep base: `pd-prep-for-pgdp/frontend/`.
-- Legacy trainer page surface: `pd-ocr-trainer/src/pd_ocr_trainer/ui.py`
-  + `dataset_ui.py`.
+The driver-facing surface is part of the contract from M0
+([`13-driver-contract.md`](13-driver-contract.md),
+[D-T12](17-decisions.md)). Because the kanban and log live in pd-ui,
+these IDs are a **shared expectation between pd-ui and trainer-spa** —
+pd-ui's `KanbanColumn` / `LogViewer` accept a `data-testid` prop the
+trainer sets.
+
+Minimum contract:
+
+| `data-testid` | Element |
+|---|---|
+| `profile-selector` | active-profile `Select` in `TopNav` |
+| `config-submit` | detection + recognition config-card submit `Button`s (scoped per card) |
+| `kanban-detection-column` | detection `KanbanColumn` |
+| `kanban-recognition-column` | recognition `KanbanColumn` |
+| `training-log-panel` | `LogViewer` root |
+| `run-start-button` | `RunControls` Start `Button` |
+
+---
+
+## 10. Testing posture
+
+- **Vitest + @testing-library/react** — unit tests per hook + component.
+  `msw` mocks at the network boundary; never mock react-query directly.
+- **Playwright** (Chromium) for top-of-funnel flows: create profile →
+  stage + Apply kanban moves → start a stubbed training run → see the
+  log panel populate → see the run reach a terminal state. Detail in
+  [`14-testing.md`](14-testing.md).
+
+---
+
+## 11. Citations
+
+- App-shell + routing convention: shipped `pd-ocr-labeler-spa` and
+  `pd-ocr-simple-gui` frontends.
+- pd-ui component surface: workspace cross-cut design
+  (`ocr-container/docs/specs/2026-05-16-cross-cut-design.md` §4, §6).
+- Legacy trainer UI surface: `pd-ocr-trainer/src/pd_ocr_trainer/ui.py`
+  + `dataset_ui.py` (profile card, detection card, recognition card,
+  output card, dataset section).

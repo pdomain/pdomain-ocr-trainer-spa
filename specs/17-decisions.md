@@ -78,22 +78,31 @@ directory preserves everything the user needs.
 
 ---
 
-## D-T4. dnd-kit for the SPA-local kanban; promotion-ready
+## D-T4. Kanban + log viewer are pd-ui components
 
-**Decided.** The dataset kanban is an **SPA-local** component (a `pd-ui`
-gap) built with `@dnd-kit/core` + `@dnd-kit/sortable` +
-`@dnd-kit/utilities`. KeyboardSensor for a11y; PointerSensor for mouse.
-It is built as a *promotion-ready* component — styled with `pd-ui`
-design tokens, exposing a clean self-contained interface — so lifting it
-into `pd-ui` later is cheap.
+**Decided.** The dataset kanban (`KanbanBoard` / `KanbanColumn` /
+`PageChip`) and the streaming-log viewer (`LogViewer`) are **pd-ui
+components**, not SPA-local — and so are the supporting `Field` /
+`FieldRow` form-row primitive and `JobStatusPip`. The kanban uses
+`@dnd-kit` inside pd-ui (PointerSensor for mouse, KeyboardSensor for
+a11y); the log viewer virtualizes with `@tanstack/react-virtual` inside
+pd-ui.
 
-**Why.** HTML5 native DnD has a11y dead-ends (no keyboard support) and
-styling pain; dnd-kit is the modern React default. Building SPA-local
-first avoids pre-generalizing a component no other app needs yet (YAGNI);
-building it promotion-ready keeps the door open.
+**Why.** `pd-ui` is the workspace-standard shared frontend library;
+these components are reusable beyond the trainer and belong with the
+other primitives so the suite shares one implementation. Building them
+SPA-local first would fork maintenance and force a later promotion.
 
-**Rejected.** `react-dnd` (heavier, less maintained). Native HTML5 (a11y
-dead-end). Pre-promoting to `pd-ui` now (YAGNI — no second consumer).
+**Consequence.** This supersedes decision D-4 of the cross-cut
+retirement design (which kept both SPA-local first). The trainer-spa
+kanban / log / config milestones gain a build dependency — the pd-ui
+components must be specced and built first. Tracked as cross-repo
+additions to the `pd-ui` spec.
+
+**Rejected.** SPA-local-first + later promotion (the original D-T4 /
+design D-4) — forks maintenance for a component the suite will share.
+`react-dnd` (heavier, less maintained than dnd-kit). Native HTML5 DnD
+(a11y dead-end).
 
 ---
 
@@ -281,11 +290,10 @@ removes per-app component maintenance.
 **Rejected (original choice).** shadcn/ui + Tailwind 3.4. Predated the
 workspace `pd-ui` standardization decision; would fork the suite's UI.
 
-**SPA-local exceptions.** Two components have no `pd-ui` counterpart —
-the DnD kanban (D-T4)
-and the streaming-log viewer. Both are built SPA-local but
-*promotion-ready* (pd-ui tokens, clean interfaces); promoting them into
-`pd-ui` is a deferred follow-up, not pre-done (YAGNI).
+**Component coverage.** The DnD kanban, streaming-log viewer,
+`Field`/`FieldRow`, and `JobStatusPip` are all pd-ui components (D-T4) —
+the trainer has no SPA-local UI *primitives*, only app-specific
+composition (`LossChart`, `ModelExportPanel`).
 
 ---
 

@@ -105,8 +105,8 @@ intent survives the legacy repo's deletion — see *Deferred scope* below.
 | Server state | **`@tanstack/react-query` v5** | Same as labeler-spa. |
 | Local state | `useState` + `useReducer`; **`zustand`** for cross-page UI prefs (selected profile, kanban filters, log auto-scroll). | Same pattern as labeler-spa. |
 | Styling | **`pd-ui` design tokens** (`tokens.css` / `primitives.css`) | No direct Tailwind, no shadcn/ui. ([D-T19](17-decisions.md)) |
-| DnD (kanban) | **`@dnd-kit/core`** + `@dnd-kit/sortable` | SPA-local kanban — a `pd-ui` gap. ([D-T4](17-decisions.md)) |
-| Log viewer | **virtualized `<div>` list** (`@tanstack/react-virtual`) | SPA-local streaming-log viewer — a `pd-ui` gap. Training emits thousands of lines; can't render unvirtualized. |
+| Kanban | pd-ui **`KanbanBoard`** (`@dnd-kit`) | Dataset kanban — a pd-ui component. ([D-T4](17-decisions.md)) |
+| Log viewer | pd-ui **`LogViewer`** (`@tanstack/react-virtual`) | Streaming-log viewer — a pd-ui component. ([D-T4](17-decisions.md)) |
 | Toasts | **`sonner`** | Same as labeler-spa. |
 | Hotkeys | **`react-hotkeys-hook`** | Same as labeler-spa. |
 | Charts (loss curves, eval) | **`recharts`** | Lightweight, plays well with React 19. ([D-T14](17-decisions.md)) |
@@ -115,14 +115,13 @@ intent survives the legacy repo's deletion — see *Deferred scope* below.
 | HTTP mocking | **msw** | Same as labeler-spa. |
 | E2E | **Playwright** (Chromium) | Same as labeler-spa. |
 
-**`pd-ui` gaps.** `pd-ui` covers ~80% of the trainer UI off the shelf. Two
-components are missing: the **DnD kanban board** and the **streaming-log
-viewer**. Both are built **SPA-local first** but as *promotion-ready*
-components — styled with `pd-ui` design tokens and exposing clean,
-self-contained interfaces — so lifting them into `pd-ui` later is cheap.
-Promotion to `pd-ui` is an explicit deferred follow-up (a log viewer
-plausibly earns it; a kanban may not); it is not pre-done now (YAGNI).
-([D-T4](17-decisions.md))
+**New `pd-ui` components.** The trainer needs four components `pd-ui`
+does not yet have — `KanbanBoard`/`KanbanColumn`/`PageChip`, `LogViewer`,
+`Field`/`FieldRow`, and `JobStatusPip`. These are added to `pd-ui`
+itself rather than built SPA-local, so the suite shares one
+implementation. The trainer-spa kanban / log / config milestones depend
+on them being specced and built in `pd-ui` first; they are tracked as
+cross-repo additions to the `pd-ui` spec. ([D-T4](17-decisions.md))
 
 ### Tooling
 
@@ -288,7 +287,6 @@ the repo's deletion; **out of scope for core parity**:
   publish, per-row licensing. ([D-T2](17-decisions.md),
   [D-T11](17-decisions.md))
 - **Typeface-classifier and glyph-feature-classifier training.**
-- **Promotion of the SPA-local kanban / log-viewer into `pd-ui`.**
 
 These get their own deferred-milestone specs (retirement plan Task 13).
 
