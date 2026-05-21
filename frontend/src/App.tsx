@@ -1,5 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { ProfilesPage } from "./pages/ProfilesPage";
+import { DatasetsPage } from "./pages/DatasetsPage";
 
 function App() {
   return (
@@ -11,6 +12,10 @@ function App() {
           <Route path="/" element={<Navigate to="/profiles" replace />} />
           <Route path="/profiles" element={<ProfilesPage />} />
           <Route path="/profiles/:name" element={<ProfilesPage />} />
+          <Route
+            path="/profiles/:name/datasets/:task"
+            element={<DatasetsPage />}
+          />
         </Routes>
       </div>
     </BrowserRouter>
