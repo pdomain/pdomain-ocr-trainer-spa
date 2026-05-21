@@ -1,3 +1,4 @@
+# esbuild ships its native binary via a post-install build script.
+# pnpm blocks build scripts by default; allow esbuild's explicitly.
 allowBuilds:
-  '0': esbuild
-  esbuild: set this to true or false
+  esbuild: true

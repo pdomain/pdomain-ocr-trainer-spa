@@ -91,7 +91,8 @@ test-slow: ## Run slow tests (real subprocess + HF mocks)
 	uv run pytest tests/ -v -m slow
 
 frontend-install: ## Install frontend dependencies
-	cd frontend && CI=true $(call _pnpm,install --frozen-lockfile) || cd frontend && $(call _pnpm,install)
+	cd frontend && export CI=true && \
+	{ $(call _pnpm,install --frozen-lockfile) ; } || { $(call _pnpm,install) ; }
 
 frontend-test: frontend-install ## Run frontend vitest suite
 	cd frontend && node_modules/.bin/vitest run
