@@ -20,3 +20,13 @@ class SplitEnum(str, Enum):
     unassigned = "unassigned"
     train = "train"
     val = "val"
+
+
+class JobState(str, Enum):
+    """Mirrors the pd-ocr-ops ``JobStatus.state`` literal exactly (spec 01 §4)."""
+
+    queued = "queued"
+    running = "running"
+    succeeded = "succeeded"
+    failed = "failed"
+    cancelled = "cancelled"

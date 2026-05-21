@@ -12,8 +12,9 @@ from datetime import (
 
 from pydantic import BaseModel
 
-from pd_ocr_trainer_spa.core.enums import (
-    TaskEnum,  # noqa: TC001 — pydantic resolves the annotation at model-build time
+from pd_ocr_trainer_spa.core.enums import (  # noqa: TC001 — pydantic resolves these at model-build time
+    JobState,
+    TaskEnum,
 )
 
 
@@ -54,3 +55,21 @@ class TrainedModel(BaseModel):
     paths: ModelPaths
     sidecar: ModelSidecar
     published_to: list[ModelPublication] = []
+
+
+class Job(BaseModel):
+    """SPA projection of the pd-ocr-ops ``JobStatus`` (spec 01 §4 / 10 §3).
+
+    The SPA does not own a job runner; ``api/jobs.py`` projects
+    ``LongJobRunner.status(job_id)`` onto this model for the frontend and
+    the OpenAPI export.
+    """
+
+    id: str
+    run_id: str | None = None
+    kind: str
+    state: JobState
+    progress: float
+    error: str | None = None
+    started_at: datetime | None = None
+    finished_at: datetime | None = None
