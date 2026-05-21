@@ -29,6 +29,7 @@ import json
 import os
 import sys
 import traceback
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Protocol
 
@@ -133,12 +134,15 @@ def run_worker(run_dir: Path, *, runner: _TrainingRunner | None = None) -> int:
         runner = _build_runner()
 
     exit_code = 0
+    saw_done = False
     try:
         for event in _iter_events(runner, task=task, profile=profile, args=args):
             payload = _event_to_dict(event)
             emit_event(payload, stdout_log=stdout_log)
             if payload.get("kind") == "error":
                 exit_code = 1
+            elif payload.get("kind") == "done":
+                saw_done = True
     except Exception as exc:  # noqa: BLE001 — surface any worker crash as an error event
         emit_event(
             {
@@ -148,7 +152,50 @@ def run_worker(run_dir: Path, *, runner: _TrainingRunner | None = None) -> int:
             stdout_log=stdout_log,
         )
         return 1
+
+    # A successful run writes its model sidecar so /models can discover it.
+    if exit_code == 0 and saw_done:
+        try:
+            write_model_sidecar(manifest, args)
+        except OSError as exc:
+            emit_event(
+                {"kind": "log", "message": f"sidecar write failed: {exc}"},
+                stdout_log=stdout_log,
+            )
     return exit_code
+
+
+def write_model_sidecar(
+    manifest: dict[str, object], args: dict[str, object]
+) -> Path | None:
+    """Write ``<model_name>.metadata.json`` under the run's shared-models dir.
+
+    The sidecar shape matches :class:`~pd_ocr_trainer_spa.core.models.ModelSidecar`
+    (spec 08 §3). Returns the sidecar path, or None when no ``shared_models_dir``
+    arg was supplied.
+    """
+    shared = args.get("shared_models_dir")
+    name = str(manifest.get("model_name", "") or args.get("name", ""))
+    if not isinstance(shared, str) or not name:
+        return None
+    leaf = Path(shared) / name
+    leaf.mkdir(parents=True, exist_ok=True)
+    sidecar: dict[str, object] = {
+        "name": name,
+        "task": str(manifest.get("task", "")),
+        "language": None,
+        "typeface": None,
+        "doctr_arch": None,
+        "trainer_version": None,
+        "trained_at": datetime.now(UTC).isoformat(),
+        "trained_on": [],
+        "args": args,
+        "qualifier": None,
+        "eval": None,
+    }
+    sidecar_path = leaf / f"{name}.metadata.json"
+    sidecar_path.write_text(json.dumps(sidecar, indent=2), encoding="utf-8")
+    return sidecar_path
 
 
 def _event_to_dict(event: object) -> dict[str, object]:

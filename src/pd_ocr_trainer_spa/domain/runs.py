@@ -231,6 +231,11 @@ def prepare_worker_args(settings: Settings, run: Run) -> dict[str, object]:
         str(run_dir(settings, run.id) / "artefacts"),
     )
     args.setdefault("name", run.model_name)
+    # The worker writes the model sidecar under this dir on a successful run.
+    args.setdefault(
+        "shared_models_dir",
+        str(settings.shared_models_dir / run.profile / run.task.value),
+    )
     return args
 
 
