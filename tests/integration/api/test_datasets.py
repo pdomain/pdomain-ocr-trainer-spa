@@ -123,10 +123,80 @@ def test_apply_total_failure_returns_409(kanban_client: TestClient) -> None:
     assert resp.json()["code"] == "dataset.apply_failed"
 
 
-def test_detection_task_returns_501(kanban_client: TestClient) -> None:
-    resp = kanban_client.get("/api/profiles/all/datasets/detection/kanban")
+def test_classifier_task_returns_501(kanban_client: TestClient) -> None:
+    resp = kanban_client.get(
+        "/api/profiles/all/datasets/typeface-classification/kanban"
+    )
     assert resp.status_code == 501
     assert resp.json()["code"] == "dataset.task_unsupported"
+
+
+def _seed_detection_export(
+    export_root: Path, project_id: str, labels: dict[str, dict[str, object]]
+) -> None:
+    """Drop a labeler DocTR detection export under the export root."""
+    det = export_root / project_id / "all" / "detection"
+    images = det / "images"
+    images.mkdir(parents=True)
+    (det / "labels.json").write_text(json.dumps(labels), encoding="utf-8")
+    for page in labels:
+        (images / page).write_bytes(b"png")
+
+
+def _det_meta(n_boxes: int) -> dict[str, object]:
+    """A DocTR DetectionDataset labels.json value with ``n_boxes`` polygons."""
+    return {
+        "img_dimensions": [100, 100],
+        "polygons": [[[0, 0], [1, 0], [1, 1], [0, 1]] for _ in range(n_boxes)],
+    }
+
+
+def test_detection_kanban_moves_pages_and_apply_writes_labels(
+    kanban_client: TestClient, kanban_settings: Settings, export_root: Path
+) -> None:
+    meta = _det_meta(3)
+    _seed_detection_export(export_root, "myproj", {"myproj_1.png": meta})
+
+    # Detection export appears in the unassigned column as a page chip.
+    resp = kanban_client.get("/api/profiles/all/datasets/detection/kanban")
+    assert resp.status_code == 200
+    rows = resp.json()["columns"]["unassigned"]["rows"]
+    chip = rows[0]["pages"][0]
+    assert chip["crop_name"] is None
+    assert chip["label_text"] == "3 bboxes"
+
+    # Apply moves the page into train and writes a valid detection labels.json.
+    resp = kanban_client.post(
+        "/api/profiles/all/datasets/detection/apply",
+        json={"assignments": [{"key": chip["key"], "target_split": "train"}]},
+    )
+    assert resp.status_code == 200
+    body = resp.json()
+    assert [r["project_id"] for r in body["columns"]["train"]["rows"]] == ["myproj"]
+    train_labels = (
+        kanban_settings.ml_training_dir / "all" / "detection" / "labels.json"
+    )
+    assert json.loads(train_labels.read_text()) == {"myproj_1.png": meta}
+
+
+def test_detection_apply_moves_train_to_val(
+    kanban_client: TestClient, kanban_settings: Settings
+) -> None:
+    meta = _det_meta(2)
+    det = kanban_settings.ml_training_dir / "all" / "detection"
+    (det / "images").mkdir(parents=True)
+    (det / "labels.json").write_text(json.dumps({"p_1.png": meta}), encoding="utf-8")
+    (det / "images" / "p_1.png").write_bytes(b"png")
+
+    resp = kanban_client.post(
+        "/api/profiles/all/datasets/detection/apply",
+        json={"assignments": [{"key": "p:p_1.png", "target_split": "val"}]},
+    )
+    assert resp.status_code == 200
+    val_labels = (
+        kanban_settings.ml_validation_dir / "all" / "detection" / "labels.json"
+    )
+    assert json.loads(val_labels.read_text()) == {"p_1.png": meta}
 
 
 def test_api_routes_not_shadowed_by_spa_catchall(kanban_client: TestClient) -> None:

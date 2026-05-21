@@ -219,8 +219,155 @@ def test_apply_all_failed_raises_409(export_settings: Settings) -> None:
     assert excinfo.value.status_code == 409
 
 
-def test_detection_task_rejected_in_m4(export_settings: Settings) -> None:
+def test_classifier_task_rejected(export_settings: Settings) -> None:
     with pytest.raises(AppError) as excinfo:
-        dom.build_kanban(export_settings, profile="all", task=TaskEnum.detection)
+        dom.build_kanban(
+            export_settings, profile="all", task=TaskEnum.typeface_classification
+        )
     assert excinfo.value.code == "dataset.task_unsupported"
     assert excinfo.value.status_code == 501
+
+
+# ---------------------------------------------------------------------------
+# detection task (spec 05 — page chips with bbox counts)
+# ---------------------------------------------------------------------------
+
+
+def _det_meta(n_boxes: int) -> dict[str, object]:
+    """A DocTR DetectionDataset labels.json value with ``n_boxes`` polygons."""
+    return {
+        "img_dimensions": [100, 100],
+        "polygons": [[[0, 0], [1, 0], [1, 1], [0, 1]] for _ in range(n_boxes)],
+    }
+
+
+def _write_detection_labels(
+    task_dir: Path, labels: dict[str, dict[str, object]]
+) -> None:
+    """Write a detection ``labels.json`` + matching page images into ``task_dir``."""
+    images = task_dir / "images"
+    images.mkdir(parents=True, exist_ok=True)
+    (task_dir / "labels.json").write_text(json.dumps(labels), encoding="utf-8")
+    for page_name in labels:
+        (images / page_name).write_bytes(b"png")
+
+
+def _seed_detection_export(
+    settings: Settings, project_id: str, labels: dict[str, dict[str, object]]
+) -> None:
+    """Drop a labeler DocTR detection export for ``project_id``."""
+    assert settings.labeler_export_root is not None
+    base = settings.labeler_export_root / project_id / "all" / "detection"
+    _write_detection_labels(base, labels)
+
+
+def _seed_detection_on_disk(
+    settings: Settings, split: str, profile: str, labels: dict[str, dict[str, object]]
+) -> None:
+    """Seed an on-disk detection split for ``profile``."""
+    root = settings.ml_training_dir if split == "train" else settings.ml_validation_dir
+    _write_detection_labels(root / profile / "detection", labels)
+
+
+def test_detection_export_appears_in_unassigned_with_bbox_count(
+    export_settings: Settings,
+) -> None:
+    _seed_detection_export(
+        export_settings, "myproj", {"myproj_1.png": _det_meta(3)}
+    )
+    view = dom.build_kanban(export_settings, profile="all", task=TaskEnum.detection)
+    rows = view.columns["unassigned"].rows
+    assert [r.project_id for r in rows] == ["myproj"]
+    chip = rows[0].pages[0]
+    assert chip.page_name == "myproj_1.png"
+    assert chip.crop_name is None  # detection chips are pages, not crops
+    assert chip.label_text == "3 bboxes"
+    assert chip.key == "myproj:myproj_1.png"
+
+
+def test_detection_single_bbox_label_is_singular(export_settings: Settings) -> None:
+    _seed_detection_export(export_settings, "p", {"p_1.png": _det_meta(1)})
+    view = dom.build_kanban(export_settings, profile="all", task=TaskEnum.detection)
+    assert view.columns["unassigned"].rows[0].pages[0].label_text == "1 bbox"
+
+
+def test_detection_apply_copies_export_into_train_with_valid_labels(
+    export_settings: Settings,
+) -> None:
+    meta = _det_meta(2)
+    _seed_detection_export(export_settings, "myproj", {"myproj_1.png": meta})
+    req = ApplyAssignmentRequest(
+        assignments=[AssignmentEntry(key="myproj:myproj_1.png", target_split="train")]
+    )
+    view, errors = dom.apply_assignments(
+        export_settings, profile="all", task=TaskEnum.detection, request=req
+    )
+    assert errors == []
+    train_labels = (
+        export_settings.ml_training_dir / "all" / "detection" / "labels.json"
+    )
+    assert json.loads(train_labels.read_text()) == {"myproj_1.png": meta}
+    assert (
+        export_settings.ml_training_dir / "all" / "detection" / "images" / "myproj_1.png"
+    ).exists()
+    assert [r.project_id for r in view.columns["train"].rows] == ["myproj"]
+
+
+def test_detection_move_train_to_val_preserves_metadata(
+    export_settings: Settings,
+) -> None:
+    meta = _det_meta(4)
+    _seed_detection_on_disk(export_settings, "train", "all", {"p_1.png": meta})
+    req = ApplyAssignmentRequest(
+        assignments=[AssignmentEntry(key="p:p_1.png", target_split="val")]
+    )
+    _view, errors = dom.apply_assignments(
+        export_settings, profile="all", task=TaskEnum.detection, request=req
+    )
+    assert errors == []
+    val_labels = json.loads(
+        (export_settings.ml_validation_dir / "all" / "detection" / "labels.json").read_text()
+    )
+    assert val_labels == {"p_1.png": meta}
+    assert not (
+        export_settings.ml_training_dir / "all" / "detection" / "images" / "p_1.png"
+    ).exists()
+
+
+def test_detection_move_to_unassigned_deletes_files(
+    export_settings: Settings,
+) -> None:
+    _seed_detection_on_disk(export_settings, "val", "all", {"p_1.png": _det_meta(1)})
+    req = ApplyAssignmentRequest(
+        assignments=[AssignmentEntry(key="p:p_1.png", target_split="unassigned")]
+    )
+    view, errors = dom.apply_assignments(
+        export_settings, profile="all", task=TaskEnum.detection, request=req
+    )
+    assert errors == []
+    val_labels = json.loads(
+        (export_settings.ml_validation_dir / "all" / "detection" / "labels.json").read_text()
+    )
+    assert val_labels == {}
+    assert not view.columns["val"].rows
+
+
+def test_detection_changed_highlight_on_differing_bbox_set(
+    export_settings: Settings,
+) -> None:
+    _seed_detection_on_disk(export_settings, "train", "all", {"p_1.png": _det_meta(2)})
+    _seed_detection_export(export_settings, "p", {"p_1.png": _det_meta(5)})
+    view = dom.build_kanban(export_settings, profile="all", task=TaskEnum.detection)
+    chip = view.columns["unassigned"].rows[0].pages[0]
+    assert chip.is_changed is True
+    assert chip.change_summary is not None
+    assert "2" in chip.change_summary
+    assert "5" in chip.change_summary
+
+
+def test_detection_unchanged_export_is_suppressed(export_settings: Settings) -> None:
+    meta = _det_meta(3)
+    _seed_detection_on_disk(export_settings, "train", "all", {"p_1.png": meta})
+    _seed_detection_export(export_settings, "p", {"p_1.png": meta})
+    view = dom.build_kanban(export_settings, profile="all", task=TaskEnum.detection)
+    assert not view.columns["unassigned"].rows
