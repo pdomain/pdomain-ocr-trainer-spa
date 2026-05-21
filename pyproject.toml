@@ -1,0 +1,155 @@
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pd-ocr-trainer-spa"
+version = "0.1.0a0"
+description = "FastAPI + React SPA for OCR model training — replaces pd-ocr-trainer NiceGUI UI"
+authors = [
+    { name = "CT", email = "concavetrillion@gmail.com" }
+]
+readme = "README.md"
+license = { text = "Unlicense" }
+requires-python = ">=3.13"
+dependencies = [
+    "pd-ocr-ops",
+    # pd-ocr-training declared here but sourced from local path — used starting M1
+    # (worker subprocess only; never imported by the FastAPI web process at torch)
+    "fastapi>=0.111",
+    "uvicorn[standard]>=0.29",
+    "pydantic>=2.7",
+    "pydantic-settings>=2.3",
+    "aiofiles>=23.2",
+]
+
+[project.scripts]
+pd-ocr-trainer-ui = "pd_ocr_trainer_spa.__main__:main"
+
+[project.urls]
+Homepage = "https://github.com/ConcaveTrillion/pd-ocr-trainer-spa"
+Repository = "https://github.com/ConcaveTrillion/pd-ocr-trainer-spa"
+
+[dependency-groups]
+dev = [
+    "basedpyright>=1.39.4",
+    "gitlint>=0.19.1",
+    "pre-commit>=4.0",
+    "psutil>=6.0",
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "pytest-cov>=6.2.1",
+    "pytest-xdist>=3.6",
+    "ruff>=0.15.13",
+    "httpx>=0.28",
+]
+e2e = [
+    "pytest-playwright>=0.5",
+]
+
+[tool.uv.sources]
+pd-book-tools = { path = "/workspaces/ocr-container/pd-book-tools", editable = true }
+pd-ocr-ops = { path = "/workspaces/ocr-container/pd-ocr-ops", editable = true }
+# pd-ocr-training will be added to sources when declared as a dependency (M1+)
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pd_ocr_trainer_spa"]
+force-include = { "src/pd_ocr_trainer_spa/static" = "pd_ocr_trainer_spa/static" }
+
+[tool.ruff]
+line-length = 110
+target-version = "py313"
+
+[tool.ruff.lint]
+select = [
+    "E", "W",
+    "F",
+    "I",
+    "N",
+    "B",
+    "SIM",
+    "UP",
+    "RUF",
+    "ERA",
+    "T20",
+    "ANN",
+    "S",
+    "C4",
+    "PERF",
+    "TC",
+    "TID",
+    "PT",
+    "RET",
+    "PL",
+    "D",
+    "BLE",
+    "TRY",
+    "LOG",
+    "G",
+]
+ignore = [
+    "B008",
+    "UP042",
+    "E501",
+    "D203",
+    "D212",
+    "D100",
+    "D104",
+    "D107",
+    "PLR0913",
+    "PLR2004",
+    "TRY003",
+    "COM812",
+    "PLC0415",
+    "PLR0912",
+    "PLR0911",
+    "PLR0915",
+    "ANN401",
+    "D205",
+    "D105",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["E741", "N806", "S101", "S104", "S105", "S106", "S301", "S311", "S603", "T201", "ANN", "D", "PLR2004", "PT011", "PT018", "S108", "PLR0133", "PLW2901", "PLW1510", "PERF401", "PERF402", "TRY", "BLE001", "TC"]
+"scripts/*.py" = ["T201", "D", "ANN", "S603", "S607", "PLW1510"]
+"**/__init__.py" = ["D104", "F401", "TC"]
+"**/_*.py" = ["D"]
+"src/pd_ocr_trainer_spa/__main__.py" = ["ANN", "D", "T201"]
+"build_hooks/*.py" = ["T201", "D", "ANN", "S603", "S607", "PLW1510"]
+
+[tool.basedpyright]
+include = ["src", "tests"]
+exclude = ["**/__pycache__", "**/.venv", "**/node_modules"]
+typeCheckingMode = "recommended"
+reportImportCycles = "none"
+venvPath = "."
+venv = ".venv"
+
+[[tool.basedpyright.executionEnvironments]]
+root = "tests"
+
+[tool.pytest.ini_options]
+addopts = [
+    "-ra",
+    "--strict-markers",
+    "--strict-config",
+    "--cov=pd_ocr_trainer_spa",
+    "--cov-branch",
+    "--cov-report=term-missing:skip-covered",
+    "-m", "not slow",
+]
+testpaths = ["tests"]
+pythonpath = ["src"]
+asyncio_mode = "auto"
+filterwarnings = [
+    "error",
+    "ignore::pytest.PytestUnraisableExceptionWarning",
+    "ignore::ResourceWarning:coverage.*",
+]
+markers = [
+    "slow: marks tests as slow (excluded from default make test run)",
+    "e2e: marks tests as end-to-end (requires a running server)",
+]

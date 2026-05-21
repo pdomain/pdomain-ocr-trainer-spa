@@ -1,0 +1,38 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: release
+    runs-on: ubuntu-22.04
+    env:
+      UV_PYTHON: "3.13"
+      CUDA_VISIBLE_DEVICES: ""
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: jdx/mise-action@v2
+      - uses: astral-sh/setup-uv@v4
+        with:
+          version: latest
+      - run: make setup
+      - run: make lint
+      - run: make typecheck
+      - run: make test
+      - run: make frontend-install
+      - run: make frontend-test
+      - run: make frontend-build
+      - run: make build
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          generate_release_notes: true
