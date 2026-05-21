@@ -1,12 +1,19 @@
-// M0 scaffold — minimal "Hello" SPA page
-// pd-ui will be wired in M1+ once @concavetrillion/pd-ui is published
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { ProfilesPage } from "./pages/ProfilesPage";
 
 function App() {
   return (
-    <div data-testid="app-root" style={{ fontFamily: "sans-serif", padding: "2rem" }}>
-      <h1>pd-ocr-trainer-spa</h1>
-      <p>Hello — M0 scaffold. Training UI coming in M1+.</p>
-    </div>
+    <BrowserRouter
+      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+    >
+      <div data-testid="app-root">
+        <Routes>
+          <Route path="/" element={<Navigate to="/profiles" replace />} />
+          <Route path="/profiles" element={<ProfilesPage />} />
+          <Route path="/profiles/:name" element={<ProfilesPage />} />
+        </Routes>
+      </div>
+    </BrowserRouter>
   );
 }
 
