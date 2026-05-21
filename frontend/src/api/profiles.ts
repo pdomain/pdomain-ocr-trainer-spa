@@ -113,3 +113,63 @@ export function deleteProfile(name: string): Promise<void> {
 export function migrateLegacy(): Promise<void> {
   return request<void>("/api/profiles/migrate-legacy", { method: "POST" });
 }
+
+// --- training-config defaults (spec 04 §3.3) -------------------------------
+
+// The run-form args dict is task-shaped and free-form — see spec 04 §3.2.
+export type TrainingArgs = Record<string, unknown>;
+
+export interface TrainingDefaultsResponse {
+  task: string;
+  args: TrainingArgs;
+}
+
+export function fetchTrainingDefaultsSeed(
+  profile: string,
+  task: string,
+): Promise<TrainingDefaultsResponse> {
+  return request<TrainingDefaultsResponse>(
+    `/api/profiles/${encodeURIComponent(profile)}/training-defaults/${encodeURIComponent(task)}/seed`,
+  );
+}
+
+// Resolves to the saved defaults, or the seed when nothing has been saved yet
+// (the GET 404s — spec 04 §3.3). The boolean `saved` flag tells the two apart.
+export async function fetchTrainingDefaultsOrSeed(
+  profile: string,
+  task: string,
+): Promise<{ args: TrainingArgs; saved: boolean }> {
+  try {
+    const got = await request<TrainingDefaultsResponse>(
+      `/api/profiles/${encodeURIComponent(profile)}/training-defaults/${encodeURIComponent(task)}`,
+    );
+    return { args: got.args, saved: true };
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) {
+      const seed = await fetchTrainingDefaultsSeed(profile, task);
+      return { args: seed.args, saved: false };
+    }
+    throw err;
+  }
+}
+
+export function putTrainingDefaults(
+  profile: string,
+  task: string,
+  args: TrainingArgs,
+): Promise<TrainingDefaultsResponse> {
+  return request<TrainingDefaultsResponse>(
+    `/api/profiles/${encodeURIComponent(profile)}/training-defaults/${encodeURIComponent(task)}`,
+    { method: "PUT", body: JSON.stringify(args) },
+  );
+}
+
+export function deleteTrainingDefaults(
+  profile: string,
+  task: string,
+): Promise<void> {
+  return request<void>(
+    `/api/profiles/${encodeURIComponent(profile)}/training-defaults/${encodeURIComponent(task)}`,
+    { method: "DELETE" },
+  );
+}

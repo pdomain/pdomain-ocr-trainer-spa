@@ -8,9 +8,13 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
 from pd_ocr_trainer_spa.core.app_state import get_app_state
-from pd_ocr_trainer_spa.core.enums import TypefaceEnum  # noqa: TC001 — pydantic resolves at model-build time
+from pd_ocr_trainer_spa.core.enums import (  # noqa: TC001 — pydantic resolves at model-build time
+    TaskEnum,
+    TypefaceEnum,
+)
 from pd_ocr_trainer_spa.core.models import Profile  # noqa: TC001 — pydantic resolves at model-build time
 from pd_ocr_trainer_spa.domain import profiles as dom
+from pd_ocr_trainer_spa.domain import training_defaults as td
 
 if TYPE_CHECKING:
     from pd_ocr_trainer_spa.core.app_state import AppState
@@ -106,3 +110,64 @@ async def migrate_legacy(
 ) -> None:
     """Migrate the legacy flat layout into ``all/`` — idempotent (spec 04 §1.6)."""
     dom.migrate_legacy(state.settings)
+
+
+# ---------------------------------------------------------------------------
+# training-config defaults (spec 04 §3.3)
+# ---------------------------------------------------------------------------
+
+
+class TrainingDefaultsResponse(BaseModel):
+    """Envelope for the training-defaults endpoints — the run-form args dict."""
+
+    task: TaskEnum
+    args: dict[str, object]
+
+
+@router.get("/{name}/training-defaults/{task}")
+async def get_training_defaults(
+    name: str,
+    task: TaskEnum,
+    state: AppState = Depends(get_app_state),
+) -> TrainingDefaultsResponse:
+    """Return saved training-defaults for a ``(profile, task)`` pair (spec 04 §3.3).
+
+    404 ``training_defaults.not_set`` when the task has never been edited — the
+    SPA then falls back to the seed via ``GET .../training-defaults/{task}/seed``.
+    """
+    args = td.get_training_defaults(state.settings, profile=name, task=task)
+    return TrainingDefaultsResponse(task=task, args=args)
+
+
+@router.get("/{name}/training-defaults/{task}/seed")
+async def get_training_defaults_seed(
+    name: str,
+    task: TaskEnum,
+) -> TrainingDefaultsResponse:
+    """Return the seed (``pd-ocr-training`` config-model defaults) for a task (spec 04 §3.2)."""
+    _ = name
+    return TrainingDefaultsResponse(task=task, args=td.seed_defaults(task))
+
+
+@router.put("/{name}/training-defaults/{task}")
+async def put_training_defaults(
+    name: str,
+    task: TaskEnum,
+    args: dict[str, object],
+    state: AppState = Depends(get_app_state),
+) -> TrainingDefaultsResponse:
+    """Persist training-defaults for a ``(profile, task)`` pair (spec 04 §3.3)."""
+    stored = td.set_training_defaults(
+        state.settings, profile=name, task=task, args=args
+    )
+    return TrainingDefaultsResponse(task=task, args=stored)
+
+
+@router.delete("/{name}/training-defaults/{task}", status_code=204)
+async def delete_training_defaults(
+    name: str,
+    task: TaskEnum,
+    state: AppState = Depends(get_app_state),
+) -> None:
+    """Drop training-defaults for a ``(profile, task)`` pair — falls back to seed."""
+    td.delete_training_defaults(state.settings, profile=name, task=task)
