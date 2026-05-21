@@ -1,116 +1,139 @@
 # 10 — Jobs and SSE
 
-The job runner that owns every long-running operation
-(training, eval, dataset publish, model publish, copy-to-datasets
-batches over the threshold) and the SSE event stream that feeds
-the SPA.
+How the SPA observes every long-running operation (training, eval,
+dataset publish, model publish) through the `pd-ocr-ops`
+`LongJobRunner` and its SSE event stream.
 
-> Required reading: [`02-backend.md`](02-backend.md) §5.5,
+> Required reading: [`02-backend.md`](02-backend.md) §5 / §6.5,
 > [`06-training-runs.md`](06-training-runs.md).
 >
-> Closely modelled on
-> `pd-ocr-labeler-spa/specs/10-jobs-and-sse.md` and
-> `pd-prep-for-pgdp/src/.../core/job_runner.py`. Where this spec is
-> silent, those are authoritative.
+> **Re-spec note (2026-05-21).** Rewritten onto the `pd-ocr-ops`
+> `LongJobRunner` (D-T10, D-T20). The SPA no longer hand-rolls a
+> `core/job_runner.py`, an asyncio event ring, or a worker pool —
+> job lifecycle and event streaming are owned by `pd-ocr-ops`. This
+> spec now describes how the SPA *consumes* that contract, not how
+> it implements one.
 
 ---
 
 ## 1. Concept
 
-A `Job` is the runtime container for a long-running operation. It
-is decoupled from `Run` so we can reuse it for non-run operations
-later (e.g. cache warm, asset migration) without polluting the
-runs registry.
+A **job** is the runtime container for one long-running operation,
+owned by the `pd-ocr-ops` `LongJobRunner`. Every `Run` of
+`kind in {train, eval, publish-dataset, publish-model}` has exactly
+one job; `Run.job_id` links them. Jobs exist only for long
+operations — short dataset/profile mutations stay synchronous
+request/response (the dataset kanban `apply` is synchronous, see
+[`05-dataset-kanban.md`](05-dataset-kanban.md) §4).
 
-Every `Run` of `kind in {train, eval, publish-dataset,
-publish-model}` has exactly one `Job`. Other operations (sync
-copy-to-datasets) run inline if estimated < 30 s, else they spin a
-`Job` of `kind="copy-to-datasets"` with `run_id=None`.
+The `LongJobRunner` is selected by `Settings.job_runner_kind`
+(D-T20); core parity uses `LocalLongJobRunner`, a SQLite-backed
+single-machine implementation.
+
+---
+
+## 2. The `LongJobRunner` contract (from `pd-ocr-ops`)
+
+The SPA imports and depends on this Protocol — it does not define
+it. `pd_ocr_ops.gpu` provides:
+
+```python
+class LongJobRunner(Protocol):                    # async, @runtime_checkable
+    async def submit(self, kind: str, spec: dict[str, object]) -> str        # job_id
+    async def status(self, job_id: str) -> JobStatus
+    async def cancel(self, job_id: str) -> None
+    async def stream_events(self, job_id: str) -> AsyncIterator[JobEvent]
+```
+
+`LocalLongJobRunner` additionally exposes
+`submit_with_process(kind, spec, cmd: list[str]) -> job_id` — the
+method the SPA uses for the training worker
+([`02-backend.md`](02-backend.md) §5.1). It spawns and supervises an
+OS subprocess; `cancel` is SIGTERM + grace + SIGKILL.
+
+`JobStatus` — the poll/terminal shape:
+
+```python
+class JobStatus(BaseModel):              # extra="forbid"
+    job_id: str
+    kind: str
+    state: Literal["queued", "running", "succeeded", "failed", "cancelled"]
+    progress: float = 0.0                # 0.0 ≤ v ≤ 1.0
+    started_at: datetime | None
+    finished_at: datetime | None
+    error: str | None                    # plain string; last stderr line on failure
+```
+
+`JobEvent` — one item in the event stream:
+
+```python
+class JobEvent(BaseModel):               # extra="forbid"
+    job_id: str
+    seq: int                             # monotonic per job, 1-based
+    at: datetime
+    kind: Literal["progress", "log", "state", "metric"]
+    payload: dict[str, Any]              # kind-specific
+```
+
+`UnknownJobError(KeyError)` is raised by `status`, `cancel`, and
+`stream_events` for an unknown `job_id`.
+
+---
+
+## 3. The SPA `Job` projection
+
+`pd-ocr-ops` `mount_routes` exposes **no** job routes, so the SPA
+defines `/api/jobs/*` itself (`api/jobs.py`), wrapping the runner.
+`GET /api/jobs/{job_id}` projects a `JobStatus` onto the SPA `Job`
+model that the frontend and OpenAPI export consume:
 
 ```python
 class Job(BaseModel):
-    id: str
-    kind: str                    # "train.detection" | "train.recognition" | ... | "publish.dataset" | "publish.model" | "copy-to-datasets"
-    run_id: str | None
-    state: JobState              # see 01-data-models.md
-    progress: JobProgress | None
-    error: JobError | None
+    id: str                              # = JobStatus.job_id
+    kind: str                            # "train.detection" | "train.recognition"
+                                         # | "eval" | "publish.dataset" | "publish.model"
+    run_id: str | None                   # resolved from the Run registry by job_id
+    state: JobState                      # = JobStatus.state (see 01-data-models.md)
+    progress: float                      # = JobStatus.progress
+    error: str | None                    # = JobStatus.error
     started_at: datetime | None
     finished_at: datetime | None
 ```
 
----
-
-## 2. JobRunner
-
-```python
-class JobRunner:
-    """Owns the registry of jobs + the per-job event ring + the worker pool."""
-
-    def submit(self, kind: str, fn: Callable[[Callable[[JobEvent], None], CancellationToken], None],
-               run_id: str | None = None) -> Job: ...
-    def get(self, job_id: str) -> Job: ...
-    def list_active(self) -> list[Job]: ...
-    def cancel(self, job_id: str) -> Job: ...
-    def replay_buffer(self, job_id: str) -> list[JobEvent]: ...
-    def stream(self, job_id: str) -> AsyncIterator[JobEvent]: ...
-```
-
-The runner uses an `asyncio.Queue` per job for live subscribers and
-an in-memory ring (last 1000 events) for replay. Workers are
-threads (so subprocess pipe reads don't block the event loop);
-they post events into a queue that the FastAPI event loop
-consumes via `asyncio.run_coroutine_threadsafe`.
-
-For training jobs, `fn` is supplied by the
-`ITrainingRunner.start(...)` adapter; the runner provides the
-emit callback and a cancellation token.
-
-Worker pool size: 1 for training jobs (one CUDA process at a time
-by default — see [Q12](../OPEN_QUESTIONS.md)); unbounded for
-publish + copy jobs (HTTP-bound, not GPU-bound).
+`run_id` is not on `JobStatus`; the SPA resolves it by scanning the
+runs registry for the run whose `job_id` matches. `UnknownJobError`
+→ `404 job.unknown`.
 
 ---
 
-## 3. JobEvent shape
+## 4. Job events on the wire
 
-```python
-class JobEvent(BaseModel):
-    """Tagged union over the wire."""
-    type: Literal["log", "progress", "metric", "artefact", "complete", "failed", "cancelled", "heartbeat"]
-    t: float                            # unix epoch with ms resolution
-    # Log
-    stream: Literal["stdout", "stderr"] | None = None
-    line: str | None = None
-    # Progress
-    current: int | None = None
-    total: int | None = None
-    message: str | None = None
-    # Metric
-    name: str | None = None
-    value: float | None = None
-    step: int | None = None
-    # Artefact
-    path: str | None = None
-    artefact_kind: Literal["weights", "config", "sidecar", "result", "preview"] | None = None
-    # Failed
-    code: str | None = None
-    detail: dict | None = None
-    # Complete
-    exit_code: int | None = None
-```
+`payload` is kind-specific. The SPA serializes `JobEvent` verbatim
+over SSE — it does **not** invent a parallel event model. Payload
+shapes for training jobs (produced by the worker `@@PDEVENT@@`
+protocol, [`02-backend.md`](02-backend.md) §5.2, and translated by
+the `pd-ocr-ops` stdout parser — see [Q27](../OPEN_QUESTIONS.md)):
 
-A discriminated union per JSON Schema; the OpenAPI export
-materializes this so the SPA's `JobEvent` type is an exhaustive
-union and `switch` on `type` is type-safe.
+| `kind` | `payload` fields | Source |
+|---|---|---|
+| `progress` | `current: int`, `total: int`, `message: str` | training `epoch` event |
+| `metric` | `name: str`, `value: float`, `step: int` | training `train_batch` / `val_batch` |
+| `log` | `stream: "stdout" \| "stderr"`, `line: str` | any worker stdout/stderr line |
+| `state` | `state: str`, `exit_code: int \| None`, `error: str \| None` | terminal `done` / `error` |
 
-`heartbeat` events fire every 15 s when no other event has been
-emitted in that window; they keep the SSE proxy alive on hosts
-that idle-timeout dormant streams.
+[`06-training-runs.md`](06-training-runs.md) §4 describes the same
+events in a `type:`-keyed shorthand; the canonical wire shape is the
+`pd-ocr-ops` `JobEvent` above (`kind` + `payload`).
+
+A `state`-kind event is emitted on every state transition; the
+final one carries the terminal `state`. There is no separate
+`heartbeat` event — `LocalLongJobRunner.stream_events` polls every
+`poll_interval_s` (default 0.5 s) and the SSE route emits an SSE
+comment line as a keep-alive when no event has flowed for 15 s.
 
 ---
 
-## 4. SSE protocol
+## 5. SSE protocol
 
 ```
 GET /api/jobs/{job_id}/events
@@ -118,123 +141,148 @@ Accept: text/event-stream
 
 retry: 5000
 
-id: 1715035200123456
-event: log
-data: {"type":"log","t":1715035200.123,"stream":"stdout","line":"Epoch 1/100"}
-
-id: 1715035200456789
+id: 1
 event: progress
-data: {"type":"progress","t":1715035200.456,"current":1,"total":100,"message":"epoch 1/100"}
+data: {"job_id":"j-abc","seq":1,"at":"2026-05-21T10:00:00Z","kind":"progress","payload":{"current":1,"total":100,"message":"epoch 1/100"}}
+
+id: 2
+event: log
+data: {"job_id":"j-abc","seq":2,"at":"2026-05-21T10:00:01Z","kind":"log","payload":{"stream":"stdout","line":"..."}}
 
 ...
 
-id: 1715035500123456
-event: complete
-data: {"type":"complete","t":1715035500.123,"exit_code":0}
+id: 142
+event: state
+data: {"job_id":"j-abc","seq":142,"at":"2026-05-21T10:05:00Z","kind":"state","payload":{"state":"succeeded","exit_code":0}}
 ```
 
-Conventions:
+`api/jobs.py` implements `GET /api/jobs/{job_id}/events` as a
+`StreamingResponse` that `async for`s over
+`LongJobRunner.stream_events(job_id)` and emits one SSE frame per
+`JobEvent`:
 
-- Each event has a numeric `id:` (monotonic per-job, ms
-  precision). Clients reconnect with `Last-Event-ID:` to resume.
-- Server uses the `id` as a key into the per-job ring buffer for
-  resume.
-- One SSE `event:` name per `JobEvent.type`, mirroring the type.
-- Default `retry:` = 5000 ms.
+- `id:` = `JobEvent.seq` (monotonic per job; clients reconnect with
+  `Last-Event-ID:`).
+- `event:` = `JobEvent.kind`.
+- `data:` = the `JobEvent` JSON.
+- `retry:` = 5000 ms.
+- The stream closes after the terminal `state` event, or on
+  `UnknownJobError` (→ 404 before the stream opens).
 
-The frontend `subscribeToJob(jobId, on_event)` wrapper handles
-reconnect and event-id restoration.
+`stream_events` is itself event-id aware only to the extent that the
+caller can pass a starting `seq`; the SPA route honours
+`Last-Event-ID:` by skipping events with `seq ≤` the header value.
 
----
-
-## 5. Buffering and retention
-
-Each job has:
-
-- **Live ring** in memory: last 1000 events. Lost on FastAPI
-  restart.
-- **Persistent log files** on disk:
-  - `runs/<run_id>/stdout.log`, `stderr.log` (full text).
-  - `runs/<run_id>/progress.jsonl` (only progress + metric +
-    artefact events, capped at 50k lines per
-    [`06-training-runs.md`](06-training-runs.md) §4).
-
-On reconnect after a server restart, the SPA gets:
-
-1. A 410 from `/events` (old job_id is gone).
-2. Frontend falls back to polling `GET /api/runs/{run_id}` until
-   status is terminal, while showing the on-disk
-   `progress.jsonl` via `/api/runs/{run_id}/progress`.
-
-This is intentional — keeping in-memory event rings across
-restarts adds complexity for marginal value
-([Q20](../OPEN_QUESTIONS.md): worth persisting?).
+The frontend consumes this through the **pd-ui `useLongJob` hook**
+(D-T19, D-T22) — the SPA does not hand-roll an `EventSource`
+wrapper.
 
 ---
 
-## 6. Cancellation
+## 6. Buffering, retention, and restart
+
+`LocalLongJobRunner` persists jobs and their events in a SQLite
+database (`jobs` + `job_events` tables) at `Settings.jobs_db_path`.
+This means:
+
+- **Event replay** within a job's life: `stream_events` reads from
+  `job_events` (every event ever written), so a reconnecting tab
+  replays from `Last-Event-ID:` with no SPA-side ring buffer.
+- **Across a FastAPI restart**: the SQLite registry survives, but
+  the in-memory subprocess handles do not, and the training worker
+  subprocess is a child of the dead FastAPI process (D-T3,
+  [Q21](../OPEN_QUESTIONS.md)). So a job left `running` at boot is
+  no longer truly running.
+
+`AppState.hydrate_from_disk` reconciles at startup: any `Run` in
+`running` whose job is not genuinely live is marked `failed`,
+`exit_code = -1`, with a synthetic `stderr.log` line (D-T3). The SPA
+does **not** attempt to reattach to orphaned subprocesses.
+
+Persistent per-run artefacts (independent of the job registry):
+
+- `runs/<run_id>/stdout.log`, `stderr.log` — full text.
+- `runs/<run_id>/progress.jsonl` — `progress` + `metric` events,
+  capped at 50k lines ([`06-training-runs.md`](06-training-runs.md)
+  §4). Served by `GET /api/runs/{run_id}/progress` for chart replay
+  of a finished or restart-orphaned run.
+
+---
+
+## 7. Cancellation
 
 ```
-POST /api/jobs/{job_id}/cancel
-→ 202 Job
+POST /api/jobs/{job_id}/cancel      → 202 Job
+POST /api/runs/{run_id}/cancel      → 202 Run   (thin wrapper)
 ```
 
-Server flow:
+`api/jobs.py` calls `LongJobRunner.cancel(job_id)`. For a training
+job that is `LocalLongJobRunner` SIGTERM → grace → SIGKILL on the
+worker subprocess; job state → `cancelled`. `POST /api/runs/{run_id}
+/cancel` resolves the run's active `job_id` and forwards.
 
-1. `CancellationToken.requested = True`.
-2. Worker observes the flag, signals the underlying operation
-   (SIGTERM for subprocess, abort flag for HTTP upload).
-3. Best-effort grace period (10 s for subprocess, 5 s for HTTP).
-4. On terminal: emits `cancelled` event with truncate marker.
-
-`POST /api/runs/{run_id}/cancel` is a thin wrapper that finds the
-active job for the run and forwards.
-
----
-
-## 7. Multi-tab fan-out
-
-Multiple browser tabs subscribed to the same job ID share the
-same upstream queue. The runner does not multi-cast at the
-transport layer; each `stream()` is its own subscriber. Per-tab
-queues are bounded (10000 events); slow consumers are dropped
-with a sentinel `failed: backpressure` event after which the
-client reconnects from `Last-Event-ID:`.
+Cancelling an already-terminal job is a no-op (returns the terminal
+`Job`). Hard cancellation lives at the subprocess boundary because
+`pd-ocr-training`'s `LocalTrainingRunner` has no in-process cancel
+hook (D-T1).
 
 ---
 
-## 8. Active-job count endpoint
+## 8. Concurrency and the active-job count
 
-For the `JobsBadge` in the header bar:
+One `train` job runs at a time across the backend (D-T15);
+additional submissions sit `queued` in the `LongJobRunner` and start
+FIFO. Publish jobs are HTTP-bound and not GPU-serialized.
+
+For the header `JobsBadge`:
 
 ```
 GET /api/jobs/active-count
 → { "count": 1, "by_kind": {"train.recognition": 1} }
 ```
 
-Polled at 5 s when count > 0, off otherwise.
+`api/jobs.py` computes this by listing the runner's non-terminal
+jobs. Polled at 5 s by the SPA when `count > 0`, off otherwise.
 
 ---
 
-## 9. Acceptance behaviour
+## 9. Multi-tab fan-out
 
-1. Start a training run. Open three browser tabs on
-   `/runs/{run_id}`. All three populate the LogViewer in real
-   time, identical contents.
-2. Restart the FastAPI server mid-run. The training subprocess is
-   killed (TODO: detached or daemon? — [Q21](../OPEN_QUESTIONS.md)).
-   On restart, the `Run` is marked failed with `process gone` per
-   [`06-training-runs.md`](06-training-runs.md) §3.
-3. Cancel a long-running publish job. SSE emits `cancelled`; the
-   HTTP upload aborts within 5 s.
-4. Disconnect a tab's network for 10 s. On reconnect, the SPA
-   resumes from `Last-Event-ID:` and replays missed events.
+Each browser tab opens its own `GET /api/jobs/{job_id}/events`
+stream; each is an independent `stream_events` iterator over the
+shared SQLite `job_events` table, so all tabs see identical
+contents. There is no transport-layer multicast and no per-tab
+backpressure sentinel — a slow tab simply lags its own SQLite
+cursor.
 
 ---
 
-## 10. Citations
+## 10. Acceptance behaviour
 
-- Job-runner pattern: `pd-ocr-labeler-spa/specs/10-jobs-and-sse.md`.
-- Original: `pd-prep-for-pgdp/src/.../core/job_runner.py`.
-- Subprocess + thread-pipe pattern: legacy `ui.py` training launch
-  callbacks.
+1. Start a training run. Open three tabs on `/runs/{run_id}`. All
+   three populate the LogViewer in real time with identical events.
+2. Restart the FastAPI server mid-run. The worker subprocess dies
+   with its parent; on restart the `Run` is marked `failed` with the
+   `process gone` line (D-T3); `LossChart` still renders from
+   `progress.jsonl`.
+3. Cancel a running job via `POST /api/jobs/{id}/cancel`. The SSE
+   stream emits a terminal `state` event with `state="cancelled"`.
+4. Disconnect a tab's network for 10 s. On reconnect the SPA sends
+   `Last-Event-ID:` and the route replays every `job_events` row
+   with a higher `seq`.
+
+---
+
+## 11. Citations
+
+- `LongJobRunner` Protocol / `JobStatus` / `JobEvent`:
+  `pd-ocr-ops/pd_ocr_ops/gpu/protocols.py:27-45`,
+  `pd-ocr-ops/pd_ocr_ops/gpu/types.py:25-56`.
+- `LocalLongJobRunner` submit / supervise / cancel / stream:
+  `pd-ocr-ops/pd_ocr_ops/gpu/local_jobs.py:64-272`.
+- `mount_routes` exposes no job routes:
+  `pd-ocr-ops/pd_ocr_ops/suite/routes.py:14`.
+- Cross-repo stdout-parser dependency: [Q27](../OPEN_QUESTIONS.md),
+  `ConcaveTrillion/pd-ocr-ops#76`.
+- Crash-recovery precedent:
+  `pd-ocr-labeler-spa/specs/10-jobs-and-sse.md`.
