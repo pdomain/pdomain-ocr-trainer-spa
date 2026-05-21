@@ -1585,9 +1585,15 @@ dependencies = [
     { name = "aiofiles" },
     { name = "fastapi" },
     { name = "pd-ocr-ops" },
+    { name = "pd-ocr-training" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "uvicorn", extra = ["standard"] },
+]
+
+[package.optional-dependencies]
+train = [
+    { name = "pd-ocr-training", extra = ["train"] },
 ]
 
 [package.dev-dependencies]
@@ -1612,10 +1618,13 @@ requires-dist = [
     { name = "aiofiles", specifier = ">=23.2" },
     { name = "fastapi", specifier = ">=0.111" },
     { name = "pd-ocr-ops", editable = "../pd-ocr-ops" },
+    { name = "pd-ocr-training", editable = "../pd-ocr-training" },
+    { name = "pd-ocr-training", extras = ["train"], marker = "extra == 'train'", editable = "../pd-ocr-training" },
     { name = "pydantic", specifier = ">=2.7" },
     { name = "pydantic-settings", specifier = ">=2.3" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.29" },
 ]
+provides-extras = ["train"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -1631,6 +1640,53 @@ dev = [
     { name = "ruff", specifier = ">=0.15.13" },
 ]
 e2e = [{ name = "pytest-playwright", specifier = ">=0.5" }]
+
+[[package]]
+name = "pd-ocr-training"
+version = "0.1.0"
+source = { editable = "../pd-ocr-training" }
+dependencies = [
+    { name = "pd-book-tools" },
+    { name = "pydantic" },
+    { name = "tomli" },
+    { name = "tomli-w" },
+]
+
+[package.optional-dependencies]
+train = [
+    { name = "matplotlib" },
+    { name = "numpy" },
+    { name = "python-doctr" },
+    { name = "torch" },
+    { name = "torchvision" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "matplotlib", marker = "extra == 'train'" },
+    { name = "numpy", marker = "extra == 'train'" },
+    { name = "pd-book-tools", editable = "../pd-book-tools" },
+    { name = "pydantic", specifier = ">=2.5" },
+    { name = "python-doctr", marker = "extra == 'train'" },
+    { name = "tomli", specifier = ">=2.0" },
+    { name = "tomli-w", specifier = ">=1.0" },
+    { name = "torch", marker = "extra == 'train'" },
+    { name = "torchvision", marker = "extra == 'train'" },
+]
+provides-extras = ["train"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "basedpyright", specifier = ">=1.39.4" },
+    { name = "gitlint", specifier = ">=0.19.1" },
+    { name = "pd-ocr-training", extras = ["train"] },
+    { name = "pre-commit", specifier = ">=4.2.0" },
+    { name = "pytest", specifier = ">=8.3" },
+    { name = "pytest-asyncio", specifier = ">=0.24" },
+    { name = "pytest-cov", specifier = ">=6.2.1" },
+    { name = "pytest-xdist", specifier = ">=3.8.0" },
+    { name = "ruff", specifier = ">=0.15.13" },
+]
 
 [[package]]
 name = "pexpect"

@@ -14,14 +14,21 @@ license = { text = "Unlicense" }
 requires-python = ">=3.13"
 dependencies = [
     "pd-ocr-ops",
-    # pd-ocr-training declared here but sourced from local path — used starting M1
-    # (worker subprocess only; never imported by the FastAPI web process at torch)
+    # pd-ocr-training base install is torch-free: the FastAPI web process
+    # imports only the typed config models + ITrainingRunner Protocol.
+    # The training worker needs the heavy stack — see the `train` extra.
+    "pd-ocr-training",
     "fastapi>=0.111",
     "uvicorn[standard]>=0.29",
     "pydantic>=2.7",
     "pydantic-settings>=2.3",
     "aiofiles>=23.2",
 ]
+
+[project.optional-dependencies]
+# Installs the torch/DocTR training stack for the worker subprocess.
+# `uv tool install pd-ocr-trainer-spa[train]` on a training-capable host.
+train = ["pd-ocr-training[train]"]
 
 [project.scripts]
 pd-ocr-trainer-ui = "pd_ocr_trainer_spa.__main__:main"
@@ -50,7 +57,7 @@ e2e = [
 [tool.uv.sources]
 pd-book-tools = { path = "../pd-book-tools", editable = true }
 pd-ocr-ops = { path = "../pd-ocr-ops", editable = true }
-# pd-ocr-training will be added to sources when declared as a dependency (M1+)
+pd-ocr-training = { path = "../pd-ocr-training", editable = true }
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/pd_ocr_trainer_spa"]
