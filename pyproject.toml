@@ -48,8 +48,8 @@ e2e = [
 ]
 
 [tool.uv.sources]
-pd-book-tools = { path = "/workspaces/ocr-container/pd-book-tools", editable = true }
-pd-ocr-ops = { path = "/workspaces/ocr-container/pd-ocr-ops", editable = true }
+pd-book-tools = { path = "../pd-book-tools", editable = true }
+pd-ocr-ops = { path = "../pd-ocr-ops", editable = true }
 # pd-ocr-training will be added to sources when declared as a dependency (M1+)
 
 [tool.hatch.build.targets.wheel]
