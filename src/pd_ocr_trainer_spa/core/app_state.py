@@ -41,9 +41,13 @@ class AppState:
     def hydrate_from_disk(self) -> None:
         """Reconcile on-disk state at boot.
 
-        M1 has no profiles or runs on disk, so this is a no-op placeholder;
-        run reconciliation (D-T3) lands with the runs milestone.
+        Runs are reconciled per D-T3: any run left ``running`` with no live
+        job is marked ``failed``. Imported lazily to keep the import graph of
+        ``core`` free of the ``domain`` layer.
         """
+        from pd_ocr_trainer_spa.domain.runs import hydrate_runs
+
+        hydrate_runs(self)
 
 
 def get_app_state(request: Request) -> AppState:
