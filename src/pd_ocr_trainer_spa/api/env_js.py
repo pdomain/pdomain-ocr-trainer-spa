@@ -11,6 +11,10 @@ from pd_ocr_trainer_spa._version import __version__
 
 router = APIRouter()
 
+# Driver-contract version (spec 13 §6). Bumping is a breaking change for
+# any Playwright driver and requires a notice in specs/17-decisions.md.
+DRIVER_CONTRACT_VERSION = 1
+
 
 @router.get("/env.js", include_in_schema=False)
 async def env_js(request: Request) -> Response:
@@ -23,6 +27,12 @@ async def env_js(request: Request) -> Response:
             "enableGlyphTraining": settings.enable_glyph_training,
             "enableHfPublish": settings.enable_hf_publish,
         }
-    payload = json.dumps({"version": __version__, "features": features})
+    payload = json.dumps(
+        {
+            "version": __version__,
+            "driverContractVersion": DRIVER_CONTRACT_VERSION,
+            "features": features,
+        }
+    )
     content = f"window.__APP_ENV__ = {payload};\n"
     return Response(content=content, media_type="application/javascript")

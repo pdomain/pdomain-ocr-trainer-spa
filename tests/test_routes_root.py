@@ -77,6 +77,15 @@ def test_api_env_js_not_shadowed(app_with_frontend: TestClient) -> None:
     assert "__APP_ENV__" in resp.text
 
 
+def test_api_env_js_exposes_driver_contract_version(
+    app_with_frontend: TestClient,
+) -> None:
+    """/env.js exposes driverContractVersion (spec 13 §6, initial = 1)."""
+    resp = app_with_frontend.get("/env.js")
+    assert resp.status_code == 200
+    assert '"driverContractVersion": 1' in resp.text
+
+
 def test_root_503_when_frontend_absent(tmp_path, monkeypatch, base_settings) -> None:
     """GET / → 503 when the static directory has no index.html."""
     # Point to a nonexistent directory

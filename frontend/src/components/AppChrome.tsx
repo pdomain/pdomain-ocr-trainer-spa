@@ -10,6 +10,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useHotkey } from "../hooks/useHotkey";
+import { AppHeader } from "./AppHeader";
 import { BannerStack } from "./BannerStack";
 import { HotkeyHelpDialog } from "./HotkeyHelpDialog";
 
@@ -54,6 +55,7 @@ export function AppChrome(): JSX.Element {
 
   return (
     <>
+      <AppHeader onOpenHelp={() => setHelpOpen(true)} />
       <BannerStack />
       <HotkeyHelpDialog open={helpOpen} onClose={() => setHelpOpen(false)} />
     </>
