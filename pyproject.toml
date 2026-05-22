@@ -131,6 +131,10 @@ convention = "google"
 include = ["src", "tests"]
 exclude = ["**/__pycache__", "**/.venv", "**/node_modules"]
 typeCheckingMode = "recommended"
+# Warnings are gated via a baseline file (.basedpyright/baseline.json) that grandfathers
+# existing warnings from sibling-dep stub gaps. New warnings beyond the baseline will
+# fail CI. Regenerate the baseline with: uv run basedpyright src/pd_ocr_trainer_spa --writebaseline
+failOnWarnings = true
 reportImportCycles = "none"
 venvPath = "."
 venv = ".venv"
