@@ -2,7 +2,7 @@
 // Spec: 09-hf-integration §5–§6, M11. Route: /publish.
 
 import { useCallback, useEffect, useState } from "react";
-import { Button, Card } from "@concavetrillion/pd-ui/primitives";
+import { Button } from "@concavetrillion/pd-ui/primitives";
 import { fetchModels } from "../api/models";
 import type { ModelListItem } from "../api/models";
 import { fetchProfiles } from "../api/profiles";
@@ -29,7 +29,7 @@ export function PublishPage(): JSX.Element {
         fetchProfiles(),
         fetchModels({ includeLegacy: false }),
       ]);
-      setProfiles(profilesResp);
+      setProfiles(profilesResp.profiles);
       setModels(modelsResp.models);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load");
