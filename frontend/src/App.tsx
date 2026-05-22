@@ -9,6 +9,7 @@ import { ModelsPage } from "./pages/ModelsPage";
 import { ModelDetailPage } from "./pages/ModelDetailPage";
 import { EvalFormPage } from "./pages/EvalFormPage";
 import { EvalResultPage } from "./pages/EvalResultPage";
+import { PublishPage } from "./pages/PublishPage";
 import { AppChrome } from "./components/AppChrome";
 import { AppToaster } from "./components/AppToaster";
 
@@ -34,6 +35,7 @@ function App() {
           <Route path="/models/:name" element={<ModelDetailPage />} />
           <Route path="/eval" element={<EvalFormPage />} />
           <Route path="/eval/:runId/result" element={<EvalResultPage />} />
+          <Route path="/publish" element={<PublishPage />} />
         </Routes>
       </div>
       <AppToaster />
