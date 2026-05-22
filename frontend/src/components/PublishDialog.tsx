@@ -22,15 +22,19 @@ export interface PublishDialogProps {
   onSuccess: (runId: string, jobId: string) => void;
 }
 
+// Canonical-case SPDX identifiers. SPDX validation is case-sensitive (#18),
+// so these must match pd_book_tools.licenses exactly. Plain "GPL-3.0" is a
+// deprecated SPDX id and is intentionally omitted in favour of the
+// -only / -or-later variants.
 const COMMON_LICENSES = [
-  "apache-2.0",
-  "mit",
-  "cc-by-4.0",
-  "cc-by-sa-4.0",
-  "cc-by-nc-4.0",
-  "cc0-1.0",
-  "gpl-3.0",
-  "gpl-3.0-only",
+  "Apache-2.0",
+  "MIT",
+  "CC-BY-4.0",
+  "CC-BY-SA-4.0",
+  "CC-BY-NC-4.0",
+  "CC0-1.0",
+  "GPL-3.0-only",
+  "GPL-3.0-or-later",
 ] as const;
 
 export function PublishDialog({
@@ -44,7 +48,7 @@ export function PublishDialog({
 }: PublishDialogProps): JSX.Element {
   const [repo, setRepo] = useState(defaultRepo);
   const [visibility, setVisibility] = useState<"private" | "public">("private");
-  const [license, setLicense] = useState("apache-2.0");
+  const [license, setLicense] = useState("Apache-2.0");
   const [customLicense, setCustomLicense] = useState("");
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -198,7 +202,7 @@ export function PublishDialog({
                     data-testid="publish-license-custom-input"
                     type="text"
                     required
-                    placeholder="e.g. bsd-3-clause"
+                    placeholder="e.g. BSD-3-Clause"
                     value={customLicense}
                     onChange={(e) => setCustomLicense(e.target.value)}
                     style={{
