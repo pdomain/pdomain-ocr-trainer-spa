@@ -12,9 +12,8 @@ from __future__ import annotations
 
 import pytest
 
-from pd_ocr_trainer_spa.domain.publish import validate_spdx_license
 from pd_ocr_trainer_spa.core.errors import AppError
-
+from pd_ocr_trainer_spa.domain.publish import validate_spdx_license
 
 # ---------------------------------------------------------------------------
 # Acceptance: canonical-case SPDX IDs from pd-book-tools must be accepted
@@ -83,8 +82,9 @@ def test_validate_rejects_completely_invalid_id() -> None:
 
 def test_spdx_valid_ids_delegates_to_pd_book_tools() -> None:
     """domain.publish.SPDX_VALID_IDS must be the pd_book_tools frozenset (518+ entries)."""
-    from pd_ocr_trainer_spa.domain.publish import SPDX_VALID_IDS as local_set
     from pd_book_tools.licenses import SPDX_VALID_IDS as upstream_set
+
+    from pd_ocr_trainer_spa.domain.publish import SPDX_VALID_IDS as local_set
 
     assert local_set is upstream_set, (
         "domain/publish.py must import SPDX_VALID_IDS directly from pd_book_tools.licenses "

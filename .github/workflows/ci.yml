@@ -18,31 +18,8 @@ jobs:
       CUDA_VISIBLE_DEVICES: ""
     steps:
       - uses: actions/checkout@v4
-      # Clone sibling repos that pyproject.toml [tool.uv.sources] references
-      # as local editable paths (../pd-book-tools, ../pd-ocr-ops,
-      # ../pd-ocr-training).  Without these the `uv sync` in `make setup`
-      # fails with "Distribution not found".
-      - uses: actions/checkout@v4
-        with:
-          repository: ConcaveTrillion/pd-book-tools
-          path: ../pd-book-tools
-      - uses: actions/checkout@v4
-        with:
-          repository: ConcaveTrillion/pd-ocr-ops
-          path: ../pd-ocr-ops
-      - uses: actions/checkout@v4
-        with:
-          repository: ConcaveTrillion/pd-ocr-training
-          path: ../pd-ocr-training
       - uses: jdx/mise-action@v2
       - uses: astral-sh/setup-uv@v4
         with:
           version: latest
-      - run: make setup
-      - run: make lint
-      - run: make typecheck
-      - run: make test
-      - run: make frontend-install
-      - run: make frontend-test
-      - run: make frontend-build
-      - run: make build
+      - run: make ci
