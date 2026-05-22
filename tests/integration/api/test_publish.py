@@ -54,7 +54,7 @@ def test_publish_dataset_missing_token_returns_400(settings: Settings, tmp_path:
             "task": "recognition",
             "repo": "testowner/pd-ocr-real-ga-clogaelach",
             "visibility": "private",
-            "license": "apache-2.0",
+            "license": "Apache-2.0",
         },
     )
     assert resp.status_code == 400
@@ -111,7 +111,7 @@ def test_publish_dataset_returns_202(settings: Settings, tmp_path: Path) -> None
                 "task": "recognition",
                 "repo": "testowner/pd-ocr-real-ga-clogaelach",
                 "visibility": "private",
-                "license": "apache-2.0",
+                "license": "Apache-2.0",
             },
         )
 
@@ -132,7 +132,7 @@ def test_publish_dataset_route_not_shadowed_by_spa(settings: Settings, tmp_path:
             "task": "recognition",
             "repo": "testowner/pd-ocr-real-ga-clogaelach",
             "visibility": "private",
-            "license": "apache-2.0",
+            "license": "Apache-2.0",
         },
     )
     # Must be JSON not HTML
