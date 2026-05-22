@@ -1,4 +1,4 @@
-"""api/publish.py — HF publish endpoints (spec 09 §5–§6, M11).
+"""api/publish.py - HF publish endpoints (spec 09 §5-§6, M11).
 
 Routes:
     POST /api/publish/dataset

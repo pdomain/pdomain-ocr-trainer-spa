@@ -326,7 +326,7 @@ a "switching from legacy trainer" section.
 
 ---
 
-## M10 — HF read path
+## M10 — HF read path [SHIPPED 2026-05-22]
 
 **Outcome.** Recognition runs can pull data from a Hugging Face
 dataset. Trainer ROADMAP milestone (a) for the SPA. Multi-source
@@ -349,7 +349,7 @@ mixing across `local + hf` works.
 
 ---
 
-## M11 — HF publish path (datasets + models)
+## M11 — HF publish path (datasets + models) [SHIPPED 2026-05-22]
 
 **Outcome.** Publish endpoints work end-to-end against a recorded
 HF mock. Dataset publish + model publish flows in the UI.

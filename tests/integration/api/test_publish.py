@@ -1,4 +1,4 @@
-"""Integration tests for api/publish.py — HF publish endpoints (spec 09 §5–§6, M11).
+"""Integration tests for api/publish.py - HF publish endpoints (spec 09 §5-§6, M11).
 
 Tests cover:
 - POST /api/publish/dataset — license gating, HF token check, 202 acceptance
@@ -10,9 +10,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import TYPE_CHECKING
-from unittest.mock import MagicMock, patch
-
-import pytest
+from unittest.mock import patch
 
 if TYPE_CHECKING:
     from fastapi.testclient import TestClient

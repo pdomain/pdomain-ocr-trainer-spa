@@ -1,4 +1,4 @@
-"""domain/publish.py — HF publish domain logic (spec 09 §5–§6, M11).
+"""domain/publish.py - HF publish domain logic (spec 09 §5-§6, M11).
 
 Responsibilities:
 - SPDX license validation (bundled list — a minimal common subset).
@@ -9,12 +9,7 @@ Responsibilities:
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from pd_ocr_trainer_spa.core.errors import AppError
-
-if TYPE_CHECKING:
-    pass
 
 # ---------------------------------------------------------------------------
 # SPDX license allowlist (common subset — spec 09 §5 references
