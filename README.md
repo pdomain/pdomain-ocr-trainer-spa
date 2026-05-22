@@ -6,7 +6,8 @@ machinery, web SPA front-end, structurally modelled on
 [`pd-ocr-labeler-spa`](../pd-ocr-labeler-spa/) and
 [`pd-prep-for-pgdp`](../pd-prep-for-pgdp/).
 
-> **Status:** spec-only. Implementation is milestone-driven (see
+> **Status:** M0–M9 shipped. M10 (HF read path) in progress.
+> Implementation is milestone-driven (see
 > [`specs/16-milestones.md`](specs/16-milestones.md)).
 
 ## What it is

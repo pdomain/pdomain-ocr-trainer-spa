@@ -87,7 +87,7 @@ styling comes from `pd-ui` (D-T19), not Tailwind/shadcn.
 
 ---
 
-## M1 — Settings + adapters + AppState seam
+## M1 — Settings + adapters + AppState seam  ✅ shipped
 
 **Outcome.** `build_app(settings)` wires every adapter Protocol with
 its v1 impl, mounts the `pd-ocr-ops` suite routes
@@ -123,7 +123,7 @@ runner — long jobs go through the `pd-ocr-ops` `LongJobRunner`.
 
 ---
 
-## M2 — Job runner integration + SSE
+## M2 — Job runner integration + SSE  ✅ shipped
 
 **Outcome.** The SPA's `/api/jobs/{id}` + `/api/jobs/{id}/events`
 endpoints wrap the `pd-ocr-ops` `LongJobRunner` (D-T20): `GET
@@ -147,7 +147,7 @@ drive the lifecycle with a fake `LongJobRunner` scripting synthetic
 
 ---
 
-## M3 — Profiles routes + page
+## M3 — Profiles routes + page  ✅ shipped
 
 **Outcome.** Working profiles list, create, edit, delete (with the
 "all" guards). Disk side-effects verified. Profile.toml round-trips.
@@ -170,7 +170,7 @@ ProfilesPage in the SPA renders the list + dialog.
 
 ---
 
-## M4 — Datasets kanban (recognition first)
+## M4 — Datasets kanban (recognition first)  ✅ shipped
 
 **Outcome.** Working kanban for `(profile, recognition)` only:
 client-side staged drag/drop + multi-select, the batch `apply`
@@ -200,7 +200,7 @@ impls land in M5+.
 
 ---
 
-## M5 — Detection kanban + training-config defaults
+## M5 — Detection kanban + training-config defaults  ✅ shipped
 
 **Outcome.** Detection kanban variant works (page chips with bbox
 counts). Per-profile training-defaults endpoints (GET/PUT/DELETE)
@@ -223,7 +223,7 @@ ship; ProfileDetailPage gains a "Defaults" tab.
 
 ---
 
-## M6 — Training runs (recognition + detection)
+## M6 — Training runs (recognition + detection)  ✅ shipped
 
 **Outcome.** Start, monitor, cancel a recognition or detection run.
 SSE log streams; LossChart populates from progress events.
@@ -258,7 +258,7 @@ Crash-recovery (running-at-boot → failed) verified.
 
 ---
 
-## M7 — Models registry + eval
+## M7 — Models registry + eval  ✅ shipped
 
 **Outcome.** Models discovered from disk, displayed, sidecar
 viewer, rename, delete, regenerate-sidecar. Eval form launches an
@@ -282,7 +282,7 @@ eval run; result page renders overall metrics.
 
 ---
 
-## M8 — Notifications + a11y polish
+## M8 — Notifications + a11y polish  ✅ shipped
 
 **Outcome.** Sonner toaster + banners work as specced. Hotkey
 help dialog and scope registry land. ARIA role/aria-live everywhere.
@@ -304,7 +304,7 @@ help dialog and scope registry land. ARIA role/aria-live everywhere.
 
 ---
 
-## M9 — Driver contract conformance + cutover prep
+## M9 — Driver contract conformance + cutover prep  ✅ shipped
 
 **Outcome.** Single Playwright spec exercises every URL + testid in
 [`13-driver-contract.md`](13-driver-contract.md). DEVELOPMENT.md gets
