@@ -1,7 +1,7 @@
 """domain/publish.py - HF publish domain logic (spec 09 §5-§6, M11).
 
 Responsibilities:
-- SPDX license validation (bundled list — a minimal common subset).
+- SPDX license validation delegated to ``pd_book_tools.licenses`` (spec 09 §5).
 - Stub job-submission helpers used by api/publish.py; the real async worker
   path is wired the same way as training runs via LongJobRunner.
 - License-gating: refuses publish when ``license`` field is not a known SPDX id.
@@ -9,56 +9,28 @@ Responsibilities:
 
 from __future__ import annotations
 
+from pd_book_tools.licenses import SPDX_VALID_IDS, is_valid_spdx_id
+
 from pd_ocr_trainer_spa.core.errors import AppError
 
-# ---------------------------------------------------------------------------
-# SPDX license allowlist (common subset — spec 09 §5 references
-# pd_book_tools.licenses.SPDX_VALID_IDS which does not yet exist; we bundle
-# a commonly-used subset until pd-book-tools exposes it).
-# ---------------------------------------------------------------------------
-
-#: Normalised lower-case SPDX identifiers accepted by the publish endpoint.
-#: Extend this list as needed; keep sorted for readability.
-SPDX_VALID_IDS: frozenset[str] = frozenset(
-    {
-        "agpl-3.0",
-        "apache-2.0",
-        "bsd-2-clause",
-        "bsd-3-clause",
-        "cc-by-4.0",
-        "cc-by-nc-4.0",
-        "cc-by-nc-nd-4.0",
-        "cc-by-nc-sa-4.0",
-        "cc-by-nd-4.0",
-        "cc-by-sa-4.0",
-        "cc0-1.0",
-        "eupl-1.2",
-        "gpl-2.0",
-        "gpl-2.0-only",
-        "gpl-3.0",
-        "gpl-3.0-only",
-        "lgpl-2.1",
-        "lgpl-3.0",
-        "mit",
-        "mpl-2.0",
-        "odc-by",
-        "odbl",
-        "unlicense",
-    }
-)
+# Re-export so callers that import SPDX_VALID_IDS from this module still work,
+# and so the object-identity assertion in tests can verify the delegation.
+__all__ = ["SPDX_VALID_IDS", "validate_spdx_license"]
 
 
 def validate_spdx_license(license_id: str) -> None:
     """Raise 409 publish.license_missing when *license_id* is not a known SPDX id.
 
-    Comparison is case-insensitive to be generous with user input.
+    Matching uses ``pd_book_tools.licenses.is_valid_spdx_id``, which is
+    case-sensitive and exact — ``Apache-2.0`` is valid, ``apache-2.0`` is not.
+    Callers should supply canonical-case SPDX identifiers.
     """
-    if license_id.lower().strip() not in SPDX_VALID_IDS:
+    if not is_valid_spdx_id(license_id):
         raise AppError(
             code="publish.license_missing",
             message=(
                 f"License '{license_id}' is not a recognised SPDX identifier. "
-                "Provide a valid SPDX id (e.g. 'apache-2.0', 'cc-by-4.0')."
+                "Provide a valid SPDX id (e.g. 'Apache-2.0', 'CC-BY-4.0')."
             ),
             status_code=409,
         )
