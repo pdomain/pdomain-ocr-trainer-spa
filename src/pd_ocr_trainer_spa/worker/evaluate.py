@@ -17,10 +17,22 @@ The worker:
 torch-free fake runner that scores a fixture; production builds the real
 runner.
 
-UPSTREAM GAP: ``pd_ocr_training`` does not yet expose an eval surface
-(``ITrainingRunner`` is train-only). Until it does, the production
-``_build_runner`` path raises a clear error; the SPA's eval round-trip is
-exercised end-to-end through the injectable stub runner.
+UPSTREAM STATE (M13 readiness, verified 2026-05-22):
+``pd_ocr_training`` now exposes ``IEvalRunner`` + ``LocalEvalRunner`` and the
+result models ``RecognitionEvalResult`` / ``EvalSlice``. However, glyph-feature
+slicing (spec 07 §4) is still blocked upstream:
+
+* ``evaluate_recognition_impl`` hard-codes ``slices=[]`` (see
+  ``pd_ocr_training/_eval_backend.py`` — "Out of scope (issue #3 baseline)").
+* ``RecognitionEvalConfig`` has no field to pass glyph annotations or a
+  ``slice_glyph_features`` flag, so the runner cannot receive the per-word
+  ``GlyphAnnotations`` it would need to compute positive/negative subsets.
+
+The pd-book-tools ``GlyphAnnotations`` data model (the other M13 pre-condition)
+has landed, but until ``pd_ocr_training`` accepts annotations as eval input and
+populates ``slices``, the SPA cannot deliver M13. The production
+``_build_runner`` path raises a clear error; the eval round-trip is exercised
+end-to-end through the injectable stub runner.
 """
 
 from __future__ import annotations
@@ -70,11 +82,19 @@ def emit_event(event: dict[str, object]) -> None:
 
 
 def _build_runner() -> EvalRunner:
-    """Build the real eval runner (UPSTREAM GAP — not yet available)."""
+    """Build the real eval runner.
+
+    pd-ocr-training exposes ``LocalEvalRunner`` (``IEvalRunner``), but wiring it
+    into this worker — including glyph-feature slicing (M13) — is not done yet.
+    Until then the production path raises a clear error and the eval round-trip
+    is exercised through the injectable stub runner.
+    """
     raise RuntimeError(
-        "Real model evaluation is not available yet: pd-ocr-training does not "
-        "expose an eval surface (ITrainingRunner is train-only). Track the "
-        "upstream gap before running a non-stub eval."
+        "Real model evaluation is not wired up yet. pd-ocr-training exposes "
+        "LocalEvalRunner (IEvalRunner), but glyph-feature slicing (M13) is "
+        "blocked: RecognitionEvalConfig has no glyph-annotation input and "
+        "evaluate_recognition_impl hard-codes slices=[]. Track the upstream "
+        "gap before running a non-stub eval."
     )
 
 
