@@ -1,8 +1,9 @@
-"""IDatasetSource adapter tests: LocalDatasetSource + HuggingFace AdapterNotImplementedError."""
+"""IDatasetSource adapter tests: LocalDatasetSource + HuggingFaceDatasetSource."""
 
 from __future__ import annotations
 
 import json
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -14,7 +15,6 @@ from pd_ocr_trainer_spa.adapters.dataset_sources import (
 from pd_ocr_trainer_spa.adapters.dataset_sources.huggingface import HuggingFaceDatasetSource
 from pd_ocr_trainer_spa.adapters.dataset_sources.local import LocalDatasetSource
 from pd_ocr_trainer_spa.core.enums import SplitEnum, TaskEnum
-from pd_ocr_trainer_spa.core.errors import AdapterNotImplementedError
 
 
 def _write_dataset(ml_dir, profile: str, task: str, labels: dict[str, object]) -> None:
@@ -69,15 +69,29 @@ def test_local_source_fetch_to_local_returns_task_dir(tmp_path) -> None:
     assert path == train / "all" / "detection"
 
 
-def test_huggingface_source_satisfies_protocol() -> None:
-    src = HuggingFaceDatasetSource()
+def _make_hf_source(tmp_path):
+    """Build a HuggingFaceDatasetSource with a fake settings + token (M10)."""
+    settings = MagicMock()
+    settings.hf_cache_dir = None
+    return HuggingFaceDatasetSource(settings, token="hf_test_token")
+
+
+def test_huggingface_source_satisfies_protocol(tmp_path) -> None:
+    """M10 real impl: HuggingFaceDatasetSource still satisfies IDatasetSource."""
+    src = _make_hf_source(tmp_path)
     assert isinstance(src, IDatasetSource)
     assert src.name == "huggingface"
 
 
-def test_huggingface_source_methods_raise_not_implemented() -> None:
-    src = HuggingFaceDatasetSource()
-    with pytest.raises(AdapterNotImplementedError):
+def test_huggingface_source_list_raises_not_implemented(tmp_path) -> None:
+    """list() is worker-side; the web process must not call it."""
+    src = _make_hf_source(tmp_path)
+    with pytest.raises(NotImplementedError):
         list(src.list("all", TaskEnum.detection, SplitEnum.train))
-    with pytest.raises(AdapterNotImplementedError):
+
+
+def test_huggingface_source_fetch_to_local_raises_not_implemented(tmp_path) -> None:
+    """fetch_to_local() without repo/revision raises NotImplementedError."""
+    src = _make_hf_source(tmp_path)
+    with pytest.raises(NotImplementedError):
         src.fetch_to_local("all", TaskEnum.detection, SplitEnum.train)

@@ -56,20 +56,29 @@ class Banner(BaseModel):
 
 
 def _hf_token_banner(settings: Settings) -> Banner | None:
-    """Return the ``hf-token-missing`` banner when HF publish is mis-configured."""
-    if not settings.enable_hf_publish:
-        return None
+    """Return the ``hf-token-missing`` banner when HF is configured without a token.
+
+    M10 extends this beyond the publish path: whenever ``hf_token_path`` is
+    explicitly set (not ``None``) but the referenced file does not exist, the
+    banner fires — the token is needed for both the read path (dataset fetch)
+    and the publish path.
+
+    No banner is emitted when ``hf_token_path`` is ``None`` (HF not configured
+    at all) or when the file is present and readable.
+    """
     token_path = settings.hf_token_path
-    if token_path is not None and token_path.exists():
+    if token_path is None:
+        return None
+    if token_path.exists():
         return None
     return Banner(
         id="hf-token-missing",
         severity="warn",
         title="Hugging Face token missing",
         description=(
-            "HF publishing is enabled but no token file was found. "
-            "Set hf_token_path to a readable file to publish datasets and "
-            "models."
+            f"No HF token file found at {token_path}. "
+            "Set hf_token_path to a readable file to fetch HF datasets or "
+            "publish datasets and models."
         ),
         action=BannerAction(label="Open settings", href="/settings"),
         dismissible=True,

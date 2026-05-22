@@ -50,10 +50,24 @@ def test_hf_token_present_suppresses_banner(settings: Settings) -> None:
     assert "hf-token-missing" not in ids
 
 
-def test_hf_publish_disabled_suppresses_banner(settings: Settings) -> None:
-    """No hf-token-missing banner while enable_hf_publish is false."""
+def test_hf_token_missing_fires_even_when_publish_disabled(settings: Settings) -> None:
+    """hf-token-missing fires whenever hf_token_path is set but missing.
+
+    M10: the banner covers the HF read path too, not just publishing.
+    enable_hf_publish no longer gates it — the token is required for fetch.
+    """
     settings.enable_hf_publish = False
     settings.hf_token_path = settings.app_data_root / "nonexistent-token"
+    client = TestClient(build_app(settings))
+
+    ids = {b["id"] for b in client.get("/api/banners").json()["banners"]}
+    assert "hf-token-missing" in ids
+
+
+def test_hf_token_path_none_suppresses_banner(settings: Settings) -> None:
+    """When hf_token_path is None (HF not configured), no banner fires."""
+    settings.enable_hf_publish = False
+    settings.hf_token_path = None
     client = TestClient(build_app(settings))
 
     ids = {b["id"] for b in client.get("/api/banners").json()["banners"]}

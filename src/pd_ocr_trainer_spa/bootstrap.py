@@ -25,6 +25,7 @@ from pd_ocr_trainer_spa.api import (
     jobs,
     profiles,
     runs,
+    sources,
 )
 from pd_ocr_trainer_spa.api import eval as eval_api
 from pd_ocr_trainer_spa.api import models as models_api
@@ -100,6 +101,7 @@ def build_app(settings: Settings) -> FastAPI:
     app.include_router(runs.router)
     app.include_router(models_api.router)
     app.include_router(eval_api.router)
+    app.include_router(sources.router)
 
     # SPA catch-all — MUST be last so /api/* routes are not shadowed
     @app.get("/{full_path:path}", include_in_schema=False)
