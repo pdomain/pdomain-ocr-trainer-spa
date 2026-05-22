@@ -13,11 +13,12 @@ readme = "README.md"
 license = { text = "Unlicense" }
 requires-python = ">=3.13"
 dependencies = [
-    "pd-ocr-ops",
+    "pd-book-tools>=0.13.0",
+    "pd-ocr-ops>=0.2.2",
     # pd-ocr-training base install is torch-free: the FastAPI web process
     # imports only the typed config models + ITrainingRunner Protocol.
     # The training worker needs the heavy stack — see the `train` extra.
-    "pd-ocr-training",
+    "pd-ocr-training>=0.2.0",
     "fastapi>=0.111",
     "uvicorn[standard]>=0.29",
     "pydantic>=2.7",
@@ -54,10 +55,15 @@ e2e = [
     "pytest-playwright>=0.5",
 ]
 
+[[tool.uv.index]]
+name = "pd-index-pip"
+url = "https://concavetrillion.github.io/pd-index-pip/simple/"
+explicit = true
+
 [tool.uv.sources]
-pd-book-tools = { path = "../pd-book-tools", editable = true }
-pd-ocr-ops = { path = "../pd-ocr-ops", editable = true }
-pd-ocr-training = { path = "../pd-ocr-training", editable = true }
+pd-book-tools = { index = "pd-index-pip" }
+pd-ocr-ops = { index = "pd-index-pip" }
+pd-ocr-training = { index = "pd-index-pip" }
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/pd_ocr_trainer_spa"]
@@ -120,7 +126,7 @@ ignore = [
 convention = "google"
 
 [tool.ruff.lint.per-file-ignores]
-"tests/*" = ["E741", "N806", "S101", "S104", "S105", "S106", "S301", "S311", "S603", "T201", "ANN", "D", "PLR2004", "PT011", "PT018", "S108", "PLR0133", "PLW2901", "PLW1510", "PERF401", "PERF402", "TRY", "BLE001", "TC"]
+"tests/*" = ["E741", "N806", "N811", "S101", "S104", "S105", "S106", "S301", "S311", "S603", "T201", "ANN", "D", "PLR2004", "PT011", "PT018", "S108", "PLR0133", "PLW2901", "PLW1510", "PERF401", "PERF402", "TRY", "BLE001", "TC"]
 "scripts/*.py" = ["T201", "D", "ANN", "S603", "S607", "PLW1510"]
 "**/__init__.py" = ["D104", "F401", "TC"]
 "**/_*.py" = ["D"]
