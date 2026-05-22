@@ -70,3 +70,47 @@ def test_banner_order_is_deterministic(
         "hf-token-missing",
         "disk-low",
     ]
+
+
+# ---------------------------------------------------------------------------
+# M10 — HF read path: banner fires when token path configured but absent
+# ---------------------------------------------------------------------------
+
+
+def test_hf_token_missing_banner_fires_for_read_path(settings: Settings) -> None:
+    """hf-token-missing fires when hf_token_path is set but the file is absent.
+
+    M10 extends the banner to cover the HF read path (datasets.load_dataset)
+    in addition to the publish path.  hf_token_path = a Path that doesn't
+    exist should always surface the banner — enable_hf_publish is irrelevant.
+    """
+    settings.enable_hf_publish = False  # read path only
+    settings.hf_token_path = settings.app_data_root / "nonexistent-token"
+
+    banners = dom.synthesize_banners(settings)
+    assert any(b.id == "hf-token-missing" for b in banners)
+
+
+def test_hf_no_token_path_configured_no_banner(settings: Settings) -> None:
+    """When hf_token_path is None the HF token banner must NOT fire.
+
+    The user has not configured HF at all; we shouldn't nag them.
+    """
+    settings.enable_hf_publish = False
+    settings.hf_token_path = None
+
+    banners = dom.synthesize_banners(settings)
+    assert not any(b.id == "hf-token-missing" for b in banners)
+
+
+def test_hf_token_present_suppresses_banner_for_read_path(
+    settings: Settings, tmp_path: Path
+) -> None:
+    """An existing token file suppresses hf-token-missing even with publish off."""
+    token = tmp_path / "token"
+    token.write_text("hf_xxx", encoding="utf-8")
+    settings.enable_hf_publish = False
+    settings.hf_token_path = token
+
+    banners = dom.synthesize_banners(settings)
+    assert not any(b.id == "hf-token-missing" for b in banners)

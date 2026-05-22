@@ -157,3 +157,47 @@ def test_delete_run_removes_terminal(settings: Settings) -> None:
     dom.mark_terminal(settings, run, status="succeeded", exit_code=0)
     dom.delete_run(settings, run.id)
     assert not dom.run_dir(settings, run.id).exists()
+
+
+# ---------------------------------------------------------------------------
+# M10 — HF source references in run args
+# ---------------------------------------------------------------------------
+
+
+def test_create_run_accepts_hf_source_in_args(settings: Settings) -> None:
+    """A run created with an HF source in args.sources stores it in manifest."""
+    _seed_profile(settings)
+    hf_source = {"kind": "huggingface", "repo": "ntw8532/pd-ocr-synth-ga-clogaelach", "revision": "main", "weight": 1.0}
+    run = dom.create_run(
+        settings,
+        profile="clogaelach",
+        task=TaskEnum.recognition,
+        args={"epochs": 2, "sources": [hf_source]},
+    )
+    assert run.args["sources"] == [hf_source]
+
+    # manifest round-trips the sources
+    reloaded = dom.read_manifest(settings, run.id)
+    assert reloaded is not None
+    reloaded_sources = reloaded.args.get("sources", [])
+    assert len(reloaded_sources) == 1
+    assert reloaded_sources[0]["repo"] == "ntw8532/pd-ocr-synth-ga-clogaelach"
+
+
+def test_prepare_worker_args_preserves_hf_source(settings: Settings) -> None:
+    """prepare_worker_args forwards the HF source entry to the worker args.json."""
+    _seed_profile(settings)
+    hf_source = {"kind": "huggingface", "repo": "ntw8532/test-ds", "revision": "main", "weight": 0.7}
+    run = dom.create_run(
+        settings,
+        profile="clogaelach",
+        task=TaskEnum.recognition,
+        args={"epochs": 1, "sources": [hf_source]},
+    )
+    args = json.loads(
+        (dom.run_dir(settings, run.id) / "args.json").read_text(encoding="utf-8")
+    )
+    # The HF source must be passed through to the worker for materialization.
+    sources = args.get("sources", [])
+    assert len(sources) == 1
+    assert sources[0]["repo"] == "ntw8532/test-ds"
