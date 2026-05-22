@@ -39,7 +39,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     } catch {
       // ignore parse errors
     }
-    throw new ApiError(message, resp.status, code);
+    throw new ApiError(code ?? "unknown", message, resp.status);
   }
   if (resp.status === 204) return undefined as T;
   return resp.json() as Promise<T>;

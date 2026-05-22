@@ -58,7 +58,10 @@ const modelItem = (name = "pd-ga-clogaelach-recognition-2026-01-01") => ({
 function makeFetch(profiles: unknown[], models: unknown[]) {
   return vi.fn((url: string) => {
     if (typeof url === "string" && url.includes("/api/profiles")) {
-      return Promise.resolve(jsonResponse(200, profiles));
+      // /api/profiles returns a ProfileListResponse envelope, not a bare array.
+      return Promise.resolve(
+        jsonResponse(200, { profiles, has_legacy_layout: false }),
+      );
     }
     if (typeof url === "string" && url.includes("/api/models")) {
       return Promise.resolve(jsonResponse(200, { models }));
