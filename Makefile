@@ -31,7 +31,7 @@ endef
 
 .PHONY: help setup install uninstall remove-venv reset lint format typecheck \
         pre-commit-check test test-slow e2e e2e-browser frontend-install \
-        frontend-test frontend-build build clean ci ci-full upgrade-deps \
+        frontend-typecheck frontend-test frontend-build build clean ci ci-full upgrade-deps \
         openapi-export dev dev-backend dev-frontend doctor mise-trust-worktrees mise-setup
 
 help: ## Show this help message
@@ -107,6 +107,9 @@ frontend-install: ## Install frontend dependencies
 	cd frontend && export CI=true && \
 	{ $(call _pnpm,install --frozen-lockfile) ; } || { $(call _pnpm,install) ; }
 
+frontend-typecheck: frontend-install ## Run tsc --noEmit type check on frontend
+	cd frontend && node_modules/.bin/tsc --noEmit
+
 frontend-test: frontend-install ## Run frontend vitest suite
 	cd frontend && node_modules/.bin/vitest run
 
@@ -157,7 +160,7 @@ clean: ## Clean cache + build artifacts
 	rm -rf dist/ frontend/dist/ 2>/dev/null || true
 	find src/pd_ocr_trainer_spa/static/ -not -name '.gitkeep' -delete 2>/dev/null || true
 
-ci: setup lint typecheck test frontend-install frontend-test ## CI pipeline (without frontend-build/e2e/wheel)
+ci: setup lint typecheck test frontend-install frontend-typecheck frontend-test ## CI pipeline (without frontend-build/e2e/wheel)
 
 ci-full: ci frontend-build e2e build ## Full CI including frontend build, e2e, and wheel
 
