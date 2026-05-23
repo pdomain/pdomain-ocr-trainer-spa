@@ -13,6 +13,7 @@ $(_goals):
 else
 
 MISE := $(shell command -v mise 2>/dev/null || echo $$HOME/.local/bin/mise)
+WORKSPACE_ROOT := $(abspath $(CURDIR)/..)
 HAVE_MISE = [ -x "$(MISE)" ]
 MISE_RUN = if $(HAVE_MISE); then $(MISE) exec --; fi
 
@@ -31,13 +32,25 @@ endef
 .PHONY: help setup install uninstall remove-venv reset lint format typecheck \
         pre-commit-check test test-slow e2e e2e-browser frontend-install \
         frontend-test frontend-build build clean ci ci-full upgrade-deps \
-        openapi-export dev dev-backend dev-frontend doctor mise-setup
+        openapi-export dev dev-backend dev-frontend doctor mise-trust-worktrees mise-setup
 
 help: ## Show this help message
 	@echo "Available commands:"
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-22s\033[0m %s\n", $$1, $$2}'
 
-mise-setup: ## Install mise tooling (Node 24, Python 3.13)
+mise-trust-worktrees: ## Trust repo + generated worktree roots for mise
+	@echo "🔐 Trusting mise config roots for this repo and generated worktrees..."
+	@mkdir -p "$$HOME/.config/mise/conf.d"
+	@printf '%s\n' \
+		'[settings]' \
+		'trusted_config_paths = [' \
+		'    "$(WORKSPACE_ROOT)",' \
+		'    "/srv/bot-workspaces",' \
+		']' \
+		> "$$HOME/.config/mise/conf.d/ocr-container-worktrees.toml"
+	@echo "✅ mise trust roots configured."
+
+mise-setup: mise-trust-worktrees ## Install mise tooling (Node 24, Python 3.13)
 	$(MISE) install
 
 setup: ## Sync Python deps + install pre-commit hooks
