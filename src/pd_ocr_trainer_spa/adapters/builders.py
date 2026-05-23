@@ -64,7 +64,7 @@ def build_job_runner(settings: Settings) -> LongJobRunner:
     async method returning an AsyncIterator; every concrete impl (including
     pd-ocr-ops' own LocalLongJobRunner) implements it as an async generator,
     which basedpyright sees as a structural mismatch. The ignores below track
-    that upstream Protocol-shape quirk — see docs/conventions/lint-deviations.md.
+    that upstream Protocol-shape quirk — see docs/decisions/lint-deviations.md.
     """
     if settings.job_runner_kind == "fake":
         from pd_ocr_trainer_spa.training.fake_runner import FakeLongJobRunner
