@@ -13,7 +13,7 @@ readme = "README.md"
 license = { text = "Unlicense" }
 requires-python = ">=3.13"
 dependencies = [
-    "pd-book-tools>=0.13.0",
+    "pd-book-tools>=0.14.1",
     "pd-ocr-ops>=0.2.2",
     # pd-ocr-training base install is torch-free: the FastAPI web process
     # imports only the typed config models + ITrainingRunner Protocol.
