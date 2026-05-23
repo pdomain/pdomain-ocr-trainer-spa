@@ -169,7 +169,7 @@ async def _event_stream(
     yield f"retry: {_SSE_RETRY_MS}\n\n"
     # pd-ocr-ops Protocol-shape quirk: stream_events is declared `async def
     # -> AsyncIterator` but every impl is an async generator (directly
-    # iterable). See docs/conventions/lint-deviations.md.
+    # iterable). See docs/decisions/lint-deviations.md.
     async for event in runner.stream_events(job_id):  # pyright: ignore[reportGeneralTypeIssues]
         if last_event_id is None or event.seq > last_event_id:
             _persist_progress(state, run_id, event)
