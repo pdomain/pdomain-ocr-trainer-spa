@@ -35,7 +35,8 @@ endef
         frontend-format frontend-format-check frontend-knip \
         build clean ci ci-full upgrade-deps \
         openapi-export dev dev-backend dev-frontend doctor mise-trust-worktrees mise-setup \
-        release-patch release-minor release-major _do-release
+        release-patch release-minor release-major _do-release \
+        local-setup local-dev local-check local-upgrade-deps local-run
 
 help: ## Show this help message
 	@echo "Available commands:"
@@ -182,6 +183,23 @@ clean: ## Clean cache + build artifacts
 ci: setup lint typecheck test frontend-install frontend-typecheck frontend-test frontend-format-check frontend-lint frontend-knip ## CI pipeline (without frontend-build/e2e/wheel)
 
 ci-full: ci frontend-build e2e build ## Full CI including frontend build, e2e, and wheel
+
+# ─── local-dev workflow (spec #362) ─────────────────────────────────────────
+
+local-setup: ## Clone any missing sibling pd-* repos into the workspace
+	@./scripts/local-setup.sh
+
+local-dev: ## Switch to local-dev mode (siblings editable + marker)
+	@./scripts/local-dev.sh
+
+local-check: ## Print local-dev mode status + per-sibling resolution
+	@./scripts/local-check.sh
+
+local-upgrade-deps: ## Upgrade deps then restore editable siblings (local-mode only)
+	@./scripts/local-upgrade-deps.sh
+
+local-run: ## Run the server against local-dev workspace (local-mode only)
+	@./scripts/local-run.sh
 
 # ---------------------------------------------------------------------------
 # Releases
