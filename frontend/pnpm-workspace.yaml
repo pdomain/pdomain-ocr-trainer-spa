@@ -1,4 +1,4 @@
-# esbuild ships its native binary via a post-install build script.
-# pnpm blocks build scripts by default; allow esbuild's explicitly.
+# Build-script allowlist for pnpm 11.
+# esbuild: needs postinstall to download the platform-specific native binary.
 allowBuilds:
   esbuild: true

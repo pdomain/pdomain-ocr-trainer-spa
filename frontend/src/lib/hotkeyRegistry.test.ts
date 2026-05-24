@@ -26,8 +26,16 @@ describe("registerHotkey", () => {
   });
 
   it("ref-counts identical re-registrations (StrictMode double mount)", () => {
-    const off1 = registerHotkey({ scope: "app", combo: "j", description: "Down" });
-    const off2 = registerHotkey({ scope: "app", combo: "j", description: "Down" });
+    const off1 = registerHotkey({
+      scope: "app",
+      combo: "j",
+      description: "Down",
+    });
+    const off2 = registerHotkey({
+      scope: "app",
+      combo: "j",
+      description: "Down",
+    });
     expect(listHotkeys()).toHaveLength(1);
     off1();
     expect(listHotkeys()).toHaveLength(1); // still one ref
@@ -36,9 +44,17 @@ describe("registerHotkey", () => {
   });
 
   it("throws on a conflicting (scope, combo) with a different description", () => {
-    registerHotkey({ scope: "kanban", combo: "x", description: "Toggle select" });
+    registerHotkey({
+      scope: "kanban",
+      combo: "x",
+      description: "Toggle select",
+    });
     expect(() =>
-      registerHotkey({ scope: "kanban", combo: "x", description: "Something else" }),
+      registerHotkey({
+        scope: "kanban",
+        combo: "x",
+        description: "Something else",
+      }),
     ).toThrow(DuplicateHotkeyError);
   });
 

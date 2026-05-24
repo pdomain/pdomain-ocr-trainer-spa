@@ -42,17 +42,20 @@ export const errorMessages: Record<string, ErrorToastBuilder> = {
   "eval.not_an_eval": () => ({
     kind: "error",
     title: "Not an eval run",
-    description: "That run id is a training run, not an eval — no result to show.",
+    description:
+      "That run id is a training run, not an eval — no result to show.",
   }),
   "eval.result_missing": () => ({
     kind: "error",
     title: "Eval result missing",
-    description: "The eval finished but no result file was written. Re-run the eval.",
+    description:
+      "The eval finished but no result file was written. Re-run the eval.",
   }),
   "eval.run_failed": (env) => ({
     kind: "error",
     title: "Eval failed",
-    description: env.message || "The evaluation run did not finish successfully.",
+    description:
+      env.message || "The evaluation run did not finish successfully.",
   }),
   // --- jobs ---------------------------------------------------------------
   "job.unknown": () => ({
@@ -64,7 +67,8 @@ export const errorMessages: Record<string, ErrorToastBuilder> = {
   "model.in_use": () => ({
     kind: "error",
     title: "Model in use",
-    description: "This model is referenced by an active run and cannot be deleted.",
+    description:
+      "This model is referenced by an active run and cannot be deleted.",
   }),
   "model.invalid_name": (env) => ({
     kind: "error",
@@ -76,18 +80,21 @@ export const errorMessages: Record<string, ErrorToastBuilder> = {
   "model.name_taken": () => ({
     kind: "error",
     title: "Name already taken",
-    description: "Another model already uses that name. Choose a different one.",
+    description:
+      "Another model already uses that name. Choose a different one.",
   }),
   "model.unknown": () => ({
     kind: "error",
     title: "Unknown model",
-    description: "That model is not in the registry — it may have been deleted.",
+    description:
+      "That model is not in the registry — it may have been deleted.",
   }),
   // --- profiles -----------------------------------------------------------
   "profile.bad_typeface": (env) => ({
     kind: "error",
     title: "Invalid typeface",
-    description: env.message || "The typeface is not one of the supported values.",
+    description:
+      env.message || "The typeface is not one of the supported values.",
   }),
   "profile.exists": () => ({
     kind: "error",
@@ -114,7 +121,8 @@ export const errorMessages: Record<string, ErrorToastBuilder> = {
   "run.already_running": () => ({
     kind: "error",
     title: "Run already active",
-    description: "A run for this profile/task is already running. Wait for it to finish.",
+    description:
+      "A run for this profile/task is already running. Wait for it to finish.",
   }),
   "run.has_artefacts": () => ({
     kind: "error",
@@ -141,7 +149,8 @@ export const errorMessages: Record<string, ErrorToastBuilder> = {
   "run.task_unsupported": () => ({
     kind: "error",
     title: "Unsupported task",
-    description: "The selected training task is not supported for this profile.",
+    description:
+      "The selected training task is not supported for this profile.",
   }),
   "run.unknown": () => ({
     kind: "error",
@@ -152,7 +161,8 @@ export const errorMessages: Record<string, ErrorToastBuilder> = {
   "training_defaults.not_set": () => ({
     kind: "error",
     title: "No saved defaults",
-    description: "This profile has no saved training defaults for that task yet.",
+    description:
+      "This profile has no saved training defaults for that task yet.",
   }),
   "training_defaults.task_unsupported": () => ({
     kind: "error",
@@ -182,7 +192,8 @@ export const errorMessages: Record<string, ErrorToastBuilder> = {
   "adapter.not_implemented": (env) => ({
     kind: "error",
     title: "Not implemented",
-    description: env.message || "That capability is not available in this build.",
+    description:
+      env.message || "That capability is not available in this build.",
   }),
 };
 

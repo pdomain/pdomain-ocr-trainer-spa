@@ -28,7 +28,9 @@ describe("AppHeader", () => {
   it("shows the app version from window.__APP_ENV__ when present", () => {
     window.__APP_ENV__ = { version: "9.9.9" };
     renderHeader();
-    expect(screen.getByTestId("header-app-version")).toHaveTextContent("v9.9.9");
+    expect(screen.getByTestId("header-app-version")).toHaveTextContent(
+      "v9.9.9",
+    );
   });
 
   it("falls back to a dev version when __APP_ENV__ is absent", () => {

@@ -3,10 +3,22 @@
 import { describe, expect, it } from "vitest";
 import { ERROR_CODES } from "../api/errors";
 import type { ErrorEnvelope } from "../api/errors";
-import { errorMessages, toastFromError, uncoveredErrorCodes } from "./errorMessages";
+import {
+  errorMessages,
+  toastFromError,
+  uncoveredErrorCodes,
+} from "./errorMessages";
 
-function envelope(code: string, overrides: Partial<ErrorEnvelope> = {}): ErrorEnvelope {
-  return { code, message: `message for ${code}`, request_id: "req-1", ...overrides };
+function envelope(
+  code: string,
+  overrides: Partial<ErrorEnvelope> = {},
+): ErrorEnvelope {
+  return {
+    code,
+    message: `message for ${code}`,
+    request_id: "req-1",
+    ...overrides,
+  };
 }
 
 describe("errorMessages coverage", () => {
@@ -36,7 +48,9 @@ describe("toastFromError", () => {
   });
 
   it("falls back to the envelope message + code for unknown codes", () => {
-    const toast = toastFromError(envelope("totally.unknown", { message: "boom" }));
+    const toast = toastFromError(
+      envelope("totally.unknown", { message: "boom" }),
+    );
     expect(toast.kind).toBe("error");
     expect(toast.title).toBe("boom");
     expect(toast.description).toBe("totally.unknown");

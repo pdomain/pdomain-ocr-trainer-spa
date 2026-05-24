@@ -167,7 +167,9 @@ export function ProfileDetailPage(): JSX.Element {
               {error}
             </p>
           )}
-          {loading && <p data-testid="profile-detail-defaults-loading">Loading…</p>}
+          {loading && (
+            <p data-testid="profile-detail-defaults-loading">Loading…</p>
+          )}
 
           {args && (
             <RunArgsEditor
@@ -179,7 +181,9 @@ export function ProfileDetailPage(): JSX.Element {
             />
           )}
 
-          <footer style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+          <footer
+            style={{ display: "flex", gap: "1rem", alignItems: "center" }}
+          >
             <Button
               data-testid="profile-detail-defaults-save"
               disabled={busy || !args}

@@ -81,10 +81,7 @@ export function fetchKanban(
   return jsonRequest<KanbanView>(`${datasetsBase(profile, task)}/kanban`);
 }
 
-export function scanKanban(
-  profile: string,
-  task: string,
-): Promise<KanbanView> {
+export function scanKanban(profile: string, task: string): Promise<KanbanView> {
   return jsonRequest<KanbanView>(`${datasetsBase(profile, task)}/scan`, {
     method: "POST",
   });

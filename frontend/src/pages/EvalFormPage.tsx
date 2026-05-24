@@ -39,9 +39,7 @@ export function EvalFormPage(): JSX.Element {
 
   const loadModels = useCallback(async () => {
     try {
-      const resp = await fetchModels(
-        showAll ? {} : { profile, task },
-      );
+      const resp = await fetchModels(showAll ? {} : { profile, task });
       setModels(resp.models);
     } catch {
       setModels([]);

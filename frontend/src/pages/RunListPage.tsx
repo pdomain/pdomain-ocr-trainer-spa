@@ -64,7 +64,11 @@ export function RunListPage(): JSX.Element {
     <div data-testid="run-list-page">
       <header style={{ display: "flex", justifyContent: "space-between" }}>
         <h1>Runs</h1>
-        <Button data-testid="run-list-refresh" variant="ghost" onClick={() => void load()}>
+        <Button
+          data-testid="run-list-refresh"
+          variant="ghost"
+          onClick={() => void load()}
+        >
           Refresh
         </Button>
       </header>
@@ -118,13 +122,19 @@ export function RunListPage(): JSX.Element {
                 <td>{r.task}</td>
                 <td>{r.kind}</td>
                 <td>
-                  <Badge data-testid={`run-list-row-${r.id}-status`} variant={STATUS_VARIANT[r.status]}>
+                  <Badge
+                    data-testid={`run-list-row-${r.id}-status`}
+                    variant={STATUS_VARIANT[r.status]}
+                  >
                     {r.status}
                   </Badge>
                 </td>
                 <td>{formatDuration(r.started_at, r.finished_at)}</td>
                 <td>
-                  <a href={`/runs/${r.id}`} data-testid={`run-list-row-${r.id}-link`}>
+                  <a
+                    href={`/runs/${r.id}`}
+                    data-testid={`run-list-row-${r.id}-link`}
+                  >
                     {r.model_name}
                   </a>
                 </td>

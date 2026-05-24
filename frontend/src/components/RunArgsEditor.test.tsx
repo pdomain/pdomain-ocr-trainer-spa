@@ -31,8 +31,12 @@ function Harness({
 
 describe("RunArgsEditor", () => {
   it("renders the detection field set including rotation", () => {
-    expect(fieldSpecForTask("detection").map((f) => f.key)).toContain("rotation");
-    render(<Harness task="detection" initial={{ epochs: 100, rotation: false }} />);
+    expect(fieldSpecForTask("detection").map((f) => f.key)).toContain(
+      "rotation",
+    );
+    render(
+      <Harness task="detection" initial={{ epochs: 100, rotation: false }} />,
+    );
     expect(screen.getByTestId("run-args-field-rotation")).toBeTruthy();
     expect(screen.getByTestId("run-args-field-epochs")).toBeTruthy();
   });
@@ -47,7 +51,9 @@ describe("RunArgsEditor", () => {
         initial={{ epochs: 10, vocab_library: ["french"] }}
       />,
     );
-    const vocab = screen.getByTestId("run-args-field-vocab_library") as HTMLInputElement;
+    const vocab = screen.getByTestId(
+      "run-args-field-vocab_library",
+    ) as HTMLInputElement;
     expect(vocab.value).toBe("french");
     // detection-only fields are absent for recognition
     expect(screen.queryByTestId("run-args-field-rotation")).toBeNull();
@@ -59,17 +65,25 @@ describe("RunArgsEditor", () => {
     render(
       <Harness task="detection" initial={{ epochs: 100 }} onChangeSpy={spy} />,
     );
-    const input = screen.getByTestId("run-args-field-epochs") as HTMLInputElement;
+    const input = screen.getByTestId(
+      "run-args-field-epochs",
+    ) as HTMLInputElement;
     await user.clear(input);
     await user.type(input, "50");
-    expect(spy).toHaveBeenLastCalledWith(expect.objectContaining({ epochs: 50 }));
+    expect(spy).toHaveBeenLastCalledWith(
+      expect.objectContaining({ epochs: 50 }),
+    );
   });
 
   it("toggles a boolean field", async () => {
     const user = userEvent.setup();
     const spy = vi.fn();
     render(
-      <Harness task="detection" initial={{ rotation: false }} onChangeSpy={spy} />,
+      <Harness
+        task="detection"
+        initial={{ rotation: false }}
+        onChangeSpy={spy}
+      />,
     );
     await user.click(screen.getByTestId("run-args-field-rotation"));
     expect(spy).toHaveBeenLastCalledWith(

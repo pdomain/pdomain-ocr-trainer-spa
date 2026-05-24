@@ -62,7 +62,9 @@ export interface KanbanBoardProps<
   columns: TColumn[];
   items: Map<TColumn["id"], TItem[]>;
   onMove: (event: KanbanMoveEvent<TColumn["id"], TItem["id"]>) => void;
-  renderColumnHeader: (props: KanbanColumnHeaderProps<TColumn>) => React.ReactNode;
+  renderColumnHeader: (
+    props: KanbanColumnHeaderProps<TColumn>,
+  ) => React.ReactNode;
   renderChip: (props: KanbanChipRenderProps<TItem>) => React.ReactNode;
   selectedIds?: ReadonlySet<TItem["id"]>;
   onSelect?: (event: KanbanSelectEvent<TItem["id"]>) => void;
@@ -94,9 +96,10 @@ export function KanbanBoard<
   chipTestId,
   className,
 }: KanbanBoardProps<TColumn, TItem>) {
-  const [grab, setGrab] = useState<GrabState<TItem["id"], TColumn["id"]> | null>(
-    null,
-  );
+  const [grab, setGrab] = useState<GrabState<
+    TItem["id"],
+    TColumn["id"]
+  > | null>(null);
   const boardRef = useRef<HTMLDivElement>(null);
 
   const columnIndexOf = useCallback(
@@ -138,10 +141,7 @@ export function KanbanBoard<
         event.preventDefault();
         const delta = key === "ArrowRight" ? 1 : -1;
         const current = columnIndexOf(grab.targetColumnId);
-        const next = Math.min(
-          columns.length - 1,
-          Math.max(0, current + delta),
-        );
+        const next = Math.min(columns.length - 1, Math.max(0, current + delta));
         setGrab({ ...grab, targetColumnId: columns[next].id as TColumn["id"] });
         return;
       }

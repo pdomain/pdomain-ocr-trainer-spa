@@ -34,7 +34,10 @@ describe("PublishDialog SPDX license casing", () => {
   });
 
   it("every license <option> uses a canonical-case SPDX identifier", async () => {
-    vi.stubGlobal("fetch", vi.fn(() => new Promise(() => {})));
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() => new Promise(() => {})),
+    );
     render(
       <PublishDialog
         mode="dataset"

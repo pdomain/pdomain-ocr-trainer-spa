@@ -60,14 +60,18 @@ describe("profilesStore", () => {
     vi.stubGlobal("fetch", fetchMock);
     const store = createProfilesStore();
     await store.getState().create({ name: "Clogaelach" });
-    expect(store.getState().profiles.map((p) => p.name)).toContain("clogaelach");
+    expect(store.getState().profiles.map((p) => p.name)).toContain(
+      "clogaelach",
+    );
   });
 
   it("create() surfaces and rethrows an API error", async () => {
     vi.stubGlobal(
       "fetch",
       vi.fn(() =>
-        Promise.resolve(jsonResponse(409, { code: "profile.exists", message: "x" })),
+        Promise.resolve(
+          jsonResponse(409, { code: "profile.exists", message: "x" }),
+        ),
       ),
     );
     const store = createProfilesStore();

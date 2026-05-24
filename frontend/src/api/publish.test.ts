@@ -59,9 +59,7 @@ describe("publish API client", () => {
   it("wraps the thrown value as an ApiError instance", async () => {
     vi.stubGlobal(
       "fetch",
-      vi.fn(() =>
-        Promise.resolve(errorResponse(500, { message: "boom" })),
-      ),
+      vi.fn(() => Promise.resolve(errorResponse(500, { message: "boom" }))),
     );
     const err = await publishDataset({
       profile: "p",
@@ -76,9 +74,7 @@ describe("publish API client", () => {
   it("returns the parsed body on success", async () => {
     vi.stubGlobal(
       "fetch",
-      vi.fn(() =>
-        Promise.resolve(okResponse({ run_id: "r1", job_id: "j1" })),
-      ),
+      vi.fn(() => Promise.resolve(okResponse({ run_id: "r1", job_id: "j1" }))),
     );
     await expect(
       publishDataset({

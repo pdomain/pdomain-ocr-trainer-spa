@@ -101,9 +101,7 @@ describe("RunDetailPage", () => {
   it("shows Cancel only for a running run and posts on click", async () => {
     const fetchMock = vi.fn((url: string, init?: RequestInit) => {
       if (String(url).endsWith("/cancel")) {
-        return Promise.resolve(
-          jsonResponse(202, run({ status: "cancelled" })),
-        );
+        return Promise.resolve(jsonResponse(202, run({ status: "cancelled" })));
       }
       if (String(url).endsWith("/progress")) {
         return Promise.resolve(jsonResponse(200, { records: [] }));
@@ -128,7 +126,8 @@ describe("RunDetailPage", () => {
     vi.stubGlobal("fetch", fetchFor(run({ status: "succeeded" }), []));
     render(routeFor());
     await waitFor(
-      () => expect(screen.getByTestId("run-detail-open-model")).toBeInTheDocument(),
+      () =>
+        expect(screen.getByTestId("run-detail-open-model")).toBeInTheDocument(),
       { timeout: 5000 },
     );
     expect(screen.queryByTestId("run-detail-cancel")).not.toBeInTheDocument();

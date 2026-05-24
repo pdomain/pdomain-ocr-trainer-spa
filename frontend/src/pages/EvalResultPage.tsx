@@ -50,9 +50,7 @@ export function EvalResultPage(): JSX.Element {
   if (pending) {
     return (
       <div data-testid="eval-result-page">
-        <p data-testid="eval-result-pending">
-          Eval has not finished yet.
-        </p>
+        <p data-testid="eval-result-pending">Eval has not finished yet.</p>
         <Button data-testid="eval-result-refresh" onClick={() => void load()}>
           Refresh
         </Button>

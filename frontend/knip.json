@@ -1,0 +1,18 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "project": ["src/**/*.{ts,tsx}"],
+  "ignoreDependencies": [
+    "@radix-ui/react-accordion",
+    "@radix-ui/react-alert-dialog",
+    "@radix-ui/react-dialog",
+    "@radix-ui/react-dropdown-menu",
+    "@radix-ui/react-popover",
+    "@radix-ui/react-select",
+    "@radix-ui/react-tabs",
+    "@radix-ui/react-toggle-group",
+    "@radix-ui/react-tooltip",
+    "clsx"
+  ],
+  "ignoreExportsUsedInFile": true,
+  "ignore": ["src/api/**", "src/components/AppToaster.tsx"]
+}

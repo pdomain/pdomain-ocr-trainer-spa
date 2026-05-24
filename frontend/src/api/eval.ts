@@ -93,7 +93,5 @@ export function submitEval(payload: EvalRequestPayload): Promise<EvalResponse> {
 }
 
 export function fetchEvalResult(runId: string): Promise<EvalResult> {
-  return request<EvalResult>(
-    `/api/eval/${encodeURIComponent(runId)}/result`,
-  );
+  return request<EvalResult>(`/api/eval/${encodeURIComponent(runId)}/result`);
 }

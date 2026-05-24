@@ -36,7 +36,12 @@ export function AppChrome(): JSX.Element {
     () => navigate("/profiles"),
   );
   useHotkey(
-    { scope: "app", combo: "g r", description: "Go to Runs", displayOnly: true },
+    {
+      scope: "app",
+      combo: "g r",
+      description: "Go to Runs",
+      displayOnly: true,
+    },
     () => navigate("/runs"),
   );
   useHotkey(
@@ -49,7 +54,12 @@ export function AppChrome(): JSX.Element {
     () => navigate("/models"),
   );
   useHotkey(
-    { scope: "app", combo: "g e", description: "Go to Eval", displayOnly: true },
+    {
+      scope: "app",
+      combo: "g e",
+      description: "Go to Eval",
+      displayOnly: true,
+    },
     () => navigate("/eval"),
   );
 

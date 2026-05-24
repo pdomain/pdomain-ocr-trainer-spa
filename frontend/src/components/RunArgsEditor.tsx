@@ -168,7 +168,9 @@ export function RunArgsEditor({
               data-testid={id}
               type={field.kind === "number" ? "number" : "text"}
               disabled={disabled}
-              value={current === undefined || current === null ? "" : String(current)}
+              value={
+                current === undefined || current === null ? "" : String(current)
+              }
               onChange={(e) => {
                 if (field.kind === "number") {
                   const raw = e.target.value;

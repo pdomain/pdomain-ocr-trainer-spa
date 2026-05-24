@@ -79,7 +79,9 @@ describe("EvalFormPage", () => {
       expect(screen.getByTestId("eval-form-page")).toBeInTheDocument(),
     );
     expect(screen.getByTestId("eval-form-profile")).toBeInTheDocument();
-    expect(screen.getByTestId("eval-form-task-recognition")).toBeInTheDocument();
+    expect(
+      screen.getByTestId("eval-form-task-recognition"),
+    ).toBeInTheDocument();
     expect(screen.getByTestId("eval-form-model")).toBeInTheDocument();
     expect(screen.getByTestId("eval-form-source-local")).toBeInTheDocument();
     expect(screen.getByTestId("eval-form-submit")).toBeInTheDocument();

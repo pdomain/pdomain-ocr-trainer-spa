@@ -35,7 +35,9 @@ describe("BannerStack", () => {
   it("renders nothing when there are no banners", async () => {
     const { container } = render(<BannerStack fetcher={fetcher([])} />);
     await waitFor(() => {
-      expect(container.querySelector('[data-testid="banner-stack"]')).toBeNull();
+      expect(
+        container.querySelector('[data-testid="banner-stack"]'),
+      ).toBeNull();
     });
   });
 
@@ -48,10 +50,9 @@ describe("BannerStack", () => {
     const banner = await screen.findByTestId("banner-hf-token-missing");
     expect(banner).toHaveAttribute("aria-live", "polite");
     expect(banner).toHaveAttribute("role", "region");
-    expect(screen.getByTestId("banner-hf-token-missing-action")).toHaveAttribute(
-      "href",
-      "/settings",
-    );
+    expect(
+      screen.getByTestId("banner-hf-token-missing-action"),
+    ).toHaveAttribute("href", "/settings");
 
     await user.click(screen.getByTestId("banner-hf-token-missing-dismiss"));
     expect(screen.queryByTestId("banner-hf-token-missing")).toBeNull();
