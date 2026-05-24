@@ -2,6 +2,18 @@
 
 Agent guidance for the `pd-ocr-trainer-spa` repo.
 
+## Commands
+
+| target | does |
+|---|---|
+| `make local-setup` | clone any missing sibling pd-* repos (pd-book-tools, pd-ocr-ops, pd-ocr-training, pd-ui) |
+| `make local-dev` | switch to local-dev mode (3 Python siblings editable + pd-ui linked + marker) |
+| `make local-check` | print local-dev mode + per-sibling resolution |
+| `make local-upgrade-deps` | upgrade deps then restore editables (local-mode only) |
+| `make local-run` | run the SPA against local-dev workspace (local-mode only) |
+
+See [workspace `docs/process/local-dev.md`](../docs/process/local-dev.md) for the canonical local-dev pattern (spec #362).
+
 <!-- workspace-process:start -->
 
 ## Before coding
