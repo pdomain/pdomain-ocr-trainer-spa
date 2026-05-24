@@ -36,7 +36,8 @@ endef
         build clean ci ci-full upgrade-deps \
         openapi-export dev dev-backend dev-frontend doctor mise-trust-worktrees mise-setup \
         release-patch release-minor release-major _do-release \
-        local-setup local-dev local-check local-upgrade-deps local-run
+        local-setup local-dev local-check local-upgrade-deps local-run \
+        update-pd-deps
 
 help: ## Show this help message
 	@echo "Available commands:"
@@ -200,6 +201,9 @@ local-upgrade-deps: ## Upgrade deps then restore editable siblings (local-mode o
 
 local-run: ## Run the server against local-dev workspace (local-mode only)
 	@./scripts/local-run.sh
+
+update-pd-deps: ## Bump all pd-* sibling deps (py: pd-book-tools, pd-ocr-ops, pd-ocr-training; npm: pd-ui) to registry latest
+	@./scripts/update-pd-deps.sh
 
 # ---------------------------------------------------------------------------
 # Releases
