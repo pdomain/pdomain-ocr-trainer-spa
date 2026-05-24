@@ -91,7 +91,9 @@ export function fetchRun(runId: string): Promise<Run> {
   return request<Run>(`/api/runs/${encodeURIComponent(runId)}`);
 }
 
-export function createRun(payload: CreateRunPayload): Promise<CreateRunResponse> {
+export function createRun(
+  payload: CreateRunPayload,
+): Promise<CreateRunResponse> {
   return request<CreateRunResponse>("/api/runs", {
     method: "POST",
     body: JSON.stringify(payload),

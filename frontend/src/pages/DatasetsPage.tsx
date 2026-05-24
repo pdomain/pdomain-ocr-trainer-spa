@@ -99,7 +99,10 @@ export function DatasetsPage(): JSX.Element {
 
   const shownChips = useMemo(
     () =>
-      [...items.values()].reduce((sum, columnItems) => sum + columnItems.length, 0),
+      [...items.values()].reduce(
+        (sum, columnItems) => sum + columnItems.length,
+        0,
+      ),
     [items],
   );
 

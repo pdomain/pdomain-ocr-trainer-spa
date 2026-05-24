@@ -82,7 +82,10 @@ export function ProfilesPage(): JSX.Element {
             {profiles.map((p) => (
               <tr key={p.name} data-testid={`profiles-row-${p.name}`}>
                 <td>
-                  <a href={`/profiles/${p.name}`} data-testid={`profiles-row-${p.name}-link`}>
+                  <a
+                    href={`/profiles/${p.name}`}
+                    data-testid={`profiles-row-${p.name}-link`}
+                  >
                     {p.name}
                   </a>
                 </td>
@@ -90,10 +93,12 @@ export function ProfilesPage(): JSX.Element {
                 <td>{p.language ?? "—"}</td>
                 <td>{p.typeface ?? "—"}</td>
                 <td>
-                  {p.counts.detection_train_pages}/{p.counts.detection_val_pages}
+                  {p.counts.detection_train_pages}/
+                  {p.counts.detection_val_pages}
                 </td>
                 <td>
-                  {p.counts.recognition_train_crops}/{p.counts.recognition_val_crops}
+                  {p.counts.recognition_train_crops}/
+                  {p.counts.recognition_val_crops}
                 </td>
                 <td>
                   {p.counts.typeface_train_crops}/{p.counts.typeface_val_crops}

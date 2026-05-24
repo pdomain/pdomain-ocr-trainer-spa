@@ -123,7 +123,10 @@ describe("DatasetsPage — kanban acceptance (spec 05 §11)", () => {
   it("scenario 2 & 3: drag stages a move, footer counts it, Apply commits", async () => {
     const fetchMock = vi.fn((url: string) =>
       Promise.resolve(
-        jsonResponse(200, String(url).endsWith("/apply") ? appliedView() : view()),
+        jsonResponse(
+          200,
+          String(url).endsWith("/apply") ? appliedView() : view(),
+        ),
       ),
     );
     vi.stubGlobal("fetch", fetchMock);
@@ -143,9 +146,9 @@ describe("DatasetsPage — kanban acceptance (spec 05 §11)", () => {
     expect(screen.getByTestId("kanban-footer-pending-count")).toHaveTextContent(
       "1 pending moves",
     );
-    expect(fetchMock.mock.calls.some(([u]) => String(u).endsWith("/apply"))).toBe(
-      false,
-    );
+    expect(
+      fetchMock.mock.calls.some(([u]) => String(u).endsWith("/apply")),
+    ).toBe(false);
 
     // Apply commits — chip lands under train, footer clears.
     await user.click(screen.getByTestId("kanban-footer-apply"));
@@ -181,9 +184,9 @@ describe("DatasetsPage — kanban acceptance (spec 05 §11)", () => {
     expect(screen.getByTestId("kanban-footer-pending-count")).toHaveTextContent(
       "No pending changes",
     );
-    expect(fetchMock.mock.calls.some(([u]) => String(u).endsWith("/apply"))).toBe(
-      false,
-    );
+    expect(
+      fetchMock.mock.calls.some(([u]) => String(u).endsWith("/apply")),
+    ).toBe(false);
   });
 });
 

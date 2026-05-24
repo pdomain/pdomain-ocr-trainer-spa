@@ -8,10 +8,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button, Card } from "@concavetrillion/pd-ui/primitives";
 import { RunArgsEditor } from "../components/RunArgsEditor";
-import {
-  fetchProfiles,
-  fetchTrainingDefaultsOrSeed,
-} from "../api/profiles";
+import { fetchProfiles, fetchTrainingDefaultsOrSeed } from "../api/profiles";
 import type { Profile, TrainingArgs } from "../api/profiles";
 import { createRun } from "../api/runs";
 import { ApiError } from "../api/profiles";
@@ -42,7 +39,10 @@ export function NewRunPage(): JSX.Element {
   const loadArgs = useCallback(async () => {
     if (profile === "") return;
     try {
-      const { args: resolved } = await fetchTrainingDefaultsOrSeed(profile, task);
+      const { args: resolved } = await fetchTrainingDefaultsOrSeed(
+        profile,
+        task,
+      );
       setArgs(resolved);
     } catch {
       setArgs({});

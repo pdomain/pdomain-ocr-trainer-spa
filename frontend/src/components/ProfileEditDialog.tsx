@@ -81,11 +81,15 @@ export function ProfileEditDialog({
       data-testid="profiles-edit-dialog"
       role="dialog"
       aria-modal="true"
-      aria-label={mode === "create" ? "New profile" : `Edit ${profile?.name ?? ""}`}
+      aria-label={
+        mode === "create" ? "New profile" : `Edit ${profile?.name ?? ""}`
+      }
       style={overlayStyle}
     >
       <div style={panelStyle}>
-        <h2>{mode === "create" ? "New profile" : `Edit ${profile?.name ?? ""}`}</h2>
+        <h2>
+          {mode === "create" ? "New profile" : `Edit ${profile?.name ?? ""}`}
+        </h2>
 
         {mode === "create" && (
           <FieldRow>

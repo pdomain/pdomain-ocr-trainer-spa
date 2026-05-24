@@ -15,7 +15,11 @@ import { NavLink } from "react-router-dom";
 import { getAppEnv } from "../lib/appEnv";
 
 /** Sidebar sections, spec 13 §4.1 — `sidebar-nav-{section}`. */
-const NAV_SECTIONS: ReadonlyArray<{ section: string; label: string; to: string }> = [
+const NAV_SECTIONS: ReadonlyArray<{
+  section: string;
+  label: string;
+  to: string;
+}> = [
   { section: "profiles", label: "Profiles", to: "/profiles" },
   { section: "datasets", label: "Datasets", to: "/profiles" },
   { section: "runs", label: "Runs", to: "/runs" },
@@ -61,7 +65,15 @@ export function AppHeader({ onOpenHelp }: AppHeaderProps): JSX.Element {
         </div>
       </header>
       <nav data-testid="sidebar-nav" aria-label="Primary">
-        <ul style={{ display: "flex", gap: "0.75rem", listStyle: "none", padding: "0.5rem 1rem", margin: 0 }}>
+        <ul
+          style={{
+            display: "flex",
+            gap: "0.75rem",
+            listStyle: "none",
+            padding: "0.5rem 1rem",
+            margin: 0,
+          }}
+        >
           {NAV_SECTIONS.map(({ section, label, to }) => (
             <li key={section}>
               <NavLink data-testid={`sidebar-nav-${section}`} to={to}>

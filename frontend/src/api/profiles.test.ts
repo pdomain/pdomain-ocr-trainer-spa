@@ -13,7 +13,9 @@ import {
 function mockFetch(impl: (url: string, init?: RequestInit) => Response): void {
   vi.stubGlobal(
     "fetch",
-    vi.fn((url: string, init?: RequestInit) => Promise.resolve(impl(url, init))),
+    vi.fn((url: string, init?: RequestInit) =>
+      Promise.resolve(impl(url, init)),
+    ),
   );
 }
 

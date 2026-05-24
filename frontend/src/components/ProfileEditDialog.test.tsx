@@ -37,8 +37,14 @@ describe("ProfileEditDialog — create mode", () => {
         onClose={() => undefined}
       />,
     );
-    await userEvent.type(screen.getByTestId("profiles-edit-dialog-name"), "Clogaelach");
-    await userEvent.type(screen.getByTestId("profiles-edit-dialog-language"), "ga");
+    await userEvent.type(
+      screen.getByTestId("profiles-edit-dialog-name"),
+      "Clogaelach",
+    );
+    await userEvent.type(
+      screen.getByTestId("profiles-edit-dialog-language"),
+      "ga",
+    );
     await userEvent.selectOptions(
       screen.getByTestId("profiles-edit-dialog-typeface"),
       "clogaelach",
@@ -54,9 +60,7 @@ describe("ProfileEditDialog — create mode", () => {
   });
 
   it("disables submit until a name is entered", () => {
-    render(
-      <ProfileEditDialog mode="create" onClose={() => undefined} />,
-    );
+    render(<ProfileEditDialog mode="create" onClose={() => undefined} />);
     expect(screen.getByTestId("profiles-edit-dialog-submit")).toBeDisabled();
   });
 });
@@ -94,7 +98,9 @@ describe("ProfileEditDialog — edit mode", () => {
         onClose={() => undefined}
       />,
     );
-    expect(screen.queryByTestId("profiles-edit-dialog-name")).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId("profiles-edit-dialog-name"),
+    ).not.toBeInTheDocument();
   });
 
   it("Cancel invokes onClose", async () => {

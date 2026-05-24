@@ -97,7 +97,9 @@ describe("ModelsPage", () => {
       vi.fn(() =>
         Promise.resolve(
           jsonResponse(200, {
-            models: [modelItem("pd-ga-x-recognition-2026", { has_sidecar: false })],
+            models: [
+              modelItem("pd-ga-x-recognition-2026", { has_sidecar: false }),
+            ],
           }),
         ),
       ),
@@ -109,7 +111,9 @@ describe("ModelsPage", () => {
     );
     await waitFor(() =>
       expect(
-        screen.getByTestId("models-row-pd-ga-x-recognition-2026-sidecar-missing"),
+        screen.getByTestId(
+          "models-row-pd-ga-x-recognition-2026-sidecar-missing",
+        ),
       ).toBeInTheDocument(),
     );
   });

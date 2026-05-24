@@ -3,7 +3,10 @@
 
 import { useState } from "react";
 import { Button } from "@concavetrillion/pd-ui/primitives";
-import type { PublishDatasetPayload, PublishModelPayload } from "../api/publish";
+import type {
+  PublishDatasetPayload,
+  PublishModelPayload,
+} from "../api/publish";
 import { publishDataset, publishModel } from "../api/publish";
 
 type PublishMode = "dataset" | "model";
@@ -118,7 +121,8 @@ export function PublishDialog({
         }}
       >
         <h2 id="publish-dialog-title" style={{ marginTop: 0 }}>
-          {mode === "dataset" ? "Publish Dataset" : "Publish Model"} to HuggingFace
+          {mode === "dataset" ? "Publish Dataset" : "Publish Model"} to
+          HuggingFace
         </h2>
 
         {error && (
@@ -230,7 +234,13 @@ export function PublishDialog({
             />
           </div>
 
-          <div style={{ display: "flex", gap: "0.5rem", justifyContent: "flex-end" }}>
+          <div
+            style={{
+              display: "flex",
+              gap: "0.5rem",
+              justifyContent: "flex-end",
+            }}
+          >
             <Button
               type="button"
               variant="ghost"

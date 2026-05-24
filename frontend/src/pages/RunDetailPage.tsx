@@ -64,7 +64,9 @@ export function RunDetailPage(): JSX.Element {
     const sub = subscribeToJob(run.job_id, {
       onEvent: (event: JobEvent) => {
         if (event.kind === "log") {
-          const line = String(event.payload.line ?? event.payload.message ?? "");
+          const line = String(
+            event.payload.line ?? event.payload.message ?? "",
+          );
           if (line) setStdout((prev) => [...prev, line]);
         }
         if (event.kind === "progress") {
@@ -126,15 +128,14 @@ export function RunDetailPage(): JSX.Element {
         <Badge data-testid="run-detail-status-badge">{run.status}</Badge>
       </header>
 
-      <progress
-        data-testid="run-detail-progress-bar"
-        max={100}
-        value={pct}
-      />
+      <progress data-testid="run-detail-progress-bar" max={100} value={pct} />
 
       <div style={{ display: "flex", gap: "0.5rem" }}>
         {run.status === "running" && (
-          <Button data-testid="run-detail-cancel" onClick={() => void handleCancel()}>
+          <Button
+            data-testid="run-detail-cancel"
+            onClick={() => void handleCancel()}
+          >
             Cancel
           </Button>
         )}

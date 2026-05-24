@@ -93,7 +93,9 @@ export function subscribeToJob(
 ): JobSubscription {
   const factory = options.factory ?? defaultEventSourceFactory;
   const basePath = options.basePath ?? "";
-  const source = factory(`${basePath}/api/jobs/${encodeURIComponent(jobId)}/events`);
+  const source = factory(
+    `${basePath}/api/jobs/${encodeURIComponent(jobId)}/events`,
+  );
 
   let lastSeq = -Infinity;
   let closed = false;

@@ -132,7 +132,10 @@ export function PublishPage(): JSX.Element {
       </section>
 
       {/* Models section */}
-      <section aria-labelledby="publish-models-heading" style={{ marginTop: "2rem" }}>
+      <section
+        aria-labelledby="publish-models-heading"
+        style={{ marginTop: "2rem" }}
+      >
         <h2 id="publish-models-heading">Models</h2>
         {models.length === 0 ? (
           <p data-testid="publish-no-models">No non-legacy models found.</p>

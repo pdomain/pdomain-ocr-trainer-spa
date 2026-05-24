@@ -6,7 +6,11 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { ProfileDetailPage } from "./ProfileDetailPage";
 
-function jsonResponse(status: number, body: unknown, headers: HeadersInit = {}): Response {
+function jsonResponse(
+  status: number,
+  body: unknown,
+  headers: HeadersInit = {},
+): Response {
   return {
     ok: status >= 200 && status < 300,
     status,
@@ -91,9 +95,9 @@ describe("ProfileDetailPage", () => {
       ) as HTMLInputElement;
       expect(epochs.value).toBe("100");
     });
-    expect(screen.getByTestId("profile-detail-defaults-source").textContent).toContain(
-      "seed",
-    );
+    expect(
+      screen.getByTestId("profile-detail-defaults-source").textContent,
+    ).toContain("seed");
   });
 
   it("round-trips: edit + save detection defaults, reopen prefills the saved value", async () => {
@@ -102,7 +106,9 @@ describe("ProfileDetailPage", () => {
     const user = userEvent.setup();
     renderPage();
     await user.click(screen.getByTestId("profile-detail-tab-defaults"));
-    const epochs = await screen.findByTestId("profile-detail-defaults-field-epochs");
+    const epochs = await screen.findByTestId(
+      "profile-detail-defaults-field-epochs",
+    );
     await user.clear(epochs);
     await user.type(epochs, "42");
     await user.click(screen.getByTestId("profile-detail-defaults-save"));
@@ -112,17 +118,21 @@ describe("ProfileDetailPage", () => {
     expect(saved.detection?.epochs).toBe(42);
 
     // Switch away and back — the saved value is prefilled.
-    await user.click(screen.getByTestId("profile-detail-defaults-task-recognition"));
-    await user.click(screen.getByTestId("profile-detail-defaults-task-detection"));
+    await user.click(
+      screen.getByTestId("profile-detail-defaults-task-recognition"),
+    );
+    await user.click(
+      screen.getByTestId("profile-detail-defaults-task-detection"),
+    );
     await waitFor(() => {
       const reopened = screen.getByTestId(
         "profile-detail-defaults-field-epochs",
       ) as HTMLInputElement;
       expect(reopened.value).toBe("42");
     });
-    expect(screen.getByTestId("profile-detail-defaults-source").textContent).toContain(
-      "saved",
-    );
+    expect(
+      screen.getByTestId("profile-detail-defaults-source").textContent,
+    ).toContain("saved");
   });
 
   it("recognition defaults round-trip independently of detection", async () => {
@@ -131,8 +141,12 @@ describe("ProfileDetailPage", () => {
     const user = userEvent.setup();
     renderPage();
     await user.click(screen.getByTestId("profile-detail-tab-defaults"));
-    await user.click(screen.getByTestId("profile-detail-defaults-task-recognition"));
-    const epochs = await screen.findByTestId("profile-detail-defaults-field-epochs");
+    await user.click(
+      screen.getByTestId("profile-detail-defaults-task-recognition"),
+    );
+    const epochs = await screen.findByTestId(
+      "profile-detail-defaults-field-epochs",
+    );
     await user.clear(epochs);
     await user.type(epochs, "25");
     await user.click(screen.getByTestId("profile-detail-defaults-save"));

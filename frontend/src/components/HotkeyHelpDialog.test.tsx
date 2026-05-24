@@ -26,7 +26,11 @@ describe("HotkeyHelpDialog", () => {
       combo: "shift+slash",
       description: "Show this dialog",
     });
-    registerHotkey({ scope: "kanban", combo: "j", description: "Move focus down" });
+    registerHotkey({
+      scope: "kanban",
+      combo: "j",
+      description: "Move focus down",
+    });
     registerHotkey({
       scope: "kanban",
       combo: "t",
@@ -41,10 +45,14 @@ describe("HotkeyHelpDialog", () => {
 
     // Only scopes with bound hotkeys render a section (spec §8).
     expect(screen.getByTestId("hotkey-help-section-app")).toBeInTheDocument();
-    expect(screen.getByTestId("hotkey-help-section-kanban")).toBeInTheDocument();
+    expect(
+      screen.getByTestId("hotkey-help-section-kanban"),
+    ).toBeInTheDocument();
     expect(screen.queryByTestId("hotkey-help-section-run-detail")).toBeNull();
 
-    expect(screen.getByText("Move selected chips to Train")).toBeInTheDocument();
+    expect(
+      screen.getByText("Move selected chips to Train"),
+    ).toBeInTheDocument();
   });
 
   it("closes when Escape is pressed", async () => {

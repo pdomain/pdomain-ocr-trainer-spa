@@ -15,7 +15,10 @@ export interface LossChartProps {
   label?: string;
 }
 
-export function LossChart({ series, label = "metric" }: LossChartProps): JSX.Element {
+export function LossChart({
+  series,
+  label = "metric",
+}: LossChartProps): JSX.Element {
   if (series.length === 0) {
     return (
       <div data-testid="run-detail-loss-chart">
@@ -42,7 +45,12 @@ export function LossChart({ series, label = "metric" }: LossChartProps): JSX.Ele
 
   return (
     <div data-testid="run-detail-loss-chart">
-      <svg width={width} height={height} role="img" aria-label={`${label} chart`}>
+      <svg
+        width={width}
+        height={height}
+        role="img"
+        aria-label={`${label} chart`}
+      >
         <polyline
           points={points}
           fill="none"

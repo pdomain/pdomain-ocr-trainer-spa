@@ -93,7 +93,10 @@ describe("PublishPage", () => {
 
   it("shows loading indicator while fetching", () => {
     // Never resolves
-    vi.stubGlobal("fetch", vi.fn(() => new Promise(() => {})));
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() => new Promise(() => {})),
+    );
     render(
       <MemoryRouter>
         <PublishPage />
@@ -141,9 +144,7 @@ describe("PublishPage", () => {
       screen.getByTestId("publish-dataset-test-profile-recognition"),
     );
     expect(screen.getByTestId("publish-dialog")).toBeInTheDocument();
-    expect(
-      screen.getByText(/Publish Dataset/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Publish Dataset/i)).toBeInTheDocument();
   });
 
   it("opens PublishDialog when a model Publish button is clicked", async () => {

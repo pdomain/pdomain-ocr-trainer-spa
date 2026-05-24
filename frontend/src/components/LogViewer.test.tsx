@@ -18,14 +18,18 @@ describe("LogViewer", () => {
     const user = userEvent.setup();
     render(<LogViewer stdout={["out"]} stderr={["err"]} />);
     await user.click(screen.getByTestId("run-detail-log-stream-toggle"));
-    expect(screen.getByTestId("run-detail-log-line-0")).toHaveTextContent("err");
+    expect(screen.getByTestId("run-detail-log-line-0")).toHaveTextContent(
+      "err",
+    );
   });
 
   it("filters lines by the search input", async () => {
     const user = userEvent.setup();
     render(<LogViewer stdout={["alpha", "beta", "gamma"]} stderr={[]} />);
     await user.type(screen.getByTestId("run-detail-log-search"), "bet");
-    expect(screen.getByTestId("run-detail-log-line-0")).toHaveTextContent("beta");
+    expect(screen.getByTestId("run-detail-log-line-0")).toHaveTextContent(
+      "beta",
+    );
     expect(screen.queryByText("alpha")).not.toBeInTheDocument();
   });
 });

@@ -174,9 +174,9 @@ describe("datasetsStore", () => {
     const store = createDatasetsStore();
     await store.getState().load("all", "recognition");
     await store.getState().apply();
-    expect(fetchMock.mock.calls.some(([u]) => String(u).endsWith("/apply"))).toBe(
-      false,
-    );
+    expect(
+      fetchMock.mock.calls.some(([u]) => String(u).endsWith("/apply")),
+    ).toBe(false);
   });
 
   it("rescan() refreshes and discards the staged overlay", async () => {

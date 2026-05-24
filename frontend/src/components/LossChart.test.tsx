@@ -7,7 +7,9 @@ import { LossChart } from "./LossChart";
 describe("LossChart", () => {
   it("renders the empty state with no series", () => {
     const { container } = render(<LossChart series={[]} />);
-    expect(screen.getByTestId("run-detail-loss-chart-empty")).toBeInTheDocument();
+    expect(
+      screen.getByTestId("run-detail-loss-chart-empty"),
+    ).toBeInTheDocument();
     expect(container).toMatchSnapshot();
   });
 
@@ -23,7 +25,9 @@ describe("LossChart", () => {
       />,
     );
     expect(screen.getByTestId("run-detail-loss-chart")).toBeInTheDocument();
-    expect(screen.queryByTestId("run-detail-loss-chart-empty")).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId("run-detail-loss-chart-empty"),
+    ).not.toBeInTheDocument();
     expect(screen.getByText(/val_cer: latest 0.0500/)).toBeInTheDocument();
   });
 });

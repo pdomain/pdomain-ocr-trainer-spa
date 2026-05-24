@@ -96,8 +96,7 @@ export function ModelDetailPage(): JSX.Element {
           Profile: {model.profile} · Task: {model.task}
         </p>
         <p>
-          Language: {model.language ?? "—"} · Typeface:{" "}
-          {model.typeface ?? "—"}
+          Language: {model.language ?? "—"} · Typeface: {model.typeface ?? "—"}
         </p>
       </header>
 
@@ -181,7 +180,9 @@ export function ModelDetailPage(): JSX.Element {
         <Card>
           <h2>Best Eval</h2>
           <p data-testid="models-detail-eval-summary">
-            <a href={`/eval/${encodeURIComponent(evalSummary.best_run_id)}/result`}>
+            <a
+              href={`/eval/${encodeURIComponent(evalSummary.best_run_id)}/result`}
+            >
               {evalSummary.best_run_id}
             </a>{" "}
             — {JSON.stringify(evalSummary.overall)}

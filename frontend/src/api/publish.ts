@@ -33,7 +33,11 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     let message = `HTTP ${resp.status}`;
     let code: string | undefined;
     try {
-      const body = (await resp.json()) as { detail?: string; message?: string; code?: string };
+      const body = (await resp.json()) as {
+        detail?: string;
+        message?: string;
+        code?: string;
+      };
       message = body.message ?? body.detail ?? message;
       code = body.code;
     } catch {

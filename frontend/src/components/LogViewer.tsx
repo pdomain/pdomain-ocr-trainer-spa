@@ -39,7 +39,9 @@ export function LogViewer({ stdout, stderr }: LogViewerProps): JSX.Element {
           data-testid="run-detail-log-stream-toggle"
           variant="ghost"
           size="sm"
-          onClick={() => setStream((s) => (s === "stdout" ? "stderr" : "stdout"))}
+          onClick={() =>
+            setStream((s) => (s === "stdout" ? "stderr" : "stdout"))
+          }
         >
           {stream}
         </Button>

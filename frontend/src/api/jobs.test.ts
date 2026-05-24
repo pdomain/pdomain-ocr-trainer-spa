@@ -4,11 +4,7 @@
 // network: scripted frames, reconnect overlap, terminal-state close.
 
 import { describe, it, expect } from "vitest";
-import {
-  subscribeToJob,
-  isTerminalState,
-  type JobEvent,
-} from "./jobs";
+import { subscribeToJob, isTerminalState, type JobEvent } from "./jobs";
 
 /** Minimal EventSource stand-in: tests push frames via `emit`. */
 class FakeEventSource {
@@ -39,7 +35,11 @@ class FakeEventSource {
   }
 }
 
-function makeEvent(seq: number, kind: JobEvent["kind"], payload = {}): JobEvent {
+function makeEvent(
+  seq: number,
+  kind: JobEvent["kind"],
+  payload = {},
+): JobEvent {
   return {
     job_id: "j-1",
     seq,
@@ -66,7 +66,10 @@ describe("subscribeToJob", () => {
     subscribeToJob(
       "j-1",
       { onEvent: (e) => received.push(e) },
-      { factory: (url) => (source = new FakeEventSource(url)) as unknown as EventSource },
+      {
+        factory: (url) =>
+          (source = new FakeEventSource(url)) as unknown as EventSource,
+      },
     );
 
     expect(source.url).toBe("/api/jobs/j-1/events");
@@ -84,7 +87,10 @@ describe("subscribeToJob", () => {
     subscribeToJob(
       "j-1",
       { onEvent: (e) => received.push(e) },
-      { factory: (url) => (source = new FakeEventSource(url)) as unknown as EventSource },
+      {
+        factory: (url) =>
+          (source = new FakeEventSource(url)) as unknown as EventSource,
+      },
     );
 
     source.emit(makeEvent(0, "log"));
@@ -108,7 +114,10 @@ describe("subscribeToJob", () => {
           closedWith = e;
         },
       },
-      { factory: (url) => (source = new FakeEventSource(url)) as unknown as EventSource },
+      {
+        factory: (url) =>
+          (source = new FakeEventSource(url)) as unknown as EventSource,
+      },
     );
 
     source.emit(makeEvent(0, "progress"));
@@ -127,7 +136,10 @@ describe("subscribeToJob", () => {
     subscribeToJob(
       "j-1",
       { onEvent: () => {} },
-      { factory: (url) => (source = new FakeEventSource(url)) as unknown as EventSource },
+      {
+        factory: (url) =>
+          (source = new FakeEventSource(url)) as unknown as EventSource,
+      },
     );
     source.emit(makeEvent(0, "state", { state: "running" }));
     expect(source.closed).toBe(false);
@@ -139,7 +151,10 @@ describe("subscribeToJob", () => {
     const sub = subscribeToJob(
       "j-1",
       { onEvent: (e) => received.push(e) },
-      { factory: (url) => (source = new FakeEventSource(url)) as unknown as EventSource },
+      {
+        factory: (url) =>
+          (source = new FakeEventSource(url)) as unknown as EventSource,
+      },
     );
     source.emit(makeEvent(0, "log"));
     sub.close();
@@ -154,10 +169,15 @@ describe("subscribeToJob", () => {
     subscribeToJob(
       "j-1",
       { onEvent: (e) => received.push(e) },
-      { factory: (url) => (source = new FakeEventSource(url)) as unknown as EventSource },
+      {
+        factory: (url) =>
+          (source = new FakeEventSource(url)) as unknown as EventSource,
+      },
     );
     // Hand a non-JSON payload directly to a registered listener.
-    (source as unknown as { listeners: Map<string, Set<EventListener>> }).listeners
+    (
+      source as unknown as { listeners: Map<string, Set<EventListener>> }
+    ).listeners
       .get("log")!
       .forEach((fn) => fn({ data: "not json" } as unknown as Event));
     expect(received).toEqual([]);

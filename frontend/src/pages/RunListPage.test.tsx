@@ -95,7 +95,9 @@ describe("RunListPage", () => {
     await waitFor(() =>
       expect(screen.getByTestId("run-list-row-r1")).toBeInTheDocument(),
     );
-    const select = screen.getByTestId("run-list-filter-status") as HTMLSelectElement;
+    const select = screen.getByTestId(
+      "run-list-filter-status",
+    ) as HTMLSelectElement;
     select.value = "failed";
     select.dispatchEvent(new Event("change", { bubbles: true }));
     await waitFor(() =>
