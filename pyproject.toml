@@ -18,7 +18,7 @@ dependencies = [
     # pd-ocr-training base install is torch-free: the FastAPI web process
     # imports only the typed config models + ITrainingRunner Protocol.
     # The training worker needs the heavy stack — see the `train` extra.
-    "pd-ocr-training>=0.2.0",
+    "pd-ocr-training>=0.2.2",
     "fastapi>=0.111",
     "uvicorn[standard]>=0.29",
     "pydantic>=2.7",

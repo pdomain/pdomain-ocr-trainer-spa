@@ -1563,7 +1563,7 @@ requires-dist = [
     { name = "fastapi", specifier = ">=0.111" },
     { name = "pd-book-tools", specifier = ">=0.14.1", index = "https://concavetrillion.github.io/pd-index-pip/simple/" },
     { name = "pd-ocr-ops", specifier = ">=0.2.2", index = "https://concavetrillion.github.io/pd-index-pip/simple/" },
-    { name = "pd-ocr-training", specifier = ">=0.2.0", index = "https://concavetrillion.github.io/pd-index-pip/simple/" },
+    { name = "pd-ocr-training", specifier = ">=0.2.2", index = "https://concavetrillion.github.io/pd-index-pip/simple/" },
     { name = "pd-ocr-training", extras = ["train"], marker = "extra == 'train'", index = "https://concavetrillion.github.io/pd-index-pip/simple/" },
     { name = "pydantic", specifier = ">=2.7" },
     { name = "pydantic-settings", specifier = ">=2.3" },
@@ -1588,7 +1588,7 @@ e2e = [{ name = "pytest-playwright", specifier = ">=0.5" }]
 
 [[package]]
 name = "pd-ocr-training"
-version = "0.2.0"
+version = "0.2.2"
 source = { registry = "https://concavetrillion.github.io/pd-index-pip/simple/" }
 dependencies = [
     { name = "pd-book-tools" },
@@ -1596,9 +1596,9 @@ dependencies = [
     { name = "tomli" },
     { name = "tomli-w" },
 ]
-sdist = { url = "https://github.com/ConcaveTrillion/pd-ocr-training/releases/download/v0.2.0/pd_ocr_training-0.2.0.tar.gz" }
+sdist = { url = "https://github.com/ConcaveTrillion/pd-ocr-training/releases/download/v0.2.2/pd_ocr_training-0.2.2.tar.gz" }
 wheels = [
-    { url = "https://github.com/ConcaveTrillion/pd-ocr-training/releases/download/v0.2.0/pd_ocr_training-0.2.0-py3-none-any.whl" },
+    { url = "https://github.com/ConcaveTrillion/pd-ocr-training/releases/download/v0.2.2/pd_ocr_training-0.2.2-py3-none-any.whl" },
 ]
 
 [package.optional-dependencies]
