@@ -19,7 +19,7 @@ if [[ $# -gt 0 ]]; then
 else
     echo "Installing pdomain-ocr-trainer-spa from pd-index ..."
     uv tool install \
-        --index https://concavetrillion.github.io/pd-index \
+        --index https://pdomain.github.io/pdomain-index-pip \
         pdomain-ocr-trainer-spa
 fi
 

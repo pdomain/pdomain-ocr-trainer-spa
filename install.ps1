@@ -21,7 +21,7 @@ if ($WheelPath) {
 } else {
     Write-Host "Installing pdomain-ocr-trainer-spa from pd-index ..."
     uv tool install `
-        --index https://concavetrillion.github.io/pd-index `
+        --index https://pdomain.github.io/pdomain-index-pip `
         pdomain-ocr-trainer-spa
 }
 
