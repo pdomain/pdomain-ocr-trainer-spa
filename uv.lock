@@ -1522,7 +1522,6 @@ wheels = [
 
 [[package]]
 name = "pdomain-ocr-trainer-spa"
-version = "0.1.0a0"
 source = { editable = "." }
 dependencies = [
     { name = "aiofiles" },
