@@ -142,6 +142,8 @@ typeCheckingMode = "recommended"
 # fail CI. Regenerate the baseline with: uv run basedpyright src/pdomain_ocr_trainer_spa --writebaseline
 failOnWarnings = true
 reportImportCycles = "none"
+# pdomain-* sibling packages don't ship py.typed; suppress stub-gap noise.
+reportMissingTypeStubs = "none"
 venvPath = "."
 venv = ".venv"
 

@@ -194,24 +194,6 @@
                 }
             }
         ],
-        "./src/pdomain_ocr_trainer_spa/adapters/builders.py": [
-            {
-                "code": "reportMissingTypeStubs",
-                "range": {
-                    "startColumn": 9,
-                    "endColumn": 33,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportMissingTypeStubs",
-                "range": {
-                    "startColumn": 9,
-                    "endColumn": 34,
-                    "lineCount": 1
-                }
-            }
-        ],
         "./src/pdomain_ocr_trainer_spa/adapters/dataset_sources/huggingface.py": [
             {
                 "code": "reportUnannotatedClassAttribute",
@@ -488,35 +470,7 @@
                 }
             }
         ],
-        "./src/pdomain_ocr_trainer_spa/adapters/model_registry/__init__.py": [
-            {
-                "code": "reportMissingTypeStubs",
-                "range": {
-                    "startColumn": 9,
-                    "endColumn": 29,
-                    "lineCount": 1
-                }
-            }
-        ],
-        "./src/pdomain_ocr_trainer_spa/adapters/model_registry/fake.py": [
-            {
-                "code": "reportMissingTypeStubs",
-                "range": {
-                    "startColumn": 9,
-                    "endColumn": 29,
-                    "lineCount": 1
-                }
-            }
-        ],
         "./src/pdomain_ocr_trainer_spa/adapters/model_registry/filesystem.py": [
-            {
-                "code": "reportMissingTypeStubs",
-                "range": {
-                    "startColumn": 9,
-                    "endColumn": 29,
-                    "lineCount": 1
-                }
-            },
             {
                 "code": "reportUnannotatedClassAttribute",
                 "range": {
@@ -543,14 +497,6 @@
             }
         ],
         "./src/pdomain_ocr_trainer_spa/adapters/model_registry/huggingface_hub.py": [
-            {
-                "code": "reportMissingTypeStubs",
-                "range": {
-                    "startColumn": 9,
-                    "endColumn": 29,
-                    "lineCount": 1
-                }
-            },
             {
                 "code": "reportUnusedParameter",
                 "range": {
@@ -830,22 +776,6 @@
         ],
         "./src/pdomain_ocr_trainer_spa/api/jobs.py": [
             {
-                "code": "reportMissingTypeStubs",
-                "range": {
-                    "startColumn": 5,
-                    "endColumn": 30,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportMissingTypeStubs",
-                "range": {
-                    "startColumn": 9,
-                    "endColumn": 29,
-                    "lineCount": 1
-                }
-            },
-            {
                 "code": "reportAny",
                 "range": {
                     "startColumn": 16,
@@ -1110,8 +1040,8 @@
             {
                 "code": "reportPrivateUsage",
                 "range": {
-                    "startColumn": 43,
-                    "endColumn": 60,
+                    "startColumn": 48,
+                    "endColumn": 65,
                     "lineCount": 1
                 }
             },
@@ -1133,14 +1063,6 @@
             }
         ],
         "./src/pdomain_ocr_trainer_spa/api/runs.py": [
-            {
-                "code": "reportMissingTypeStubs",
-                "range": {
-                    "startColumn": 5,
-                    "endColumn": 30,
-                    "lineCount": 1
-                }
-            },
             {
                 "code": "reportAny",
                 "range": {
@@ -1266,14 +1188,6 @@
         ],
         "./src/pdomain_ocr_trainer_spa/bootstrap.py": [
             {
-                "code": "reportMissingTypeStubs",
-                "range": {
-                    "startColumn": 13,
-                    "endColumn": 36,
-                    "lineCount": 1
-                }
-            },
-            {
                 "code": "reportUnusedFunction",
                 "range": {
                     "startColumn": 14,
@@ -1283,14 +1197,6 @@
             }
         ],
         "./src/pdomain_ocr_trainer_spa/core/app_state.py": [
-            {
-                "code": "reportMissingTypeStubs",
-                "range": {
-                    "startColumn": 9,
-                    "endColumn": 33,
-                    "lineCount": 1
-                }
-            },
             {
                 "code": "reportExplicitAny",
                 "range": {
@@ -2122,14 +2028,6 @@
         ],
         "./src/pdomain_ocr_trainer_spa/training/config_build.py": [
             {
-                "code": "reportMissingTypeStubs",
-                "range": {
-                    "startColumn": 5,
-                    "endColumn": 30,
-                    "lineCount": 1
-                }
-            },
-            {
                 "code": "reportUnusedCallResult",
                 "range": {
                     "startColumn": 4,
@@ -2189,22 +2087,6 @@
             }
         ],
         "./src/pdomain_ocr_trainer_spa/training/fake_runner.py": [
-            {
-                "code": "reportMissingTypeStubs",
-                "range": {
-                    "startColumn": 5,
-                    "endColumn": 30,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportMissingTypeStubs",
-                "range": {
-                    "startColumn": 5,
-                    "endColumn": 25,
-                    "lineCount": 1
-                }
-            },
             {
                 "code": "reportAny",
                 "range": {
@@ -2378,14 +2260,6 @@
         ],
         "./src/pdomain_ocr_trainer_spa/worker/train.py": [
             {
-                "code": "reportMissingTypeStubs",
-                "range": {
-                    "startColumn": 9,
-                    "endColumn": 34,
-                    "lineCount": 1
-                }
-            },
-            {
                 "code": "reportUnusedCallResult",
                 "range": {
                     "startColumn": 4,
@@ -2406,14 +2280,6 @@
                 "range": {
                     "startColumn": 16,
                     "endColumn": 40,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportMissingTypeStubs",
-                "range": {
-                    "startColumn": 9,
-                    "endColumn": 24,
                     "lineCount": 1
                 }
             },
