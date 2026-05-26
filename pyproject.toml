@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pdomain-ocr-trainer-spa"
-version = "0.1.0a0"
+dynamic = ["version"]
 description = "FastAPI + React SPA for OCR model training — replaces pd-ocr-trainer NiceGUI UI"
 authors = [
     { name = "CT", email = "concavetrillion@gmail.com" }
@@ -64,6 +64,9 @@ explicit = true
 pdomain-book-tools = { index = "pdomain-index-pip" }
 pdomain-ocr-ops = { index = "pdomain-index-pip" }
 pdomain-ocr-training = { index = "pdomain-index-pip" }
+
+[tool.hatch.version]
+source = "vcs"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/pdomain_ocr_trainer_spa"]
