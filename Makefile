@@ -137,8 +137,8 @@ frontend-format-check: frontend-install ## Check SPA formatting with Prettier (n
 frontend-knip: frontend-install ## Run knip dead-export detector
 	cd frontend && $(call _pnpm,run knip)
 
-build: ## Build wheel + sdist (requires frontend-build first)
-	uv build
+build: ## Build wheel (requires frontend-build first; sdist skipped — static/ not in sdist)
+	uv build --wheel
 
 e2e: frontend-build ## Run Playwright browser e2e tests (requires chromium)
 	@echo "🌐 Running Playwright e2e tests..."
