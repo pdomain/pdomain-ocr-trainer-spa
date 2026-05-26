@@ -144,7 +144,7 @@ pd-ocr-trainer-ui --port 8081
 Per workspace `project_release_strategy.md` memory:
 
 ```
-uv tool install --index https://concavetrillion.github.io/pd-index pdomain-ocr-trainer-spa
+uv tool install --index https://pdomain.github.io/pdomain-index-pip pdomain-ocr-trainer-spa
 ```
 
 The `pd-index` repo isn't built yet — when it lands, this repo's
