@@ -1,7 +1,7 @@
 // ProfilesPage — the profiles inventory table + create/edit/delete (spec 04 §5).
 
 import { useEffect, useState } from "react";
-import { Button, Card } from "@concavetrillion/pd-ui/primitives";
+import { Button, Card } from "@pdomain/pdomain-ui/primitives";
 import { useProfilesStore } from "../stores/profilesStore";
 import { ProfileEditDialog } from "../components/ProfileEditDialog";
 import type { Profile } from "../api/profiles";

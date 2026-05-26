@@ -1,8 +1,8 @@
-# install.ps1 — install pd-ocr-trainer-spa via uv tool install (Windows)
+# install.ps1 — install pdomain-ocr-trainer-spa via uv tool install (Windows)
 #
 # Usage:
 #   .\install.ps1              # install from pd-index PEP 503 registry (when available)
-#   .\install.ps1 .\dist\pd_ocr_trainer_spa-*.whl  # install from a local wheel
+#   .\install.ps1 .\dist\pdomain_ocr_trainer_spa-*.whl  # install from a local wheel
 
 param(
     [string]$WheelPath = ""
@@ -16,15 +16,15 @@ if (-not (Get-Command uv -ErrorAction SilentlyContinue)) {
 }
 
 if ($WheelPath) {
-    Write-Host "Installing pd-ocr-trainer-spa from $WheelPath ..."
+    Write-Host "Installing pdomain-ocr-trainer-spa from $WheelPath ..."
     uv tool install $WheelPath
 } else {
-    Write-Host "Installing pd-ocr-trainer-spa from pd-index ..."
+    Write-Host "Installing pdomain-ocr-trainer-spa from pd-index ..."
     uv tool install `
         --index https://concavetrillion.github.io/pd-index `
-        pd-ocr-trainer-spa
+        pdomain-ocr-trainer-spa
 }
 
 Write-Host ""
-Write-Host "✅ pd-ocr-trainer-spa installed."
+Write-Host "✅ pdomain-ocr-trainer-spa installed."
 Write-Host "   Run: pd-ocr-trainer-ui --port 8081"

@@ -3,7 +3,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Badge, Button, Card } from "@concavetrillion/pd-ui/primitives";
+import { Badge, Button, Card } from "@pdomain/pdomain-ui/primitives";
 import { cancelRun, fetchRun, fetchRunProgress } from "../api/runs";
 import type { Run } from "../api/runs";
 import { subscribeToJob } from "../api/jobs";

@@ -22,7 +22,7 @@ Each OCR word may carry an optional `glyph_annotations` sidecar —
 ct/st ligatures, long-s positions, swash caps, and similar
 typographic features. Ground-truth text stays canonical; the
 annotations live in parallel. The data model is owned by
-`pd-book-tools`; training data is produced by `pd-ocr-synth` (gold)
+`pdomain-book-tools`; training data is produced by `pdomain-ocr-synth` (gold)
 and `pd-ocr-labeler` (human).
 
 The feature set is one binary feature per `LigatureMark.kind`, plus
@@ -65,14 +65,14 @@ rendering — [`07-evaluation-and-metrics.md`](07-evaluation-and-metrics.md)
 
 *A new model; ships after (g1).*
 
-- A new training task in `pd-ocr-training` (a `train_glyph`
+- A new training task in `pdomain-ocr-training` (a `train_glyph`
   entry point alongside detection / recognition), behind the same
   `ITrainingRunner` Protocol (D-T1).
 - Model: a small CNN with a **multi-head sigmoid** output — one head
   per binary feature. Shared trunk + per-feature heads
   ([Q10](../OPEN_QUESTIONS.md)); architecture finalized by
   experiment.
-- Training data: `pd-ocr-synth` (primary, weight ~0.8) +
+- Training data: `pdomain-ocr-synth` (primary, weight ~0.8) +
   human-labeled crops from `pd-ocr-labeler` (secondary, weight ~0.2,
   upsampled).
 - New HF dataset shape `pd-ocr-shape: glyph-classification/v1`; repo
@@ -101,14 +101,14 @@ metrics — [`04-profiles-and-config.md`](04-profiles-and-config.md)
 Beyond core-parity completion, (g1)/(g2) are gated on upstream
 readiness:
 
-- **`pd-book-tools` `GlyphAnnotations` data model** must have
+- **`pdomain-book-tools` `GlyphAnnotations` data model** must have
   landed, and at least one eval dataset must be annotated — gates
   (g1).
-- **`pd-ocr-synth`** must emit `glyph-classification/v1` datasets —
+- **`pdomain-ocr-synth`** must emit `glyph-classification/v1` datasets —
   gates (g2).
 - **`pd-ocr-labeler`** human glyph-annotation pipeline must exist —
   feeds (g2) training data and consumes the (g2) model.
-- **`pd-ocr-training`** must grow the `train_glyph` recognition-peer
+- **`pdomain-ocr-training`** must grow the `train_glyph` recognition-peer
   task behind `ITrainingRunner` — gates (g2).
 
 The SPA waits on all of these; it does not build ahead of them.

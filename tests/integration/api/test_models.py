@@ -5,12 +5,12 @@ from __future__ import annotations
 import json
 from typing import TYPE_CHECKING
 
-from pd_ocr_trainer_spa.core.models import ModelSidecar
+from pdomain_ocr_trainer_spa.core.models import ModelSidecar
 
 if TYPE_CHECKING:
     from fastapi.testclient import TestClient
 
-    from pd_ocr_trainer_spa.settings import Settings
+    from pdomain_ocr_trainer_spa.settings import Settings
 
 
 def _write_model(
@@ -122,7 +122,7 @@ def test_trained_run_sidecar_visible_in_models(
     Simulates what worker/train.py does on a successful run — writes the
     sidecar under shared_models_dir — then asserts the API discovers it.
     """
-    from pd_ocr_trainer_spa.worker.train import write_model_sidecar
+    from pdomain_ocr_trainer_spa.worker.train import write_model_sidecar
 
     name = "pd-ga-clogaelach-recognition-2026-05-21"
     shared = settings.shared_models_dir / "clogaelach" / "recognition"

@@ -1,4 +1,4 @@
-# `pd-ocr-trainer-spa` Specs
+# `pdomain-ocr-trainer-spa` Specs
 
 Numbered design documents. Read [`00-overview.md`](00-overview.md)
 first; it lists every other spec and tells you which to read for any
@@ -20,7 +20,7 @@ given implementation task.
 | 07 | [`07-evaluation-and-metrics.md`](07-evaluation-and-metrics.md) | Eval, CER/WER, glyph-feature slicing |
 | 08 | [`08-models.md`](08-models.md) | Model registry, sidecar, naming, on-disk + HF publishing |
 | 09 | [`09-hf-integration.md`](09-hf-integration.md) | DatasetSource adapter, HF read/publish, auth, caching |
-| 10 | [`10-jobs-and-sse.md`](10-jobs-and-sse.md) | Consuming the pd-ocr-ops LongJobRunner; SSE event shapes; cancellation |
+| 10 | [`10-jobs-and-sse.md`](10-jobs-and-sse.md) | Consuming the pdomain-ocr-ops LongJobRunner; SSE event shapes; cancellation |
 | 11 | [`11-notifications.md`](11-notifications.md) | Toast queue, busy overlays, error surfacing |
 | 12 | [`12-hotkeys-a11y.md`](12-hotkeys-a11y.md) | Keybindings, focus management, kanban a11y |
 | 13 | [`13-driver-contract.md`](13-driver-contract.md) | data-testid + URL invariants for any future Playwright driver |
@@ -47,5 +47,5 @@ given implementation task.
 - **Open questions.** Inline as `([Qn](../OPEN_QUESTIONS.md))`. Do not
   pretend they're answered.
 - **Re-use over re-spec.** When a topic is identical to the labeler
-  SPA, link rather than duplicate (`see pd-ocr-labeler-spa
+  SPA, link rather than duplicate (`see pdomain-ocr-labeler-spa
   specs/10-jobs-and-sse.md`).

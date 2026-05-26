@@ -175,7 +175,7 @@ class Run(BaseModel):
     finished_at: datetime | None
     exit_code: int | None
     artefact_paths: list[str]     # absolute paths emitted on success (model files, sidecar, dataset snapshot)
-    job_id: str | None            # the pd-ocr-ops LongJobRunner job for this run, if any
+    job_id: str | None            # the pdomain-ocr-ops LongJobRunner job for this run, if any
 
 class RunKind(str, Enum):
     train = "train"
@@ -212,7 +212,7 @@ exit code `-1` and a synthetic `stderr.log` line "process gone").
 
 ## 4. Job
 
-The SPA `Job` is a **projection of the `pd-ocr-ops` `JobStatus`**
+The SPA `Job` is a **projection of the `pdomain-ocr-ops` `JobStatus`**
 (D-T20). The SPA does not own a job runner; `api/jobs.py` projects
 `LongJobRunner.status(job_id)` onto this model. See
 [`10-jobs-and-sse.md`](10-jobs-and-sse.md) §3 for the projection and
@@ -230,7 +230,7 @@ class Job(BaseModel):
     finished_at: datetime | None
 
 class JobState(str, Enum):
-    """Mirrors pd-ocr-ops JobStatus.state exactly."""
+    """Mirrors pdomain-ocr-ops JobStatus.state exactly."""
     queued = "queued"
     running = "running"
     succeeded = "succeeded"
@@ -239,7 +239,7 @@ class JobState(str, Enum):
 ```
 
 The structured event payloads (`progress` / `metric` / `log` /
-`state`) are the `pd-ocr-ops` `JobEvent` shape — defined in
+`state`) are the `pdomain-ocr-ops` `JobEvent` shape — defined in
 [`10-jobs-and-sse.md`](10-jobs-and-sse.md) §2, not duplicated here.
 
 ---
@@ -318,7 +318,7 @@ class AppState:
     auth: IAuth
     dataset_sources: list[IDatasetSource]
     model_registry: IModelRegistry
-    job_runner: LongJobRunner               # pd-ocr-ops; owns job lifecycle (D-T20)
+    job_runner: LongJobRunner               # pdomain-ocr-ops; owns job lifecycle (D-T20)
 
     profiles: dict[str, Profile]            # by normalized name
     runs: dict[str, Run]                    # by run id

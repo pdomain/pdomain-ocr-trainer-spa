@@ -2,7 +2,7 @@
 // Spec: 09-hf-integration §5–§6, M11.
 
 import { useState } from "react";
-import { Button } from "@concavetrillion/pd-ui/primitives";
+import { Button } from "@pdomain/pdomain-ui/primitives";
 import type {
   PublishDatasetPayload,
   PublishModelPayload,
@@ -26,7 +26,7 @@ export interface PublishDialogProps {
 }
 
 // Canonical-case SPDX identifiers. SPDX validation is case-sensitive (#18),
-// so these must match pd_book_tools.licenses exactly. Plain "GPL-3.0" is a
+// so these must match pdomain_book_tools.licenses exactly. Plain "GPL-3.0" is a
 // deprecated SPDX id and is intentionally omitted in favour of the
 // -only / -or-later variants.
 const COMMON_LICENSES = [

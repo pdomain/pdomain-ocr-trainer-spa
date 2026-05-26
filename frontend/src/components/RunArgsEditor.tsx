@@ -9,7 +9,7 @@
 // field spec are preserved verbatim on change (forward-compatible).
 
 import { useEffect, useState } from "react";
-import { Input } from "@concavetrillion/pd-ui/primitives";
+import { Input } from "@pdomain/pdomain-ui/primitives";
 import type { TrainingArgs } from "../api/profiles";
 
 type FieldKind = "number" | "boolean" | "text" | "string-list";

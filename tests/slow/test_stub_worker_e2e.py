@@ -18,7 +18,7 @@ from typing import TYPE_CHECKING
 import pytest
 
 if TYPE_CHECKING:
-    from pd_ocr_trainer_spa.settings import Settings
+    from pdomain_ocr_trainer_spa.settings import Settings
 
 _STUB_WORKER = Path(__file__).parent.parent / "fixtures" / "stub_worker.py"
 
@@ -48,12 +48,12 @@ async def _submit_and_wait(
 
 def test_stub_worker_runs_to_completion(settings: Settings) -> None:
     """A real subprocess running the stub worker drives the job to succeeded."""
-    from pd_ocr_ops.gpu.local_jobs import LocalLongJobRunner
+    from pdomain_ocr_ops.gpu.local_jobs import LocalLongJobRunner
 
     # Seed a profile + recognition training data so create_run validates.
-    from pd_ocr_trainer_spa.core.enums import TaskEnum, TypefaceEnum
-    from pd_ocr_trainer_spa.domain import runs as dom
-    from pd_ocr_trainer_spa.domain.profiles import create_profile
+    from pdomain_ocr_trainer_spa.core.enums import TaskEnum, TypefaceEnum
+    from pdomain_ocr_trainer_spa.domain import runs as dom
+    from pdomain_ocr_trainer_spa.domain.profiles import create_profile
 
     create_profile(
         settings, name="clogaelach", language="ga", typeface=TypefaceEnum.clogaelach

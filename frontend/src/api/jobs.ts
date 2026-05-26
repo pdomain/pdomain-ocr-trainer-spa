@@ -1,7 +1,7 @@
 // M2 — TypeScript types + SSE subscription helper for the jobs API.
 //
 // Mirrors the backend `api/jobs.py` projection (spec 10-jobs-and-sse).
-// The full pd-ui `useLongJob` hook wraps this in a later milestone; this
+// The full pdomain-ui `useLongJob` hook wraps this in a later milestone; this
 // module is the framework-agnostic transport seam underneath it.
 
 export type JobState =
@@ -11,7 +11,7 @@ export type JobState =
   | "failed"
   | "cancelled";
 
-/** SPA projection of the pd-ocr-ops `JobStatus` (GET /api/jobs/{id}). */
+/** SPA projection of the pdomain-ocr-ops `JobStatus` (GET /api/jobs/{id}). */
 export interface Job {
   id: string;
   run_id: string | null;

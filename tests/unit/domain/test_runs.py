@@ -7,13 +7,13 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from pd_ocr_trainer_spa.core.enums import TaskEnum, TypefaceEnum
-from pd_ocr_trainer_spa.core.errors import AppError
-from pd_ocr_trainer_spa.domain import runs as dom
-from pd_ocr_trainer_spa.domain.profiles import create_profile
+from pdomain_ocr_trainer_spa.core.enums import TaskEnum, TypefaceEnum
+from pdomain_ocr_trainer_spa.core.errors import AppError
+from pdomain_ocr_trainer_spa.domain import runs as dom
+from pdomain_ocr_trainer_spa.domain.profiles import create_profile
 
 if TYPE_CHECKING:
-    from pd_ocr_trainer_spa.settings import Settings
+    from pdomain_ocr_trainer_spa.settings import Settings
 
 
 def _seed_profile(settings: Settings, *, with_data: bool = True) -> str:
@@ -167,7 +167,7 @@ def test_delete_run_removes_terminal(settings: Settings) -> None:
 def test_create_run_accepts_hf_source_in_args(settings: Settings) -> None:
     """A run created with an HF source in args.sources stores it in manifest."""
     _seed_profile(settings)
-    hf_source = {"kind": "huggingface", "repo": "ntw8532/pd-ocr-synth-ga-clogaelach", "revision": "main", "weight": 1.0}
+    hf_source = {"kind": "huggingface", "repo": "ntw8532/pdomain-ocr-synth-ga-clogaelach", "revision": "main", "weight": 1.0}
     run = dom.create_run(
         settings,
         profile="clogaelach",
@@ -181,7 +181,7 @@ def test_create_run_accepts_hf_source_in_args(settings: Settings) -> None:
     assert reloaded is not None
     reloaded_sources = reloaded.args.get("sources", [])
     assert len(reloaded_sources) == 1
-    assert reloaded_sources[0]["repo"] == "ntw8532/pd-ocr-synth-ga-clogaelach"
+    assert reloaded_sources[0]["repo"] == "ntw8532/pdomain-ocr-synth-ga-clogaelach"
 
 
 def test_prepare_worker_args_preserves_hf_source(settings: Settings) -> None:

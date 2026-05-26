@@ -6,7 +6,7 @@
 // open and returned to the trigger on close.
 
 import { useEffect, useRef, useSyncExternalStore } from "react";
-import { KeyCap } from "@concavetrillion/pd-ui/primitives";
+import { KeyCap } from "@pdomain/pdomain-ui/primitives";
 import { hotkeysByScope, subscribeHotkeys } from "../lib/hotkeyRegistry";
 
 export interface HotkeyHelpDialogProps {

@@ -1,6 +1,6 @@
 {
     "files": {
-        "./src/pd_ocr_trainer_spa/__main__.py": [
+        "./src/pdomain_ocr_trainer_spa/__main__.py": [
             {
                 "code": "reportUnusedCallResult",
                 "range": {
@@ -194,7 +194,7 @@
                 }
             }
         ],
-        "./src/pd_ocr_trainer_spa/adapters/builders.py": [
+        "./src/pdomain_ocr_trainer_spa/adapters/builders.py": [
             {
                 "code": "reportMissingTypeStubs",
                 "range": {
@@ -212,7 +212,7 @@
                 }
             }
         ],
-        "./src/pd_ocr_trainer_spa/adapters/dataset_sources/huggingface.py": [
+        "./src/pdomain_ocr_trainer_spa/adapters/dataset_sources/huggingface.py": [
             {
                 "code": "reportUnannotatedClassAttribute",
                 "range": {
@@ -446,7 +446,7 @@
                 }
             }
         ],
-        "./src/pd_ocr_trainer_spa/adapters/dataset_sources/local.py": [
+        "./src/pdomain_ocr_trainer_spa/adapters/dataset_sources/local.py": [
             {
                 "code": "reportUnannotatedClassAttribute",
                 "range": {
@@ -488,7 +488,7 @@
                 }
             }
         ],
-        "./src/pd_ocr_trainer_spa/adapters/model_registry/__init__.py": [
+        "./src/pdomain_ocr_trainer_spa/adapters/model_registry/__init__.py": [
             {
                 "code": "reportMissingTypeStubs",
                 "range": {
@@ -498,7 +498,7 @@
                 }
             }
         ],
-        "./src/pd_ocr_trainer_spa/adapters/model_registry/fake.py": [
+        "./src/pdomain_ocr_trainer_spa/adapters/model_registry/fake.py": [
             {
                 "code": "reportMissingTypeStubs",
                 "range": {
@@ -508,7 +508,7 @@
                 }
             }
         ],
-        "./src/pd_ocr_trainer_spa/adapters/model_registry/filesystem.py": [
+        "./src/pdomain_ocr_trainer_spa/adapters/model_registry/filesystem.py": [
             {
                 "code": "reportMissingTypeStubs",
                 "range": {
@@ -542,7 +542,7 @@
                 }
             }
         ],
-        "./src/pd_ocr_trainer_spa/adapters/model_registry/huggingface_hub.py": [
+        "./src/pdomain_ocr_trainer_spa/adapters/model_registry/huggingface_hub.py": [
             {
                 "code": "reportMissingTypeStubs",
                 "range": {
@@ -608,7 +608,7 @@
                 }
             }
         ],
-        "./src/pd_ocr_trainer_spa/adapters/storage/filesystem.py": [
+        "./src/pdomain_ocr_trainer_spa/adapters/storage/filesystem.py": [
             {
                 "code": "reportUnusedCallResult",
                 "range": {
@@ -618,7 +618,7 @@
                 }
             }
         ],
-        "./src/pd_ocr_trainer_spa/adapters/storage/s3.py": [
+        "./src/pdomain_ocr_trainer_spa/adapters/storage/s3.py": [
             {
                 "code": "reportUnusedParameter",
                 "range": {
@@ -708,7 +708,7 @@
                 }
             }
         ],
-        "./src/pd_ocr_trainer_spa/api/banners.py": [
+        "./src/pdomain_ocr_trainer_spa/api/banners.py": [
             {
                 "code": "reportCallInDefaultInitializer",
                 "range": {
@@ -718,7 +718,7 @@
                 }
             }
         ],
-        "./src/pd_ocr_trainer_spa/api/datasets.py": [
+        "./src/pdomain_ocr_trainer_spa/api/datasets.py": [
             {
                 "code": "reportCallInDefaultInitializer",
                 "range": {
@@ -752,7 +752,7 @@
                 }
             }
         ],
-        "./src/pd_ocr_trainer_spa/api/env_js.py": [
+        "./src/pdomain_ocr_trainer_spa/api/env_js.py": [
             {
                 "code": "reportAny",
                 "range": {
@@ -802,7 +802,7 @@
                 }
             }
         ],
-        "./src/pd_ocr_trainer_spa/api/eval.py": [
+        "./src/pdomain_ocr_trainer_spa/api/eval.py": [
             {
                 "code": "reportCallInDefaultInitializer",
                 "range": {
@@ -828,7 +828,7 @@
                 }
             }
         ],
-        "./src/pd_ocr_trainer_spa/api/jobs.py": [
+        "./src/pdomain_ocr_trainer_spa/api/jobs.py": [
             {
                 "code": "reportMissingTypeStubs",
                 "range": {
@@ -958,7 +958,7 @@
                 }
             }
         ],
-        "./src/pd_ocr_trainer_spa/api/models.py": [
+        "./src/pdomain_ocr_trainer_spa/api/models.py": [
             {
                 "code": "reportUnusedParameter",
                 "range": {
@@ -1032,7 +1032,7 @@
                 }
             }
         ],
-        "./src/pd_ocr_trainer_spa/api/profiles.py": [
+        "./src/pdomain_ocr_trainer_spa/api/profiles.py": [
             {
                 "code": "reportCallInDefaultInitializer",
                 "range": {
@@ -1106,7 +1106,7 @@
                 }
             }
         ],
-        "./src/pd_ocr_trainer_spa/api/publish.py": [
+        "./src/pdomain_ocr_trainer_spa/api/publish.py": [
             {
                 "code": "reportPrivateUsage",
                 "range": {
@@ -1132,7 +1132,7 @@
                 }
             }
         ],
-        "./src/pd_ocr_trainer_spa/api/runs.py": [
+        "./src/pdomain_ocr_trainer_spa/api/runs.py": [
             {
                 "code": "reportMissingTypeStubs",
                 "range": {
@@ -1214,7 +1214,7 @@
                 }
             }
         ],
-        "./src/pd_ocr_trainer_spa/api/sources.py": [
+        "./src/pdomain_ocr_trainer_spa/api/sources.py": [
             {
                 "code": "reportExplicitAny",
                 "range": {
@@ -1264,7 +1264,7 @@
                 }
             }
         ],
-        "./src/pd_ocr_trainer_spa/bootstrap.py": [
+        "./src/pdomain_ocr_trainer_spa/bootstrap.py": [
             {
                 "code": "reportMissingTypeStubs",
                 "range": {
@@ -1282,7 +1282,7 @@
                 }
             }
         ],
-        "./src/pd_ocr_trainer_spa/core/app_state.py": [
+        "./src/pdomain_ocr_trainer_spa/core/app_state.py": [
             {
                 "code": "reportMissingTypeStubs",
                 "range": {
@@ -1348,7 +1348,7 @@
                 }
             }
         ],
-        "./src/pd_ocr_trainer_spa/core/errors.py": [
+        "./src/pdomain_ocr_trainer_spa/core/errors.py": [
             {
                 "code": "reportUnannotatedClassAttribute",
                 "range": {
@@ -1382,7 +1382,7 @@
                 }
             }
         ],
-        "./src/pd_ocr_trainer_spa/domain/datasets.py": [
+        "./src/pdomain_ocr_trainer_spa/domain/datasets.py": [
             {
                 "code": "reportUnknownVariableType",
                 "range": {
@@ -1552,7 +1552,7 @@
                 }
             }
         ],
-        "./src/pd_ocr_trainer_spa/domain/eval.py": [
+        "./src/pdomain_ocr_trainer_spa/domain/eval.py": [
             {
                 "code": "reportUnusedCallResult",
                 "range": {
@@ -1610,7 +1610,7 @@
                 }
             }
         ],
-        "./src/pd_ocr_trainer_spa/domain/models.py": [
+        "./src/pdomain_ocr_trainer_spa/domain/models.py": [
             {
                 "code": "reportImplicitStringConcatenation",
                 "range": {
@@ -1708,7 +1708,7 @@
                 }
             }
         ],
-        "./src/pd_ocr_trainer_spa/domain/profiles.py": [
+        "./src/pdomain_ocr_trainer_spa/domain/profiles.py": [
             {
                 "code": "reportUnusedCallResult",
                 "range": {
@@ -1758,7 +1758,7 @@
                 }
             }
         ],
-        "./src/pd_ocr_trainer_spa/domain/publish.py": [
+        "./src/pdomain_ocr_trainer_spa/domain/publish.py": [
             {
                 "code": "reportUnusedParameter",
                 "range": {
@@ -1896,7 +1896,7 @@
                 }
             }
         ],
-        "./src/pd_ocr_trainer_spa/domain/runs.py": [
+        "./src/pdomain_ocr_trainer_spa/domain/runs.py": [
             {
                 "code": "reportUnusedCallResult",
                 "range": {
@@ -2018,7 +2018,7 @@
                 }
             }
         ],
-        "./src/pd_ocr_trainer_spa/domain/training_defaults.py": [
+        "./src/pdomain_ocr_trainer_spa/domain/training_defaults.py": [
             {
                 "code": "reportAny",
                 "range": {
@@ -2100,7 +2100,7 @@
                 }
             }
         ],
-        "./src/pd_ocr_trainer_spa/middleware/request_id.py": [
+        "./src/pdomain_ocr_trainer_spa/middleware/request_id.py": [
             {
                 "code": "reportImplicitOverride",
                 "range": {
@@ -2110,7 +2110,7 @@
                 }
             }
         ],
-        "./src/pd_ocr_trainer_spa/settings.py": [
+        "./src/pdomain_ocr_trainer_spa/settings.py": [
             {
                 "code": "reportUnannotatedClassAttribute",
                 "range": {
@@ -2120,7 +2120,7 @@
                 }
             }
         ],
-        "./src/pd_ocr_trainer_spa/training/config_build.py": [
+        "./src/pdomain_ocr_trainer_spa/training/config_build.py": [
             {
                 "code": "reportMissingTypeStubs",
                 "range": {
@@ -2178,7 +2178,7 @@
                 }
             }
         ],
-        "./src/pd_ocr_trainer_spa/training/events.py": [
+        "./src/pdomain_ocr_trainer_spa/training/events.py": [
             {
                 "code": "reportAny",
                 "range": {
@@ -2188,7 +2188,7 @@
                 }
             }
         ],
-        "./src/pd_ocr_trainer_spa/training/fake_runner.py": [
+        "./src/pdomain_ocr_trainer_spa/training/fake_runner.py": [
             {
                 "code": "reportMissingTypeStubs",
                 "range": {
@@ -2214,7 +2214,7 @@
                 }
             }
         ],
-        "./src/pd_ocr_trainer_spa/worker/evaluate.py": [
+        "./src/pdomain_ocr_trainer_spa/worker/evaluate.py": [
             {
                 "code": "reportUnusedCallResult",
                 "range": {
@@ -2376,7 +2376,7 @@
                 }
             }
         ],
-        "./src/pd_ocr_trainer_spa/worker/train.py": [
+        "./src/pdomain_ocr_trainer_spa/worker/train.py": [
             {
                 "code": "reportMissingTypeStubs",
                 "range": {

@@ -6,7 +6,7 @@ import { resolve } from "path";
 export default defineConfig({
   plugins: [react()],
   build: {
-    outDir: resolve(__dirname, "../src/pd_ocr_trainer_spa/static"),
+    outDir: resolve(__dirname, "../src/pdomain_ocr_trainer_spa/static"),
     emptyOutDir: true,
   },
   server: {

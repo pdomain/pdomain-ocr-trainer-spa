@@ -5,9 +5,9 @@ from __future__ import annotations
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from pd_ocr_trainer_spa.core.errors import AppError, FieldError
-from pd_ocr_trainer_spa.middleware.error_handler import app_error_handler
-from pd_ocr_trainer_spa.middleware.request_id import REQUEST_ID_HEADER, RequestIdMiddleware
+from pdomain_ocr_trainer_spa.core.errors import AppError, FieldError
+from pdomain_ocr_trainer_spa.middleware.error_handler import app_error_handler
+from pdomain_ocr_trainer_spa.middleware.request_id import REQUEST_ID_HEADER, RequestIdMiddleware
 
 
 def _app() -> FastAPI:

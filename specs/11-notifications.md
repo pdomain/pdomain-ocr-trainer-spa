@@ -148,7 +148,7 @@ JobsBadge.
 ## 5. SSE-driven notifications
 
 Terminal job transitions emit toasts. The terminal event is a
-`pd-ocr-ops` `JobEvent` of `kind="state"` whose `payload.state` is
+`pdomain-ocr-ops` `JobEvent` of `kind="state"` whose `payload.state` is
 `succeeded` / `failed` / `cancelled`
 ([`10-jobs-and-sse.md`](10-jobs-and-sse.md) §4):
 
@@ -221,5 +221,5 @@ render an action button without sonner's default linking.
 ## 9. Citations
 
 - Error envelope: [`02-backend.md`](02-backend.md) §6.
-- Sonner usage pattern: `pd-ocr-labeler-spa/specs/11-notifications.md`.
-- pgdp-prep banner pattern: `pd-prep-for-pgdp/frontend/src/components/Banners/`.
+- Sonner usage pattern: `pdomain-ocr-labeler-spa/specs/11-notifications.md`.
+- pgdp-prep banner pattern: `pdomain-prep-for-pgdp/frontend/src/components/Banners/`.

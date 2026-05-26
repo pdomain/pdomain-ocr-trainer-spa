@@ -2,7 +2,7 @@
 
 Runs as a hatch build hook. Fails the build if the static/index.html
 and at least one assets/*.js + assets/*.css are missing from
-src/pd_ocr_trainer_spa/static/.
+src/pdomain_ocr_trainer_spa/static/.
 
 Usage: configured automatically by hatchling (see pyproject.toml).
 To run manually:
@@ -14,7 +14,7 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-STATIC_DIR = Path(__file__).parent.parent / "src" / "pd_ocr_trainer_spa" / "static"
+STATIC_DIR = Path(__file__).parent.parent / "src" / "pdomain_ocr_trainer_spa" / "static"
 
 
 def check() -> None:

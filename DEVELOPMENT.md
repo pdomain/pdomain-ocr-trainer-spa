@@ -1,4 +1,4 @@
-# Development Guide — pd-ocr-trainer-spa
+# Development Guide — pdomain-ocr-trainer-spa
 
 FastAPI + React/Vite SPA that replaces the legacy `pd-ocr-trainer` NiceGUI UI
 for OCR model training (detection + recognition + typeface + glyph classifiers).
@@ -72,7 +72,7 @@ All variables use the `PD_OCR_TRAINER_SPA_` prefix.
 | `PD_OCR_TRAINER_SPA_SHARED_MODELS_DIR` | `~/shared-models` | Trained model output |
 | `PD_OCR_TRAINER_SPA_ENABLE_HF_PUBLISH` | `false` | Enable HF publish routes |
 
-See `src/pd_ocr_trainer_spa/settings.py` for the full list.
+See `src/pdomain_ocr_trainer_spa/settings.py` for the full list.
 
 ---
 
@@ -82,17 +82,17 @@ See `src/pd_ocr_trainer_spa/settings.py` for the full list.
 FastAPI process (torch-free)
   ├── /api/*         API routes
   ├── /env.js        Build version + feature flags for SPA
-  ├── /healthz       Owned by pd-ocr-ops mount_routes
+  ├── /healthz       Owned by pdomain-ocr-ops mount_routes
   └── /*             React SPA catch-all (serves index.html)
 
-Worker subprocess (torch + DocTR, launched by pd-ocr-ops LongJobRunner)
-  └── pd_ocr_trainer_spa.worker.train
-        └── pd_ocr_training.LocalTrainingRunner (ITrainingRunner)
+Worker subprocess (torch + DocTR, launched by pdomain-ocr-ops LongJobRunner)
+  └── pdomain_ocr_trainer_spa.worker.train
+        └── pdomain_ocr_training.LocalTrainingRunner (ITrainingRunner)
 ```
 
 The FastAPI process **never imports torch**. Training is isolated to
 a worker subprocess whose lifecycle (start, supervise, cancel) is
-managed by the `pd-ocr-ops` `LongJobRunner`.
+managed by the `pdomain-ocr-ops` `LongJobRunner`.
 
 ---
 
@@ -108,17 +108,17 @@ Both ports are configurable via environment variables.
 ## Building a wheel
 
 ```bash
-make frontend-build   # build SPA → src/pd_ocr_trainer_spa/static/
+make frontend-build   # build SPA → src/pdomain_ocr_trainer_spa/static/
 make build            # python -m build → dist/*.whl
 
 # Verify SPA bundle is inside the wheel
-python -m zipfile -l dist/pd_ocr_trainer_spa-*.whl | grep static/index.html
+python -m zipfile -l dist/pdomain_ocr_trainer_spa-*.whl | grep static/index.html
 ```
 
 ## Install from wheel
 
 ```bash
-uv tool install ./dist/pd_ocr_trainer_spa-*.whl
+uv tool install ./dist/pdomain_ocr_trainer_spa-*.whl
 pd-ocr-trainer-ui --port 8081
 ```
 
@@ -142,7 +142,7 @@ namespaces: **ports** and **environment-variable prefixes**.
 
 ### The two apps never collide
 
-| | Legacy `pd-ocr-trainer` | New `pd-ocr-trainer-spa` |
+| | Legacy `pd-ocr-trainer` | New `pdomain-ocr-trainer-spa` |
 |---|---|---|
 | UI stack | NiceGUI | FastAPI + React/Vite SPA |
 | Entry point | `pd-ocr-trainer` | `pd-ocr-trainer-ui` |
@@ -186,7 +186,7 @@ Verification that they do not collide:
 - `curl -sf http://127.0.0.1:8000/` and
   `curl -sf http://127.0.0.1:8081/` both succeed — two live servers,
   two ports.
-- `pd-ocr-trainer-spa`'s `/env.js` reports its own version and
+- `pdomain-ocr-trainer-spa`'s `/env.js` reports its own version and
   `driverContractVersion`; the legacy NiceGUI app serves no `/env.js`.
 
 ### Coexistence caveats

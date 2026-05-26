@@ -1,6 +1,6 @@
-# 03 — Frontend (React/Vite/TS on pd-ui)
+# 03 — Frontend (React/Vite/TS on pdomain-ui)
 
-The SPA half of `pd-ocr-trainer-spa`. Built with Vite, served from the
+The SPA half of `pdomain-ocr-trainer-spa`. Built with Vite, served from the
 FastAPI wheel in production, served via the Vite dev-server with an
 `/api` proxy in development.
 
@@ -14,17 +14,17 @@ deepen each piece.
 
 ---
 
-## 1. Component strategy — pd-ui first
+## 1. Component strategy — pdomain-ui first
 
-The frontend is built on the shared **`pd-ui`** component library
-(`@concavetrillion/pd-ui`, consumed from the `pd-index-npm` registry).
-No Tailwind, no shadcn/ui — pd-ui supplies the design tokens
+The frontend is built on the shared **`pdomain-ui`** component library
+(`@pdomain/pdomain-ui`, consumed from the `pdomain-index-npm` registry).
+No Tailwind, no shadcn/ui — pdomain-ui supplies the design tokens
 (`tokens.css` / `primitives.css`), primitives, and app shell.
 ([D-T19](17-decisions.md))
 
-**Every interactive element of the legacy trainer maps to a pd-ui
+**Every interactive element of the legacy trainer maps to a pdomain-ui
 component** (table in §6). Two component families needed by the trainer
-do not yet exist in pd-ui and are added to it
+do not yet exist in pdomain-ui and are added to it
 ([D-T4](17-decisions.md)) rather than built SPA-local:
 
 - `KanbanBoard` / `KanbanColumn` / `PageChip` — drag-and-drop board.
@@ -32,7 +32,7 @@ do not yet exist in pd-ui and are added to it
 - `Field` / `FieldRow` — labelled form-row primitive.
 - `JobStatusPip` — job-state pip.
 
-These are tracked as cross-repo additions to the `pd-ui` spec; the
+These are tracked as cross-repo additions to the `pdomain-ui` spec; the
 trainer-spa kanban/log/config milestones depend on them being built
 first (see [`16-milestones.md`](16-milestones.md)).
 
@@ -59,7 +59,7 @@ frontend/
 ├── src/
 │   ├── main.tsx
 │   ├── App.tsx            # AppShell + RouterProvider
-│   ├── index.css          # imports pd-ui tokens.css / primitives.css
+│   ├── index.css          # imports pdomain-ui tokens.css / primitives.css
 │   ├── routes.tsx         # canonical route table (testable)
 │   ├── api/
 │   │   ├── client.ts
@@ -88,7 +88,7 @@ frontend/
 │   │   ├── SettingsPage.tsx       # read-only config view
 │   │   └── *.test.tsx
 │   ├── components/
-│   │   ├── ProfileEditDialog.tsx  # pd-ui Dialog + Field/FieldRow
+│   │   ├── ProfileEditDialog.tsx  # pdomain-ui Dialog + Field/FieldRow
 │   │   ├── DetectionConfigCard.tsx
 │   │   ├── RecognitionConfigCard.tsx
 │   │   ├── RunControls.tsx        # Start / Stop buttons
@@ -109,7 +109,7 @@ frontend/
 ```
 
 No `tailwind.config.ts`, no `components.json`, no `src/components/ui/`,
-no `src/styles/tokens.css` — pd-ui owns all of that.
+no `src/styles/tokens.css` — pdomain-ui owns all of that.
 
 ---
 
@@ -180,7 +180,7 @@ interface UIPrefsStore {
 }
 ```
 
-Persist key: `pd-ocr-trainer-spa.ui-prefs.v1`.
+Persist key: `pdomain-ocr-trainer-spa.ui-prefs.v1`.
 
 ### 4.3 Kanban staging (`zustand`, **not** persisted) — D-T23
 
@@ -233,7 +233,7 @@ export async function createRun(req: CreateRunRequest): Promise<CreateRunRespons
 }
 ```
 
-`api/jobs.ts` is a thin layer over the pd-ui `useLongJob` hook, which
+`api/jobs.ts` is a thin layer over the pdomain-ui `useLongJob` hook, which
 owns the SSE/polling subscription to a job's event stream
 ([D-T10](17-decisions.md), [D-T20](17-decisions.md)).
 
@@ -243,7 +243,7 @@ owns the SSE/polling subscription to a job's event stream
 
 ### 6.1 App chrome
 
-The app is wrapped in the pd-ui `AppShell`:
+The app is wrapped in the pdomain-ui `AppShell`:
 
 ```
 ┌────────────────────────────────────────────────────────────────────┐
@@ -259,41 +259,41 @@ The app is wrapped in the pd-ui `AppShell`:
 └──────────┴─────────────────────────────────────────────────────────┘
 ```
 
-- `AppShell` props: `appId="pd-ocr-trainer-spa"`, `appDisplayName`,
+- `AppShell` props: `appId="pdomain-ocr-trainer-spa"`, `appDisplayName`,
   `appIconUrl`, `launcherSlot="header"`, `deployMode="local"`,
   `uiPrefsConfig`.
 - The active-profile `Select` lives in the `TopNav`. Switching it
   updates `UIPrefsStore.selectedProfile` and, when on a profile-scoped
   route, navigates to `/profiles/{name}/datasets`.
 - Cross-app launching uses `useSuiteSiblings`; active suite jobs surface
-  via the pd-ui `JobsDrawer` / `useSuiteJobs`.
+  via the pdomain-ui `JobsDrawer` / `useSuiteJobs`.
 
 ### 6.2 Legacy element → component mapping
 
 | Legacy NiceGUI element | Component |
 |---|---|
-| App header/banner | pd-ui `AppShell` + `TopNav` + `LauncherSlot` (`useSuiteSiblings`) |
-| Profile card (active-profile picker) | pd-ui `Select` in `TopNav`; `ProfilesPage` uses `Card` + `Field`/`FieldRow` |
-| Profile edit (language / typeface / display_name) | `ProfileEditDialog` — pd-ui `Dialog` + `Field`/`FieldRow` + `Select` |
-| Detection config card | `DetectionConfigCard` — pd-ui `Card` + `Accordion` (help) + `Field`/`FieldRow` + `Input`/`Select` + `Button` |
+| App header/banner | pdomain-ui `AppShell` + `TopNav` + `LauncherSlot` (`useSuiteSiblings`) |
+| Profile card (active-profile picker) | pdomain-ui `Select` in `TopNav`; `ProfilesPage` uses `Card` + `Field`/`FieldRow` |
+| Profile edit (language / typeface / display_name) | `ProfileEditDialog` — pdomain-ui `Dialog` + `Field`/`FieldRow` + `Select` |
+| Detection config card | `DetectionConfigCard` — pdomain-ui `Card` + `Accordion` (help) + `Field`/`FieldRow` + `Input`/`Select` + `Button` |
 | Recognition config card | `RecognitionConfigCard` — same; `vocab` is a `Field` with `Select` + a `CUSTOM:` text `Input` |
-| Start / Stop training buttons | `RunControls` — pd-ui `Button` (`run-start-button` testid) |
-| Training run / progress | pd-ui `Progress` + `JobStatusPip` + `useLongJob` (SSE) |
-| Live training-output log | pd-ui **`LogViewer`** |
-| Dataset kanban (drag-drop) | pd-ui **`KanbanBoard` / `KanbanColumn` / `PageChip`** |
+| Start / Stop training buttons | `RunControls` — pdomain-ui `Button` (`run-start-button` testid) |
+| Training run / progress | pdomain-ui `Progress` + `JobStatusPip` + `useLongJob` (SSE) |
+| Live training-output log | pdomain-ui **`LogViewer`** |
+| Dataset kanban (drag-drop) | pdomain-ui **`KanbanBoard` / `KanbanColumn` / `PageChip`** |
 | Model name / export controls | **SPA-local `ModelExportPanel`** in `RunDetailPage` |
 | Loss curve | **SPA-local `LossChart`** (recharts) |
 
-### 6.3 New pd-ui components (specced here, built in pd-ui)
+### 6.3 New pdomain-ui components (specced here, built in pdomain-ui)
 
-- **`KanbanBoard` / `KanbanColumn` / `PageChip`** — pd-ui owns the
+- **`KanbanBoard` / `KanbanColumn` / `PageChip`** — pdomain-ui owns the
   `dnd-kit` integration (PointerSensor for mouse, KeyboardSensor for
   a11y) and per-column virtualization. The trainer supplies render-props
   for chip content and column headers, plus the data. Move events are
   routed into the SPA's `kanban-staging` store; the board renders the
   staged arrangement and a pending-diff affordance; "Apply" / "Discard"
   are SPA-owned actions ([D-T23](17-decisions.md)).
-- **`LogViewer`** — pd-ui owns virtualization (`@tanstack/react-virtual`)
+- **`LogViewer`** — pdomain-ui owns virtualization (`@tanstack/react-virtual`)
   and the auto-scroll / wrap toggles. Fed a stream of lines; the trainer
   wires it to `useLongJob` events. Client buffer cap configurable; the
   full log stays on disk for the run-detail tail endpoint.
@@ -301,8 +301,8 @@ The app is wrapped in the pd-ui `AppShell`:
   control slot, an optional help/`Accordion` slot, and an error slot
   driven by `422 ErrorEnvelope` `details[].loc`.
 - **`JobStatusPip`** — a job-state pip (queued / running / succeeded /
-  failed / cancelled — `JobState` per pd-ocr-ops; render "Done" via the
-  `label` prop when UX calls for it), a job-aware variant of pd-ui
+  failed / cancelled — `JobState` per pdomain-ocr-ops; render "Done" via the
+  `label` prop when UX calls for it), a job-aware variant of pdomain-ui
   `StatusPip`.
 
 The trainer's `DatasetsPage` shows **two `KanbanBoard`s** — one for the
@@ -311,7 +311,7 @@ detection dataset, one for recognition — per the design's "dual kanban".
 ### 6.4 SPA-local components
 
 - **`LossChart`** — `recharts` line chart over a run's `progress.jsonl`;
-  downsamples to ~500 points for long runs. App-specific; not a pd-ui
+  downsamples to ~500 points for long runs. App-specific; not a pdomain-ui
   candidate ([D-T14](17-decisions.md)).
 - **`ModelExportPanel`** — model-name (`pd-<lang>-<typeface>-<task>-<date>`,
   [D-T6](17-decisions.md)) + export-to-`dist/` controls, shown on
@@ -336,7 +336,7 @@ detection dataset, one for recognition — per the design's "dual kanban".
 
 ## 8. Performance constraints
 
-- `KanbanBoard` columns can render thousands of page chips — pd-ui
+- `KanbanBoard` columns can render thousands of page chips — pdomain-ui
   virtualizes per column.
 - `LogViewer` virtualizes lines and formats only visible ones; client
   buffer cap (~50k lines); the server retains the full log on disk.
@@ -349,9 +349,9 @@ detection dataset, one for recognition — per the design's "dual kanban".
 
 The driver-facing surface is part of the contract from M0
 ([`13-driver-contract.md`](13-driver-contract.md),
-[D-T12](17-decisions.md)). Because the kanban and log live in pd-ui,
-these IDs are a **shared expectation between pd-ui and trainer-spa** —
-pd-ui's `KanbanColumn` / `LogViewer` accept a `data-testid` prop the
+[D-T12](17-decisions.md)). Because the kanban and log live in pdomain-ui,
+these IDs are a **shared expectation between pdomain-ui and trainer-spa** —
+pdomain-ui's `KanbanColumn` / `LogViewer` accept a `data-testid` prop the
 trainer sets.
 
 Minimum contract:
@@ -380,9 +380,9 @@ Minimum contract:
 
 ## 11. Citations
 
-- App-shell + routing convention: shipped `pd-ocr-labeler-spa` and
-  `pd-ocr-simple-gui` frontends.
-- pd-ui component surface: workspace cross-cut design
+- App-shell + routing convention: shipped `pdomain-ocr-labeler-spa` and
+  `pdomain-ocr-simple-gui` frontends.
+- pdomain-ui component surface: workspace cross-cut design
   (`ocr-container/docs/specs/2026-05-16-cross-cut-design.md` §4, §6).
 - Legacy trainer UI surface: `pd-ocr-trainer/src/pd_ocr_trainer/ui.py`
   + `dataset_ui.py` (profile card, detection card, recognition card,

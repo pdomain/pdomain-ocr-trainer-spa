@@ -7,12 +7,12 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from pd_ocr_trainer_spa.core.enums import TaskEnum
-from pd_ocr_trainer_spa.core.errors import AppError
-from pd_ocr_trainer_spa.domain import training_defaults as td
+from pdomain_ocr_trainer_spa.core.enums import TaskEnum
+from pdomain_ocr_trainer_spa.core.errors import AppError
+from pdomain_ocr_trainer_spa.domain import training_defaults as td
 
 if TYPE_CHECKING:
-    from pd_ocr_trainer_spa.settings import Settings
+    from pdomain_ocr_trainer_spa.settings import Settings
 
 
 def test_detection_seed_matches_spec_04_section_3_2() -> None:

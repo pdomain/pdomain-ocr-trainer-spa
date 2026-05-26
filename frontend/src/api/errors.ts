@@ -4,7 +4,7 @@
 // `api/types.ts` string-literal union. That export gate (spec 02 §8) is
 // not wired yet, so this module is the hand-maintained source of truth
 // until it is. Every code below is raised by an `AppError` in the backend
-// (`grep AppError src/pd_ocr_trainer_spa`) or named by a spec as a worker
+// (`grep AppError src/pdomain_ocr_trainer_spa`) or named by a spec as a worker
 // failure code. The coverage smoke test asserts `errorMessages` covers
 // every entry here — drift fails CI.
 

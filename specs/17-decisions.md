@@ -4,12 +4,12 @@ Architectural decisions baked into the rest of the specs. Each entry
 records what was chosen, what was rejected, and why. New deviations from
 any of these require a new entry, not a silent edit to a per-area spec.
 
-> Format borrowed from `pd-ocr-labeler-spa/specs/17-decisions.md`.
+> Format borrowed from `pdomain-ocr-labeler-spa/specs/17-decisions.md`.
 > IDs prefixed `D-T<n>` to keep them disjoint from labeler-spa `D-<n>`.
 >
 > **Re-spec note.** D-T1, D-T3, D-T9, D-T10 were revised — and D-T19–D-T22
-> added — when the SPA was re-spec'd onto the `pd-ui` + `pd-ocr-ops` +
-> `pd-ocr-training` stack (cross-cut retirement design, 2026-05-21). The
+> added — when the SPA was re-spec'd onto the `pdomain-ui` + `pdomain-ocr-ops` +
+> `pdomain-ocr-training` stack (cross-cut retirement design, 2026-05-21). The
 > original D-T1 (training as raw subprocess calls into `pd-ocr-trainer`)
 > and the rejected shadcn/ui+Tailwind frontend choice are superseded.
 
@@ -19,11 +19,11 @@ any of these require a new entry, not a silent edit to a per-area spec.
 
 **Decided.** A training run executes in a **worker subprocess**. The
 FastAPI backend never imports `torch`/DocTR: it imports only
-`pd-ocr-training`'s `ITrainingRunner` Protocol and the `torch`-free typed
+`pdomain-ocr-training`'s `ITrainingRunner` Protocol and the `torch`-free typed
 config models (`DetectionConfig` / `RecognitionConfig`). The subprocess
-builds the config and drives `pd_ocr_training.LocalTrainingRunner`, whose
+builds the config and drives `pdomain_ocr_training.LocalTrainingRunner`, whose
 `TrainingEvent`s are forwarded to the parent as job events. The
-subprocess lifecycle is owned by the `pd-ocr-ops` `LongJobRunner`
+subprocess lifecycle is owned by the `pdomain-ocr-ops` `LongJobRunner`
 (D-T20).
 
 **Why.** Three reasons, in priority order:
@@ -46,7 +46,7 @@ reasons above.
 
 **Rejected (original D-T1).** Raw `python -m pd_ocr_trainer.train_<task>`
 subprocess calls into the legacy repo. The legacy repo is being retired;
-training code now lives behind `ITrainingRunner` in `pd-ocr-training`.
+training code now lives behind `ITrainingRunner` in `pdomain-ocr-training`.
 
 ---
 
@@ -78,26 +78,26 @@ directory preserves everything the user needs.
 
 ---
 
-## D-T4. Kanban + log viewer are pd-ui components
+## D-T4. Kanban + log viewer are pdomain-ui components
 
 **Decided.** The dataset kanban (`KanbanBoard` / `KanbanColumn` /
-`PageChip`) and the streaming-log viewer (`LogViewer`) are **pd-ui
+`PageChip`) and the streaming-log viewer (`LogViewer`) are **pdomain-ui
 components**, not SPA-local — and so are the supporting `Field` /
 `FieldRow` form-row primitive and `JobStatusPip`. The kanban uses
-`@dnd-kit` inside pd-ui (PointerSensor for mouse, KeyboardSensor for
+`@dnd-kit` inside pdomain-ui (PointerSensor for mouse, KeyboardSensor for
 a11y); the log viewer virtualizes with `@tanstack/react-virtual` inside
-pd-ui.
+pdomain-ui.
 
-**Why.** `pd-ui` is the workspace-standard shared frontend library;
+**Why.** `pdomain-ui` is the workspace-standard shared frontend library;
 these components are reusable beyond the trainer and belong with the
 other primitives so the suite shares one implementation. Building them
 SPA-local first would fork maintenance and force a later promotion.
 
 **Consequence.** This supersedes decision D-4 of the cross-cut
 retirement design (which kept both SPA-local first). The trainer-spa
-kanban / log / config milestones gain a build dependency — the pd-ui
+kanban / log / config milestones gain a build dependency — the pdomain-ui
 components must be specced and built first. Tracked as cross-repo
-additions to the `pd-ui` spec.
+additions to the `pdomain-ui` spec.
 
 **Rejected.** SPA-local-first + later promotion (the original D-T4 /
 design D-4) — forks maintenance for a component the suite will share.
@@ -126,7 +126,7 @@ out-of-band registry. TOML is human-editable.
 Legacy `pd-<profile>-<task>-<...>` names are displayed and evaluated but
 never minted.
 
-**Why.** Aligns with the trainer ROADMAP and `pd-ocr-cli`'s expected
+**Why.** Aligns with the trainer ROADMAP and `pdomain-ocr-cli`'s expected
 name form; gives a coexistence window without a breaking-change moment.
 
 ---
@@ -151,26 +151,26 @@ dev port 5174.
 
 ---
 
-## D-T9. doctr is a dependency of `pd-ocr-training`
+## D-T9. doctr is a dependency of `pdomain-ocr-training`
 
 **Status.** ✅ **Superseded** by the retirement design.
 
-**Decided.** DocTR is a normal dependency of `pd-ocr-training`, declared
+**Decided.** DocTR is a normal dependency of `pdomain-ocr-training`, declared
 in that package's `pyproject.toml`. The SPA does not vendor doctr, does
 not clone it, and is not involved in any `CUSTOM:` vocab patching — that
-is entirely a `pd-ocr-training` concern.
+is entirely a `pdomain-ocr-training` concern.
 
 **Why.** The original decision (users clone `mindee/doctr` next to the
 legacy checkout) was a legacy-trainer workflow. With training code
-extracted into `pd-ocr-training`, doctr is just one more dependency of
+extracted into `pdomain-ocr-training`, doctr is just one more dependency of
 that package.
 
 ---
 
-## D-T10. SSE progress contract is owned by `pd-ocr-ops`
+## D-T10. SSE progress contract is owned by `pdomain-ocr-ops`
 
 **Decided.** The job event stream — event kinds, replay/reconnect
-behaviour, and the SSE endpoint shape — is whatever the `pd-ocr-ops`
+behaviour, and the SSE endpoint shape — is whatever the `pdomain-ocr-ops`
 `LongJobRunner` provides. The SPA does not hand-roll a per-job event
 ring; it consumes the `LongJobRunner` contract.
 
@@ -198,7 +198,7 @@ itself deferred (D-T2).
 
 **Decided.** `data-testid` and URL invariants are part of the contract
 from M0 (per [`13-driver-contract.md`](13-driver-contract.md)). A peer
-`pd-ocr-trainer-spa-driver` repo is **not** built in v1; the contract
+`pdomain-ocr-trainer-spa-driver` repo is **not** built in v1; the contract
 exists so one *can* be built later.
 
 **Why.** The trainer has no comparable mechanical pre-pass need —
@@ -232,7 +232,7 @@ overlay. recharts has good React 19 compatibility and a small footprint.
 
 **Decided.** One `train` job runs at a time across the entire backend.
 Submitting another while one runs queues it. This is enforced through
-the `pd-ocr-ops` `LongJobRunner`.
+the `pdomain-ocr-ops` `LongJobRunner`.
 
 **Why.** Training is GPU-bound; running two on one GPU thrashes VRAM.
 One-at-a-time with explicit opt-in for parallel is the cleaner default.
@@ -266,63 +266,63 @@ starts, normal commit hygiene applies.)
 
 ## D-T18. Workspace .gitignore tracks the new repo
 
-**Decided.** `pd-ocr-trainer-spa/` is in the workspace `.gitignore`
+**Decided.** `pdomain-ocr-trainer-spa/` is in the workspace `.gitignore`
 alongside the other `pd-*` repos so the workspace's own git stays clean.
 
 **Why.** Mirrors labeler-spa precedent.
 
 ---
 
-## D-T19. Frontend built on the `pd-ui` component library
+## D-T19. Frontend built on the `pdomain-ui` component library
 
-**Decided.** The SPA frontend is built on **`pd-ui`**
-(`@concavetrillion/pd-ui`, consumed from the `pd-index-npm` registry):
+**Decided.** The SPA frontend is built on **`pdomain-ui`**
+(`@pdomain/pdomain-ui`, consumed from the `pdomain-index-npm` registry):
 `AppShell`, `TopNav`, `Card`, `Accordion`, `Field`/`FieldRow`, `Button`,
 `Select`, `Progress`, `JobStatusPip`, the `useLongJob` hook, and the
 `tokens.css` / `primitives.css` design tokens. No direct Tailwind, no
 shadcn/ui.
 
-**Why.** `pd-ui` is the workspace-standard shared frontend library; the
-shipped `pd-ocr-labeler-spa` and `pd-ocr-simple-gui` are built on it.
+**Why.** `pdomain-ui` is the workspace-standard shared frontend library; the
+shipped `pdomain-ocr-labeler-spa` and `pdomain-ocr-simple-gui` are built on it.
 Reusing it gives visual + behavioural consistency across the suite and
 removes per-app component maintenance.
 
 **Rejected (original choice).** shadcn/ui + Tailwind 3.4. Predated the
-workspace `pd-ui` standardization decision; would fork the suite's UI.
+workspace `pdomain-ui` standardization decision; would fork the suite's UI.
 
 **Component coverage.** The DnD kanban, streaming-log viewer,
-`Field`/`FieldRow`, and `JobStatusPip` are all pd-ui components (D-T4) —
+`Field`/`FieldRow`, and `JobStatusPip` are all pdomain-ui components (D-T4) —
 the trainer has no SPA-local UI *primitives*, only app-specific
 composition (`LossChart`, `ModelExportPanel`).
 
 ---
 
-## D-T20. Long jobs via the `pd-ocr-ops` `LongJobRunner`
+## D-T20. Long jobs via the `pdomain-ocr-ops` `LongJobRunner`
 
 **Decided.** Long-running jobs (training runs, and any future long
-operation) are managed by the `pd-ocr-ops` `LongJobRunner`: a job
+operation) are managed by the `pdomain-ocr-ops` `LongJobRunner`: a job
 registry, per-job status, and an SSE event stream. The SPA does not
 hand-roll a `core/job_runner.py`.
 
-**Why.** `pd-ocr-ops` is the workspace-standard ops library; its
+**Why.** `pdomain-ocr-ops` is the workspace-standard ops library; its
 `LongJobRunner` is the canonical long-job seam every `pd-*` SPA backend
 uses. Reusing it removes duplicated job-lifecycle code and a class of
 restart/SSE bugs.
 
 **Rejected.** A SPA-local in-memory job runner (the original D-T3
-mechanism). Duplicates `pd-ocr-ops` for one consumer.
+mechanism). Duplicates `pdomain-ocr-ops` for one consumer.
 
 ---
 
-## D-T21. Suite plumbing via `pd-ocr-ops` `mount_routes`
+## D-T21. Suite plumbing via `pdomain-ocr-ops` `mount_routes`
 
-**Decided.** The FastAPI app mounts `pd-ocr-ops` suite routes via
-`pd_ocr_ops.suite.mount_routes(app, adapters)` — registry, UI-prefs,
+**Decided.** The FastAPI app mounts `pdomain-ocr-ops` suite routes via
+`pdomain_ocr_ops.suite.mount_routes(app, adapters)` — registry, UI-prefs,
 sibling-spawn, and the central `/healthz` endpoint. The SPA does not
 hand-roll these.
 
 **Why.** Workspace-standard suite integration; matches the shipped
-`pd-ocr-labeler-spa` and `pd-ocr-simple-gui` backends.
+`pdomain-ocr-labeler-spa` and `pdomain-ocr-simple-gui` backends.
 
 ---
 

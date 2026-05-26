@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
-from pd_ocr_ops.gpu.protocols import LongJobRunner
-from pd_ocr_ops.gpu.types import JobEvent
+from pdomain_ocr_ops.gpu.protocols import LongJobRunner
+from pdomain_ocr_ops.gpu.types import JobEvent
 
-from pd_ocr_trainer_spa.training.fake_runner import FakeLongJobRunner
+from pdomain_ocr_trainer_spa.training.fake_runner import FakeLongJobRunner
 
 
 def _event(kind: str, payload: dict[str, object]) -> JobEvent:

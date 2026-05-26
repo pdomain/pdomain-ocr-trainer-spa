@@ -15,14 +15,14 @@ from unittest.mock import patch
 if TYPE_CHECKING:
     from fastapi.testclient import TestClient
 
-    from pd_ocr_trainer_spa.settings import Settings
+    from pdomain_ocr_trainer_spa.settings import Settings
 
 
 def _make_client(settings: Settings, tmp_path: Path) -> TestClient:
     """Build a TestClient with a valid HF token and enable_hf_publish=True."""
     from fastapi.testclient import TestClient
 
-    from pd_ocr_trainer_spa.bootstrap import build_app
+    from pdomain_ocr_trainer_spa.bootstrap import build_app
 
     token_path = tmp_path / "hf-token"
     token_path.write_text("hf_test_token", encoding="utf-8")
@@ -41,7 +41,7 @@ def test_publish_dataset_missing_token_returns_400(settings: Settings, tmp_path:
     """POST /api/publish/dataset without an HF token returns 400 hf.auth_missing."""
     from fastapi.testclient import TestClient
 
-    from pd_ocr_trainer_spa.bootstrap import build_app
+    from pdomain_ocr_trainer_spa.bootstrap import build_app
 
     settings.hf_token_path = tmp_path / "nonexistent"
     settings.enable_hf_publish = True
@@ -101,7 +101,7 @@ def test_publish_dataset_returns_202(settings: Settings, tmp_path: Path) -> None
     client = _make_client(settings, tmp_path)
 
     with patch(
-        "pd_ocr_trainer_spa.domain.publish.submit_publish_dataset_job",
+        "pdomain_ocr_trainer_spa.domain.publish.submit_publish_dataset_job",
         return_value=("run-abc", "job-xyz"),
     ):
         resp = client.post(
@@ -148,7 +148,7 @@ def test_publish_model_missing_token_returns_400(settings: Settings, tmp_path: P
     """POST /api/publish/model without HF token returns 400 hf.auth_missing."""
     from fastapi.testclient import TestClient
 
-    from pd_ocr_trainer_spa.bootstrap import build_app
+    from pdomain_ocr_trainer_spa.bootstrap import build_app
 
     settings.hf_token_path = tmp_path / "nonexistent"
     settings.enable_hf_publish = True
@@ -224,7 +224,7 @@ def test_publish_model_returns_202(settings: Settings, tmp_path: Path) -> None:
     (model_dir / "sidecar.json").write_text(json.dumps(sidecar), encoding="utf-8")
 
     with patch(
-        "pd_ocr_trainer_spa.domain.publish.submit_publish_model_job",
+        "pdomain_ocr_trainer_spa.domain.publish.submit_publish_model_job",
         return_value=("run-abc", "job-xyz"),
     ):
         resp = client.post(

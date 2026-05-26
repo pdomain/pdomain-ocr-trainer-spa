@@ -1,16 +1,16 @@
 # 10 — Jobs and SSE
 
 How the SPA observes every long-running operation (training, eval,
-dataset publish, model publish) through the `pd-ocr-ops`
+dataset publish, model publish) through the `pdomain-ocr-ops`
 `LongJobRunner` and its SSE event stream.
 
 > Required reading: [`02-backend.md`](02-backend.md) §5 / §6.5,
 > [`06-training-runs.md`](06-training-runs.md).
 >
-> **Re-spec note (2026-05-21).** Rewritten onto the `pd-ocr-ops`
+> **Re-spec note (2026-05-21).** Rewritten onto the `pdomain-ocr-ops`
 > `LongJobRunner` (D-T10, D-T20). The SPA no longer hand-rolls a
 > `core/job_runner.py`, an asyncio event ring, or a worker pool —
-> job lifecycle and event streaming are owned by `pd-ocr-ops`. This
+> job lifecycle and event streaming are owned by `pdomain-ocr-ops`. This
 > spec now describes how the SPA *consumes* that contract, not how
 > it implements one.
 
@@ -19,7 +19,7 @@ dataset publish, model publish) through the `pd-ocr-ops`
 ## 1. Concept
 
 A **job** is the runtime container for one long-running operation,
-owned by the `pd-ocr-ops` `LongJobRunner`. Every `Run` of
+owned by the `pdomain-ocr-ops` `LongJobRunner`. Every `Run` of
 `kind in {train, eval, publish-dataset, publish-model}` has exactly
 one job; `Run.job_id` links them. Jobs exist only for long
 operations — short dataset/profile mutations stay synchronous
@@ -32,10 +32,10 @@ single-machine implementation.
 
 ---
 
-## 2. The `LongJobRunner` contract (from `pd-ocr-ops`)
+## 2. The `LongJobRunner` contract (from `pdomain-ocr-ops`)
 
 The SPA imports and depends on this Protocol — it does not define
-it. `pd_ocr_ops.gpu` provides:
+it. `pdomain_ocr_ops.gpu` provides:
 
 ```python
 class LongJobRunner(Protocol):                    # async, @runtime_checkable
@@ -82,7 +82,7 @@ class JobEvent(BaseModel):               # extra="forbid"
 
 ## 3. The SPA `Job` projection
 
-`pd-ocr-ops` `mount_routes` exposes **no** job routes, so the SPA
+`pdomain-ocr-ops` `mount_routes` exposes **no** job routes, so the SPA
 defines `/api/jobs/*` itself (`api/jobs.py`), wrapping the runner.
 `GET /api/jobs/{job_id}` projects a `JobStatus` onto the SPA `Job`
 model that the frontend and OpenAPI export consume:
@@ -112,7 +112,7 @@ runs registry for the run whose `job_id` matches. `UnknownJobError`
 over SSE — it does **not** invent a parallel event model. Payload
 shapes for training jobs (produced by the worker `@@PDEVENT@@`
 protocol, [`02-backend.md`](02-backend.md) §5.2, and translated by
-the `pd-ocr-ops` stdout parser — see [Q27](../OPEN_QUESTIONS.md)):
+the `pdomain-ocr-ops` stdout parser — see [Q27](../OPEN_QUESTIONS.md)):
 
 | `kind` | `payload` fields | Source |
 |---|---|---|
@@ -123,7 +123,7 @@ the `pd-ocr-ops` stdout parser — see [Q27](../OPEN_QUESTIONS.md)):
 
 [`06-training-runs.md`](06-training-runs.md) §4 describes the same
 events in a `type:`-keyed shorthand; the canonical wire shape is the
-`pd-ocr-ops` `JobEvent` above (`kind` + `payload`).
+`pdomain-ocr-ops` `JobEvent` above (`kind` + `payload`).
 
 A `state`-kind event is emitted on every state transition; the
 final one carries the terminal `state`. There is no separate
@@ -173,7 +173,7 @@ data: {"job_id":"j-abc","seq":142,"at":"2026-05-21T10:05:00Z","kind":"state","pa
 caller can pass a starting `seq`; the SPA route honours
 `Last-Event-ID:` by skipping events with `seq ≤` the header value.
 
-The frontend consumes this through the **pd-ui `useLongJob` hook**
+The frontend consumes this through the **pdomain-ui `useLongJob` hook**
 (D-T19, D-T22) — the SPA does not hand-roll an `EventSource`
 wrapper.
 
@@ -223,7 +223,7 @@ worker subprocess; job state → `cancelled`. `POST /api/runs/{run_id}
 
 Cancelling an already-terminal job is a no-op (returns the terminal
 `Job`). Hard cancellation lives at the subprocess boundary because
-`pd-ocr-training`'s `LocalTrainingRunner` has no in-process cancel
+`pdomain-ocr-training`'s `LocalTrainingRunner` has no in-process cancel
 hook (D-T1).
 
 ---
@@ -276,13 +276,13 @@ cursor.
 ## 11. Citations
 
 - `LongJobRunner` Protocol / `JobStatus` / `JobEvent`:
-  `pd-ocr-ops/pd_ocr_ops/gpu/protocols.py:27-45`,
-  `pd-ocr-ops/pd_ocr_ops/gpu/types.py:25-56`.
+  `pdomain-ocr-ops/pdomain_ocr_ops/gpu/protocols.py:27-45`,
+  `pdomain-ocr-ops/pdomain_ocr_ops/gpu/types.py:25-56`.
 - `LocalLongJobRunner` submit / supervise / cancel / stream:
-  `pd-ocr-ops/pd_ocr_ops/gpu/local_jobs.py:64-272`.
+  `pdomain-ocr-ops/pdomain_ocr_ops/gpu/local_jobs.py:64-272`.
 - `mount_routes` exposes no job routes:
-  `pd-ocr-ops/pd_ocr_ops/suite/routes.py:14`.
+  `pdomain-ocr-ops/pdomain_ocr_ops/suite/routes.py:14`.
 - Cross-repo stdout-parser dependency: [Q27](../OPEN_QUESTIONS.md),
-  `ConcaveTrillion/pd-ocr-ops#76`.
+  `pdomain/pdomain-ocr-ops#76`.
 - Crash-recovery precedent:
-  `pd-ocr-labeler-spa/specs/10-jobs-and-sse.md`.
+  `pdomain-ocr-labeler-spa/specs/10-jobs-and-sse.md`.

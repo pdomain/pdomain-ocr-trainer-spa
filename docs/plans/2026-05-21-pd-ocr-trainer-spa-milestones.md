@@ -2,25 +2,25 @@
 status: active
 synced: 2026-05-21
 milestone: 1
-repo: ConcaveTrillion/pd-ocr-trainer-spa
+repo: pdomain/pdomain-ocr-trainer-spa
 ---
 
-# pd-ocr-trainer-spa Milestone Roadmap
+# pdomain-ocr-trainer-spa Milestone Roadmap
 
-This plan tracks the 15 implementation milestones (M0–M14) for `pd-ocr-trainer-spa`, the FastAPI + React/Vite/TypeScript replacement for the legacy NiceGUI `pd-ocr-trainer`. Milestones M0–M3 are infrastructure (no domain UI); M4–M9 are vertical slices (one page + its backend routes); M10–M14 are post-core-parity ROADMAP milestones gated on upstream readiness. Each milestone is bounded to approximately one coding session with concrete acceptance tests. See `specs/16-milestones.md` for the milestone spec and `specs/02`–`specs/19` for the authoritative per-area design (the post-2026-05-21 re-spec onto the pd-ui / pd-ocr-ops / pd-ocr-training stack supersedes any stale impl detail in `16-milestones.md`).
+This plan tracks the 15 implementation milestones (M0–M14) for `pdomain-ocr-trainer-spa`, the FastAPI + React/Vite/TypeScript replacement for the legacy NiceGUI `pd-ocr-trainer`. Milestones M0–M3 are infrastructure (no domain UI); M4–M9 are vertical slices (one page + its backend routes); M10–M14 are post-core-parity ROADMAP milestones gated on upstream readiness. Each milestone is bounded to approximately one coding session with concrete acceptance tests. See `specs/16-milestones.md` for the milestone spec and `specs/02`–`specs/19` for the authoritative per-area design (the post-2026-05-21 re-spec onto the pdomain-ui / pdomain-ocr-ops / pdomain-ocr-training stack supersedes any stale impl detail in `16-milestones.md`).
 
 ---
 
 ## Task 1 — M0 Repo scaffold  {#m0-scaffold}
 model: sonnet  effort: M  area: infra
 
-Context: M0 bootstraps the entire `pd-ocr-trainer-spa` repo: pyproject.toml, uv.lock, Makefile, mise.toml, pre-commit, Dockerfile, GitHub Actions workflows (ci/release/nightly), the FastAPI backend skeleton (healthz, env.js, static mount), and a minimal React/Vite/TS frontend serving a static "Hello" SPA. No domain logic is introduced. M0 was already shipped via retirement-plan issue #282 (Scaffold pd-ocr-trainer-spa repo); its GH issue will be created then immediately closed on sync.
-Approach: Bootstrap the full repo scaffold modelled on a shipped peer SPA, wiring `pd-ui`, `pd-ocr-ops`, and `pd-ocr-training` as dependencies; add SPA-serving contract tests.
+Context: M0 bootstraps the entire `pdomain-ocr-trainer-spa` repo: pyproject.toml, uv.lock, Makefile, mise.toml, pre-commit, Dockerfile, GitHub Actions workflows (ci/release/nightly), the FastAPI backend skeleton (healthz, env.js, static mount), and a minimal React/Vite/TS frontend serving a static "Hello" SPA. No domain logic is introduced. M0 was already shipped via retirement-plan issue #282 (Scaffold pdomain-ocr-trainer-spa repo); its GH issue will be created then immediately closed on sync.
+Approach: Bootstrap the full repo scaffold modelled on a shipped peer SPA, wiring `pdomain-ui`, `pdomain-ocr-ops`, and `pdomain-ocr-training` as dependencies; add SPA-serving contract tests.
 Verification: `make ci` green; `pd-ocr-trainer-ui --no-browser --port 8081 --host 127.0.0.1` serves 200 at `/healthz` and `/`
 Acceptance:
 - [ ] `make ci` green (backend lint/typecheck/test + frontend install/test)
 - [ ] `tests/test_routes_root.py` passes with monkeypatch (no real frontend build required)
-- [ ] `pd-ui`, `pd-ocr-ops`, `pd-ocr-training` listed as dependencies
+- [ ] `pdomain-ui`, `pdomain-ocr-ops`, `pdomain-ocr-training` listed as dependencies
 - [ ] GitHub repo created and configured (`allow_squash_merge=false`)
 
 ---
@@ -29,7 +29,7 @@ Acceptance:
 model: sonnet  effort: M  area: backend
 Blocked-by: #m0-scaffold
 
-Context: M1 wires every adapter Protocol with its v1 implementation inside `build_app(settings)`, mounts the pd-ocr-ops suite routes, and constructs the pd-ocr-ops `LongJobRunner`. `Fake*` siblings are added for tests. `AppState.hydrate_from_disk` runs on boot but populates nothing yet because no profiles exist. This milestone establishes the adapter layer all subsequent milestones depend on.
+Context: M1 wires every adapter Protocol with its v1 implementation inside `build_app(settings)`, mounts the pdomain-ocr-ops suite routes, and constructs the pdomain-ocr-ops `LongJobRunner`. `Fake*` siblings are added for tests. `AppState.hydrate_from_disk` runs on boot but populates nothing yet because no profiles exist. This milestone establishes the adapter layer all subsequent milestones depend on.
 Approach: Implement `IStorage`, `IAuth`, `IDatasetSource`, `IModelRegistry` adapter Protocols with real + fake impls plus the `training/` glue package; wire `mount_routes` and a fake `LongJobRunner`; add request-id + error-handler middleware.
 Verification: `make ci` green; every adapter Protocol unit-tested with the fake impl
 Acceptance:
@@ -43,7 +43,7 @@ Acceptance:
 model: sonnet  effort: M  area: backend
 Blocked-by: #m1-adapters
 
-Context: M2 delivers the SPA's `/api/jobs/{id}` + `/api/jobs/{id}/events` SSE endpoints wrapping the pd-ocr-ops `LongJobRunner` (per spec 10). No real run kinds exist yet — tests use a fake `LongJobRunner` scripting synthetic events to drive the full lifecycle including reconnection and cancellation.
+Context: M2 delivers the SPA's `/api/jobs/{id}` + `/api/jobs/{id}/events` SSE endpoints wrapping the pdomain-ocr-ops `LongJobRunner` (per spec 10). No real run kinds exist yet — tests use a fake `LongJobRunner` scripting synthetic events to drive the full lifecycle including reconnection and cancellation.
 Approach: Implement `api/jobs.py` projecting `JobStatus` onto the SPA `Job` model and streaming `stream_events` as SSE; add a TS subscription helper; test reconnect with `Last-Event-ID` and cancel-suppression against the fake runner.
 Verification: `make ci` green; SSE integration test passes with synthetic events
 Acceptance:
@@ -57,7 +57,7 @@ Acceptance:
 model: sonnet  effort: M  area: fullstack
 Blocked-by: #m2-job-runner
 
-Context: M3 ships the working profiles CRUD: list, create, edit, delete with "all" guards. profile.toml round-trips to disk. The React `ProfilesPage` renders the list and dialog on pd-ui primitives. This is the first vertical slice and unlocks all dataset and training milestones gated on profile existence.
+Context: M3 ships the working profiles CRUD: list, create, edit, delete with "all" guards. profile.toml round-trips to disk. The React `ProfilesPage` renders the list and dialog on pdomain-ui primitives. This is the first vertical slice and unlocks all dataset and training milestones gated on profile existence.
 Approach: Implement `domain/profiles.py`, `api/profiles.py`, `ProfilesPage`, `ProfileEditDialog`, and a profiles store with full test coverage at each layer.
 Verification: `make ci` green; all 6 profile acceptance scenarios pass
 Acceptance:
@@ -70,8 +70,8 @@ Acceptance:
 model: sonnet  effort: M  area: fullstack
 Blocked-by: #m3-profiles
 
-Context: M4 delivers the working dataset kanban for `(profile, recognition)` only: client-side staged drag/drop, multi-select, the batch `apply` commit, the "changed" highlight, and rescan. Detection and classifier kanbans share the pd-ui `KanbanBoard` component but their backend endpoint impls land in M5 and M12.
-Approach: Implement `domain/datasets.py`, `api/datasets.py`, the `DatasetsPage` composing the pd-ui `KanbanBoard`, and the staged-overlay client state; wire the keyboard-only drag flow.
+Context: M4 delivers the working dataset kanban for `(profile, recognition)` only: client-side staged drag/drop, multi-select, the batch `apply` commit, the "changed" highlight, and rescan. Detection and classifier kanbans share the pdomain-ui `KanbanBoard` component but their backend endpoint impls land in M5 and M12.
+Approach: Implement `domain/datasets.py`, `api/datasets.py`, the `DatasetsPage` composing the pdomain-ui `KanbanBoard`, and the staged-overlay client state; wire the keyboard-only drag flow.
 Verification: `make ci` green; kanban acceptance scenarios pass; keyboard scenario passes
 Acceptance:
 - [ ] Acceptance scenarios from `specs/05-dataset-kanban.md` §11 (recognition only)
@@ -96,7 +96,7 @@ Acceptance:
 model: sonnet  effort: L  area: fullstack
 Blocked-by: #m5-kanban-detect
 
-Context: M6 ships the full training-run lifecycle: start, monitor, cancel a recognition or detection run via the worker subprocess + pd-ocr-ops `LongJobRunner`. SSE log streams into the pd-ui `LogViewer`; `LossChart` populates from progress events. Run-detail and run-list pages work. A sidecar is written next to the model on completion. Crash-recovery (running-at-boot → failed) is verified.
+Context: M6 ships the full training-run lifecycle: start, monitor, cancel a recognition or detection run via the worker subprocess + pdomain-ocr-ops `LongJobRunner`. SSE log streams into the pdomain-ui `LogViewer`; `LossChart` populates from progress events. Run-detail and run-list pages work. A sidecar is written next to the model on completion. Crash-recovery (running-at-boot → failed) is verified.
 Approach: Implement `domain/runs.py`, `api/runs.py`, the `worker/train.py` subprocess + `training/` glue, frontend run pages, the stub worker fixture, and an e2e lifecycle test.
 Verification: `make ci` green; all 6 run acceptance scenarios pass; the slow stub-worker e2e test passes
 Acceptance:
@@ -177,8 +177,8 @@ Acceptance:
 model: sonnet  effort: L  area: fullstack
 Blocked-by: #m11-hf-publish
 
-Context: M12 trains, evaluates, and publishes a typeface classifier (ROADMAP milestone a.5, see `specs/18-deferred-hf-datasets.md`). It adds the typeface kanban variant and per-class eval slicing. Gated on M11 and on the typeface training task existing in `pd-ocr-training` (upstream readiness — OPEN_QUESTIONS Q9).
-Approach: Wire the typeface classifier training task from `pd-ocr-training`; add the typeface kanban view + run form; extend the eval metrics table to slice per class.
+Context: M12 trains, evaluates, and publishes a typeface classifier (ROADMAP milestone a.5, see `specs/18-deferred-hf-datasets.md`). It adds the typeface kanban variant and per-class eval slicing. Gated on M11 and on the typeface training task existing in `pdomain-ocr-training` (upstream readiness — OPEN_QUESTIONS Q9).
+Approach: Wire the typeface classifier training task from `pdomain-ocr-training`; add the typeface kanban view + run form; extend the eval metrics table to slice per class.
 Verification: `make ci` green; round-trip ingest → train → eval → publish for typeface-classification/v1
 Acceptance:
 - [ ] Round-trip: ingest a typeface-classification/v1 dataset, train, eval, publish
@@ -189,7 +189,7 @@ Acceptance:
 model: sonnet  effort: M  area: fullstack
 Blocked-by: #m11-hf-publish
 
-Context: M13 extends recognition eval to support per-glyph-feature slicing and renders the per-feature breakdown (ROADMAP g1, see `specs/19-deferred-glyph-classifier.md`). Gated on M11 and on the `pd-book-tools` `GlyphAnnotations` data model having landed upstream.
+Context: M13 extends recognition eval to support per-glyph-feature slicing and renders the per-feature breakdown (ROADMAP g1, see `specs/19-deferred-glyph-classifier.md`). Gated on M11 and on the `pdomain-book-tools` `GlyphAnnotations` data model having landed upstream.
 Approach: Extend the eval pipeline with slicing logic keyed on `GlyphAnnotations`; add per-feature rows to the eval metrics table.
 Verification: `make ci` green; eval slicing acceptance tests from `specs/07-evaluation-and-metrics.md` §8 pass
 Acceptance:
@@ -201,8 +201,8 @@ Acceptance:
 model: opus  effort: L  area: fullstack
 Blocked-by: #m13-glyph-eval
 
-Context: M14 trains, evaluates, and publishes the glyph classifier — the large multi-head model (ROADMAP g2, see `specs/19-deferred-glyph-classifier.md`). This is the final post-core-parity milestone, gated on M13 and on `pd-ocr-synth` emitting a `glyph-classification/v1` dataset.
-Approach: Wire the glyph classifier training task from `pd-ocr-training`; extend the run form and eval pages for glyph-classifier jobs; publish round-trip against the ROADMAP (g2) ship criterion.
+Context: M14 trains, evaluates, and publishes the glyph classifier — the large multi-head model (ROADMAP g2, see `specs/19-deferred-glyph-classifier.md`). This is the final post-core-parity milestone, gated on M13 and on `pdomain-ocr-synth` emitting a `glyph-classification/v1` dataset.
+Approach: Wire the glyph classifier training task from `pdomain-ocr-training`; extend the run form and eval pages for glyph-classifier jobs; publish round-trip against the ROADMAP (g2) ship criterion.
 Verification: `make ci` green; round-trip per the ROADMAP (g2) ship criterion
 Acceptance:
 - [ ] Round-trip per the ROADMAP (g2) ship criterion

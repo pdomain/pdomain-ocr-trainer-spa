@@ -1,7 +1,7 @@
 """Unit tests for domain/publish.py SPDX license validation (issue #18).
 
 These tests verify that ``validate_spdx_license`` delegates to
-``pd_book_tools.licenses.is_valid_spdx_id`` and therefore accepts only
+``pdomain_book_tools.licenses.is_valid_spdx_id`` and therefore accepts only
 canonical-case SPDX identifiers (``Apache-2.0``, not ``apache-2.0``).
 
 RED phase: all tests in this file are written BEFORE the production code
@@ -12,11 +12,11 @@ from __future__ import annotations
 
 import pytest
 
-from pd_ocr_trainer_spa.core.errors import AppError
-from pd_ocr_trainer_spa.domain.publish import validate_spdx_license
+from pdomain_ocr_trainer_spa.core.errors import AppError
+from pdomain_ocr_trainer_spa.domain.publish import validate_spdx_license
 
 # ---------------------------------------------------------------------------
-# Acceptance: canonical-case SPDX IDs from pd-book-tools must be accepted
+# Acceptance: canonical-case SPDX IDs from pdomain-book-tools must be accepted
 # ---------------------------------------------------------------------------
 
 
@@ -41,7 +41,7 @@ def test_validate_accepts_canonical_case_cc0() -> None:
 
 
 # ---------------------------------------------------------------------------
-# Rejection: non-canonical case must now be rejected (pd-book-tools is
+# Rejection: non-canonical case must now be rejected (pdomain-book-tools is
 # case-sensitive; lowercase "apache-2.0" is NOT a valid SPDX identifier)
 # ---------------------------------------------------------------------------
 
@@ -76,17 +76,17 @@ def test_validate_rejects_completely_invalid_id() -> None:
 
 
 # ---------------------------------------------------------------------------
-# Source of truth: SPDX_VALID_IDS in publish.py must come from pd-book-tools
+# Source of truth: SPDX_VALID_IDS in publish.py must come from pdomain-book-tools
 # ---------------------------------------------------------------------------
 
 
-def test_spdx_valid_ids_delegates_to_pd_book_tools() -> None:
-    """domain.publish.SPDX_VALID_IDS must be the pd_book_tools frozenset (518+ entries)."""
-    from pd_book_tools.licenses import SPDX_VALID_IDS as upstream_set
+def test_spdx_valid_ids_delegates_to_pdomain_book_tools() -> None:
+    """domain.publish.SPDX_VALID_IDS must be the pdomain_book_tools frozenset (518+ entries)."""
+    from pdomain_book_tools.licenses import SPDX_VALID_IDS as upstream_set
 
-    from pd_ocr_trainer_spa.domain.publish import SPDX_VALID_IDS as local_set
+    from pdomain_ocr_trainer_spa.domain.publish import SPDX_VALID_IDS as local_set
 
     assert local_set is upstream_set, (
-        "domain/publish.py must import SPDX_VALID_IDS directly from pd_book_tools.licenses "
+        "domain/publish.py must import SPDX_VALID_IDS directly from pdomain_book_tools.licenses "
         "rather than bundling a hand-rolled subset."
     )

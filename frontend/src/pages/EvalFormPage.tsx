@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Button, Card } from "@concavetrillion/pd-ui/primitives";
+import { Button, Card } from "@pdomain/pdomain-ui/primitives";
 import { fetchProfiles } from "../api/profiles";
 import type { Profile } from "../api/profiles";
 import { fetchModels } from "../api/models";

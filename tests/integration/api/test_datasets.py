@@ -8,8 +8,8 @@ from typing import TYPE_CHECKING
 import pytest
 from fastapi.testclient import TestClient
 
-from pd_ocr_trainer_spa.bootstrap import build_app
-from pd_ocr_trainer_spa.settings import Settings
+from pdomain_ocr_trainer_spa.bootstrap import build_app
+from pdomain_ocr_trainer_spa.settings import Settings
 
 if TYPE_CHECKING:
     from pathlib import Path

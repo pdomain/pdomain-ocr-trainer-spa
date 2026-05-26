@@ -12,7 +12,7 @@ ships SPA bundle bytes, and what GPU / MPS quirks to expect.
 ## 1. Repo layout (top level)
 
 ```
-pd-ocr-trainer-spa/
+pdomain-ocr-trainer-spa/
 ├── README.md
 ├── DEVELOPMENT.md                  (M0 — quickstart for contributors)
 ├── Dockerfile                      (multi-stage: deps → frontend-build → wheel-build → runtime)
@@ -31,7 +31,7 @@ pd-ocr-trainer-spa/
 ├── .gitignore
 ├── specs/                          (this directory)
 ├── OPEN_QUESTIONS.md
-├── src/pd_ocr_trainer_spa/         (Python package)
+├── src/pdomain_ocr_trainer_spa/         (Python package)
 ├── frontend/                       (Vite / React)
 └── tests/
 ```
@@ -54,9 +54,9 @@ UV_LINK_MODE = "copy"
 uv handles Python deps; npm handles frontend deps. Pre-commit
 hooks run both.
 
-Pinning rationale matches `pd-ocr-labeler-spa/specs/15-deployment-dev.md`
+Pinning rationale matches `pdomain-ocr-labeler-spa/specs/15-deployment-dev.md`
 — Node 24 because pgdp-prep is on it; Python 3.13 because
-`pd-book-tools` is on it.
+`pdomain-book-tools` is on it.
 
 ---
 
@@ -70,10 +70,10 @@ make typecheck               # pyright + tsc
 make test                    # pytest (excludes -m slow)
 make test-slow               # pytest -m slow
 make frontend-test           # vitest --run
-make frontend-build          # vite build → frontend/dist + copy into src/pd_ocr_trainer_spa/static
+make frontend-build          # vite build → frontend/dist + copy into src/pdomain_ocr_trainer_spa/static
 make build                   # python -m build (wheel + sdist); fails if static/ is empty (build_hooks/spa_check.py)
 make e2e                     # playwright test
-make openapi-export          # python -m pd_ocr_trainer_spa.scripts.export_openapi → frontend/openapi.json + types.ts
+make openapi-export          # python -m pdomain_ocr_trainer_spa.scripts.export_openapi → frontend/openapi.json + types.ts
 make dev                     # start backend (uvicorn --reload) and frontend (vite dev) concurrently
 make dev-backend             # uvicorn only
 make dev-frontend            # vite only
@@ -94,7 +94,7 @@ Both ports configurable via env.
 
 `build_hooks/spa_check.py` runs as a hatch build hook:
 
-1. Reads `src/pd_ocr_trainer_spa/static/index.html`.
+1. Reads `src/pdomain_ocr_trainer_spa/static/index.html`.
 2. Asserts presence and non-empty.
 3. Asserts at least one `assets/*.js` and `assets/*.css` referenced
    from index.html exists.
@@ -104,14 +104,14 @@ Force-include in `pyproject.toml`:
 
 ```toml
 [tool.hatch.build.targets.wheel]
-packages = ["src/pd_ocr_trainer_spa"]
-force-include = { "src/pd_ocr_trainer_spa/static" = "pd_ocr_trainer_spa/static" }
+packages = ["src/pdomain_ocr_trainer_spa"]
+force-include = { "src/pdomain_ocr_trainer_spa/static" = "pdomain_ocr_trainer_spa/static" }
 ```
 
 Verify post-build:
 
 ```bash
-python -m zipfile -l dist/pd_ocr_trainer_spa-*.whl | grep static/index.html
+python -m zipfile -l dist/pdomain_ocr_trainer_spa-*.whl | grep static/index.html
 ```
 
 ---
@@ -135,7 +135,7 @@ Two paths:
 ### 6.1 `uv tool install` from a local wheel
 
 ```
-uv tool install ./dist/pd_ocr_trainer_spa-*.whl
+uv tool install ./dist/pdomain_ocr_trainer_spa-*.whl
 pd-ocr-trainer-ui --port 8081
 ```
 
@@ -144,7 +144,7 @@ pd-ocr-trainer-ui --port 8081
 Per workspace `project_release_strategy.md` memory:
 
 ```
-uv tool install --index https://concavetrillion.github.io/pd-index pd-ocr-trainer-spa
+uv tool install --index https://concavetrillion.github.io/pd-index pdomain-ocr-trainer-spa
 ```
 
 The `pd-index` repo isn't built yet — when it lands, this repo's
@@ -164,7 +164,7 @@ the `pd-index` URL. Mirrors the labeler-spa installers.
 
 ```toml
 [project.scripts]
-pd-ocr-trainer-ui = "pd_ocr_trainer_spa.__main__:main"
+pd-ocr-trainer-ui = "pdomain_ocr_trainer_spa.__main__:main"
 ```
 
 `__main__:main`:
@@ -183,14 +183,14 @@ different name so both can coexist.
 ## 8. GPU / MPS notes
 
 Detection + recognition training reaches DocTR through
-`pd-ocr-training`, run inside the worker subprocess
+`pdomain-ocr-training`, run inside the worker subprocess
 ([`02-backend.md`](02-backend.md) §5, D-T1). The long-lived FastAPI
 process **never imports `torch`** — only the worker does.
 
 - Device discovery (`GET /api/runtime/devices`) goes through
-  `pd-ocr-ops` (`pd_ocr_ops.gpu`, `pick_device`), not a SPA-local
+  `pdomain-ocr-ops` (`pdomain_ocr_ops.gpu`, `pick_device`), not a SPA-local
   torch probe. The endpoint result is cached.
-- CUDA: the worker uses whatever `pd-ocr-training` + DocTR support;
+- CUDA: the worker uses whatever `pdomain-ocr-training` + DocTR support;
   `CreateRunRequest.device` pins a GPU index.
 - MPS: opportunistically offered in the device dropdown when the
   platform reports it available; some DocTR ops fall back to CPU
@@ -203,9 +203,9 @@ process **never imports `torch`** — only the worker does.
 ## 9. DocTR dependency
 
 There is **no doctr clone or submodule** (D-T9). DocTR is a normal
-dependency of `pd-ocr-training`, declared in that package's
+dependency of `pdomain-ocr-training`, declared in that package's
 `pyproject.toml`; `uv` resolves it transitively. Any `CUSTOM:` vocab
-handling is entirely a `pd-ocr-training` concern — the SPA neither
+handling is entirely a `pdomain-ocr-training` concern — the SPA neither
 clones, vendors, nor patches doctr. ([Q26](../OPEN_QUESTIONS.md) is
 resolved.)
 
@@ -242,7 +242,7 @@ as `ci.yml`, then:
 - (Future) Pushes wheel to `pd-index` repo's PEP 503 tree.
 
 Two-pass `npm install` lesson from
-`pd-ocr-labeler-spa/specs/15-deployment-dev.md` (B-28 + B-19) is
+`pdomain-ocr-labeler-spa/specs/15-deployment-dev.md` (B-28 + B-19) is
 inherited here: dockerfile and CI both `npm install` once during
 deps stage and once after lockfile, to converge on the lockfile
 before builds.
@@ -286,19 +286,19 @@ repos:
 2. `make dev` → backend at 8081, vite at 5174. Open browser; SPA
    loads, calls `/api/profiles`, shows `all` profile.
 3. `make build` → wheel under `dist/`. `python -m zipfile -l` shows
-   `pd_ocr_trainer_spa/static/index.html` present.
+   `pdomain_ocr_trainer_spa/static/index.html` present.
 4. `uv tool install ./dist/...whl` → `pd-ocr-trainer-ui --port 8081`
    serves both API and SPA from one process.
 5. `make doctor` reports CUDA: yes/no, MPS: yes/no, HF token:
-   yes/no, and the resolved `pd-ocr-training` / `pd-ocr-ops`
+   yes/no, and the resolved `pdomain-ocr-training` / `pdomain-ocr-ops`
    versions.
 
 ---
 
 ## 13. Citations
 
-- Wheel-with-SPA pattern: `pd-ocr-labeler-spa/specs/15-deployment-dev.md`.
+- Wheel-with-SPA pattern: `pdomain-ocr-labeler-spa/specs/15-deployment-dev.md`.
 - Two-pass npm install: same spec + commit `eba093e`.
-- DocTR as a `pd-ocr-training` dependency: D-T9
+- DocTR as a `pdomain-ocr-training` dependency: D-T9
   ([`17-decisions.md`](17-decisions.md)).
 - Release strategy: workspace memory `project_release_strategy.md`.

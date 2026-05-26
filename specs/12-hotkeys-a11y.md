@@ -63,7 +63,7 @@ operation.
 Focus model: each chip is a roving-tabindex `[role="listitem"]`
 inside a `[role="list"]` per column. The column itself is
 `[role="region" aria-label="Training" aria-keyshortcuts="j k h l"]`.
-Keyboard drag-and-drop is provided by the `pd-ui` `KanbanBoard`
+Keyboard drag-and-drop is provided by the `pdomain-ui` `KanbanBoard`
 (D-T4) via dnd-kit's `KeyboardSensor`: `Space` to grab, arrows to
 move, `Space` to drop, `Esc` to abort.
 
@@ -115,7 +115,7 @@ overridden.
 
 - Route changes restore focus to the first heading (`<h1>`) of the
   new page after the data is ready.
-- Modal dialogs trap focus (the `pd-ui` dialog primitive enforces
+- Modal dialogs trap focus (the `pdomain-ui` dialog primitive enforces
   this). On close, focus returns to the trigger element.
 - Toasts never steal focus.
 - The kanban toolbar / footer buttons (`Rescan`, `Apply`,
@@ -145,10 +145,10 @@ overridden.
 ## 7. Colour and contrast
 
 - All status colours have a non-colour signifier (icon or text).
-- The `pd-ui` `tokens.css` palette keeps WCAG AA contrast
+- The `pdomain-ui` `tokens.css` palette keeps WCAG AA contrast
   (≥ 4.5:1) on body text — no direct Tailwind (D-T19).
 - Dark mode parity: every page tested in both themes; the test
-  suite asserts no hard-coded colour outside the `pd-ui`
+  suite asserts no hard-coded colour outside the `pdomain-ui`
   `tokens.css` semantic tokens.
 
 ---
@@ -203,6 +203,6 @@ operable (`Tab` between sections, `Esc` to close).
 
 ## 10. Citations
 
-- Hotkey library + scope pattern: `pd-ocr-labeler-spa/specs/12-hotkeys-a11y.md`.
+- Hotkey library + scope pattern: `pdomain-ocr-labeler-spa/specs/12-hotkeys-a11y.md`.
 - dnd-kit accessibility: dnd-kit docs §Accessibility (KeyboardSensor).
 - ARIA for chart canvases: WAI-ARIA Authoring Practices §Chart pattern.

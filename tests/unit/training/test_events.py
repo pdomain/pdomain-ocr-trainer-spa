@@ -6,7 +6,7 @@ import json
 
 import pytest
 
-from pd_ocr_trainer_spa.training.events import is_event_line, parse_event_line
+from pdomain_ocr_trainer_spa.training.events import is_event_line, parse_event_line
 
 
 def test_is_event_line() -> None:

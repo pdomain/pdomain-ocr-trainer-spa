@@ -38,7 +38,7 @@ _FRONTEND_SRC = _REPO_ROOT / "frontend" / "src"
 _APP_TSX = _FRONTEND_SRC / "App.tsx"
 
 # Chrome testids spec 13 §4.1 lists that are NOT yet implemented as part
-# of M9's minimal header. They depend on larger features (pd-ui AppShell
+# of M9's minimal header. They depend on larger features (pdomain-ui AppShell
 # `TopNav` + the active-profile selector, spec 03 §6.1; jobs SSE badge).
 # Tracked for a later milestone; the conformance test documents the gap
 # rather than silently passing.
@@ -343,7 +343,7 @@ def test_sidebar_nav_links_cover_every_section(source_text: str) -> None:
 # --------------------------------------------------------------------------
 def test_driver_contract_version_exposed() -> None:
     """`/env.js` exposes `driverContractVersion` (spec 13 §6, initial = 1)."""
-    env_js = (_REPO_ROOT / "src" / "pd_ocr_trainer_spa" / "api" / "env_js.py").read_text(
+    env_js = (_REPO_ROOT / "src" / "pdomain_ocr_trainer_spa" / "api" / "env_js.py").read_text(
         encoding="utf-8"
     )
     assert "driverContractVersion" in env_js, (

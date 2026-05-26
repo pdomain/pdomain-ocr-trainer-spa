@@ -1,12 +1,12 @@
-"""Shared pytest fixtures for pd-ocr-trainer-spa."""
+"""Shared pytest fixtures for pdomain-ocr-trainer-spa."""
 
 from __future__ import annotations
 
 import pytest
 from fastapi.testclient import TestClient
 
-from pd_ocr_trainer_spa.bootstrap import build_app
-from pd_ocr_trainer_spa.settings import Settings
+from pdomain_ocr_trainer_spa.bootstrap import build_app
+from pdomain_ocr_trainer_spa.settings import Settings
 
 
 @pytest.fixture
@@ -53,8 +53,8 @@ def trained_profile(settings: Settings):
     """
     import json
 
-    from pd_ocr_trainer_spa.core.enums import TypefaceEnum
-    from pd_ocr_trainer_spa.domain.profiles import create_profile
+    from pdomain_ocr_trainer_spa.core.enums import TypefaceEnum
+    from pdomain_ocr_trainer_spa.domain.profiles import create_profile
 
     create_profile(
         settings,

@@ -11,8 +11,8 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from pd_ocr_trainer_spa.core.models import EvalMetrics
-from pd_ocr_trainer_spa.worker import evaluate as worker
+from pdomain_ocr_trainer_spa.core.models import EvalMetrics
+from pdomain_ocr_trainer_spa.worker import evaluate as worker
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -107,5 +107,5 @@ def test_run_worker_runner_failure_exits_nonzero(tmp_path: Path) -> None:
 
 def test_build_runner_surfaces_upstream_gap() -> None:
     """The production runner path raises a clear upstream-gap error."""
-    with pytest.raises(RuntimeError, match="pd-ocr-training"):
+    with pytest.raises(RuntimeError, match="pdomain-ocr-training"):
         worker._build_runner()

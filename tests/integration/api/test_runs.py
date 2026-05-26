@@ -9,13 +9,13 @@ from __future__ import annotations
 import json
 from typing import TYPE_CHECKING
 
-from pd_ocr_ops.gpu.types import JobEvent
+from pdomain_ocr_ops.gpu.types import JobEvent
 
 if TYPE_CHECKING:
     from fastapi.testclient import TestClient
 
-    from pd_ocr_trainer_spa.settings import Settings
-    from pd_ocr_trainer_spa.training.fake_runner import FakeLongJobRunner
+    from pdomain_ocr_trainer_spa.settings import Settings
+    from pdomain_ocr_trainer_spa.training.fake_runner import FakeLongJobRunner
 
 
 def _ev(kind: str, payload: dict[str, object]) -> JobEvent:
@@ -66,8 +66,8 @@ def test_create_run_no_training_data_409(
     client: TestClient, fake_runner: FakeLongJobRunner
 ) -> None:
     """A profile without labels.json is rejected before submission."""
-    from pd_ocr_trainer_spa.core.enums import TypefaceEnum
-    from pd_ocr_trainer_spa.domain.profiles import create_profile
+    from pdomain_ocr_trainer_spa.core.enums import TypefaceEnum
+    from pdomain_ocr_trainer_spa.domain.profiles import create_profile
 
     state = client.app.state.app_state  # type: ignore[attr-defined]
     create_profile(
@@ -85,7 +85,7 @@ def test_create_run_incomplete_profile_409(
     client: TestClient, fake_runner: FakeLongJobRunner, settings: Settings
 ) -> None:
     """A profile lacking language/typeface blocks model-name derivation."""
-    from pd_ocr_trainer_spa.domain.profiles import create_profile
+    from pdomain_ocr_trainer_spa.domain.profiles import create_profile
 
     create_profile(settings, name="bare")
     task_dir = settings.ml_training_dir / "bare" / "recognition"
@@ -287,9 +287,9 @@ def test_hydrate_marks_orphaned_running_as_failed(
     settings: Settings, trained_profile: str
 ) -> None:
     """A run left 'running' at boot with no live job is marked failed."""
-    from pd_ocr_trainer_spa.bootstrap import build_app
-    from pd_ocr_trainer_spa.core.enums import TaskEnum
-    from pd_ocr_trainer_spa.domain import runs as dom
+    from pdomain_ocr_trainer_spa.bootstrap import build_app
+    from pdomain_ocr_trainer_spa.core.enums import TaskEnum
+    from pdomain_ocr_trainer_spa.domain import runs as dom
 
     run = dom.create_run(
         settings, profile=trained_profile, task=TaskEnum.recognition, args={}

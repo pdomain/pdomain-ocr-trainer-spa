@@ -1,12 +1,12 @@
 // LogViewer — a lightweight stdout/stderr log pane for the run-detail page.
 //
-// Spec 06 §7 names a pd-ui `LogViewer`, but pd-ui exposes no such component
-// yet (only `primitives` / `worklist` / `canvas`). Until pd-ui ships one this
+// Spec 06 §7 names a pdomain-ui `LogViewer`, but pdomain-ui exposes no such component
+// yet (only `primitives` / `worklist` / `canvas`). Until pdomain-ui ships one this
 // SPA-local viewer carries the spec-13 §4.4 testid contract; swapping in the
-// pd-ui component later is a drop-in behind the same testids.
+// pdomain-ui component later is a drop-in behind the same testids.
 
 import { useEffect, useRef, useState } from "react";
-import { Button } from "@concavetrillion/pd-ui/primitives";
+import { Button } from "@pdomain/pdomain-ui/primitives";
 
 export interface LogViewerProps {
   stdout: string[];

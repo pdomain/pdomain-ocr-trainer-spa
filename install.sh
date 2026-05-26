@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# install.sh — install pd-ocr-trainer-spa via uv tool install
+# install.sh — install pdomain-ocr-trainer-spa via uv tool install
 #
 # Usage:
 #   ./install.sh              # install from pd-index PEP 503 registry (when available)
@@ -14,15 +14,15 @@ if ! command -v uv &>/dev/null; then
 fi
 
 if [[ $# -gt 0 ]]; then
-    echo "Installing pd-ocr-trainer-spa from $1 ..."
+    echo "Installing pdomain-ocr-trainer-spa from $1 ..."
     uv tool install "$1"
 else
-    echo "Installing pd-ocr-trainer-spa from pd-index ..."
+    echo "Installing pdomain-ocr-trainer-spa from pd-index ..."
     uv tool install \
         --index https://concavetrillion.github.io/pd-index \
-        pd-ocr-trainer-spa
+        pdomain-ocr-trainer-spa
 fi
 
 echo ""
-echo "✅ pd-ocr-trainer-spa installed."
+echo "✅ pdomain-ocr-trainer-spa installed."
 echo "   Run: pd-ocr-trainer-ui --port 8081"

@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from pd_ocr_trainer_spa.adapters.auth import AuthedUser, IAuth
-from pd_ocr_trainer_spa.adapters.auth.none_ import NoneAuth
+from pdomain_ocr_trainer_spa.adapters.auth import AuthedUser, IAuth
+from pdomain_ocr_trainer_spa.adapters.auth.none_ import NoneAuth
 
 
 def test_none_auth_satisfies_protocol() -> None:

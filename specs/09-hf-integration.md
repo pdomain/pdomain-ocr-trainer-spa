@@ -136,7 +136,7 @@ Server flow:
 
 1. Validate: profile has data, language + typeface set, license is
    a known SPDX value (validated against
-   `pd_book_tools.licenses.SPDX_VALID_IDS` — bundled list).
+   `pdomain_book_tools.licenses.SPDX_VALID_IDS` — bundled list).
 2. For each row: confirm per-row `license` field exists in
    `metadata.jsonl` (recognition/typeface/glyph) or per-page
    provenance (detection). Refuse with
@@ -229,7 +229,7 @@ user explicitly clicks "Refresh".
 1. Set `PD_OCR_TRAINER_SPA_HF_TOKEN_PATH` to a valid token. Open
    `/sources` — list shows `local` (always) and `huggingface`.
 2. Open the kanban for `(clogaelach, recognition)` → "Add HF
-   source" → enter `ntw8532/pd-ocr-synth-ga-clogaelach`. Preview
+   source" → enter `ntw8532/pdomain-ocr-synth-ga-clogaelach`. Preview
    shows 50 rows.
 3. Start a recognition run with `sources = [local(weight=0.3),
    huggingface(weight=0.7)]`. The transient dataset dir under

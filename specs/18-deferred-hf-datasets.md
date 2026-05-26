@@ -29,8 +29,8 @@ from the legacy roadmap.
 - **HF dataset publishing lives in the trainer**, not the labeler.
   The labeler labels; the trainer consumes labeled data, so it owns
   packaging, publishing, and versioning. In the new stack that
-  ownership lands in `pd-ocr-trainer-spa` (publish routes) backed by
-  the `pd-ocr-training` / `pd-ocr-ops` libraries.
+  ownership lands in `pdomain-ocr-trainer-spa` (publish routes) backed by
+  the `pdomain-ocr-training` / `pdomain-ocr-ops` libraries.
 - **Two attributes are required on every dataset and every model:**
   - `language` — BCP-47 lowercase, open string (`en`, `ga`, `de`,
     `el`, `grc`, `la`, …).
@@ -91,7 +91,7 @@ Each is independently shippable, in order. SPA mapping in brackets.
 - An interactive script prompts the operator for `(language,
   typeface)` per project.
 - Prefer `matched-ocr/` as the source — it carries the richer
-  pd-book-tools page document, not the derived `labels.json`.
+  pdomain-book-tools page document, not the derived `labels.json`.
 - The labeler's per-word style flags are also backfilled into a
   typeface-classifier dataset in the same pass.
 - Private-by-default; promote to public after license review.
@@ -103,7 +103,7 @@ Each is independently shippable, in order. SPA mapping in brackets.
 - Profiles without `sources:` emit a deprecation warning.
 - After one release, `local` stops being the default source.
 - Coordinate the `pd-<lang>-<typeface>-<task>-<base>` model-name
-  convention with `pd-ocr-cli` (the SPA already mints only the new
+  convention with `pdomain-ocr-cli` (the SPA already mints only the new
   form — D-T6).
 - **Ship criterion:** production training uses only HF sources.
 

@@ -7,14 +7,14 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from pd_ocr_trainer_spa.adapters.dataset_sources import (
+from pdomain_ocr_trainer_spa.adapters.dataset_sources import (
     DatasetCropRef,
     DatasetPageRef,
     IDatasetSource,
 )
-from pd_ocr_trainer_spa.adapters.dataset_sources.huggingface import HuggingFaceDatasetSource
-from pd_ocr_trainer_spa.adapters.dataset_sources.local import LocalDatasetSource
-from pd_ocr_trainer_spa.core.enums import SplitEnum, TaskEnum
+from pdomain_ocr_trainer_spa.adapters.dataset_sources.huggingface import HuggingFaceDatasetSource
+from pdomain_ocr_trainer_spa.adapters.dataset_sources.local import LocalDatasetSource
+from pdomain_ocr_trainer_spa.core.enums import SplitEnum, TaskEnum
 
 
 def _write_dataset(ml_dir, profile: str, task: str, labels: dict[str, object]) -> None:

@@ -7,15 +7,15 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from pd_ocr_trainer_spa.core.enums import TaskEnum
-from pd_ocr_trainer_spa.core.errors import AppError
-from pd_ocr_trainer_spa.core.models import ApplyAssignmentRequest, AssignmentEntry
-from pd_ocr_trainer_spa.domain import datasets as dom
+from pdomain_ocr_trainer_spa.core.enums import TaskEnum
+from pdomain_ocr_trainer_spa.core.errors import AppError
+from pdomain_ocr_trainer_spa.core.models import ApplyAssignmentRequest, AssignmentEntry
+from pdomain_ocr_trainer_spa.domain import datasets as dom
 
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from pd_ocr_trainer_spa.settings import Settings
+    from pdomain_ocr_trainer_spa.settings import Settings
 
 
 def _write_recognition_labels(task_dir: Path, labels: dict[str, str]) -> None:

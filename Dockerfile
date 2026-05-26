@@ -21,7 +21,7 @@ COPY src/ src/
 
 # Copy sibling Python deps (for [tool.uv.sources] path references)
 COPY --from=builder /dev/null /tmp/placeholder
-# Note: in real CI, sibling repos (pd-ocr-ops, pd-ocr-training) are installed
+# Note: in real CI, sibling repos (pdomain-ocr-ops, pdomain-ocr-training) are installed
 # from the pd-index PEP 503 registry, not path sources.
 # For local builds, mount sibling repos as volumes.
 
