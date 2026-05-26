@@ -2,3 +2,11 @@
 # esbuild: needs postinstall to download the platform-specific native binary.
 allowBuilds:
   esbuild: true
+
+# Packages excluded from the minimum release age check.
+# These were published recently and are known-good; regenerate the lockfile
+# after adding entries here (`pnpm clean --lockfile && pnpm install`).
+minimumReleaseAgeExclude:
+  - "@concavetrillion/pd-ui@0.2.1"
+  - "@tanstack/react-virtual@3.13.26"
+  - "@tanstack/virtual-core@3.16.0"
