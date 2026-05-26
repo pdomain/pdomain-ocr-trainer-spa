@@ -11,8 +11,8 @@ covers that explicitly.
 >
 > **Re-spec note (2026-05-21).** The training-test seam moved. The
 > SPA no longer owns an `ITrainingRunner` adapter to fake — training
-> runs through `pd-ocr-training` inside a worker subprocess
-> supervised by the `pd-ocr-ops` `LongJobRunner` (D-T1, D-T20). The
+> runs through `pdomain-ocr-training` inside a worker subprocess
+> supervised by the `pdomain-ocr-ops` `LongJobRunner` (D-T1, D-T20). The
 > CI-safe seam is now a **fake `LongJobRunner`** plus a **stub
 > worker script**; there is no `FakeTrainingRunner`.
 
@@ -72,7 +72,7 @@ def fake_runner(app) -> FakeLongJobRunner:
 
 `FakeLongJobRunner` is the in-test `LongJobRunner`. Instead of
 spawning the worker subprocess on `submit` / `submit_with_process`,
-it emits a scripted sequence of `pd-ocr-ops` `JobEvent`s and
+it emits a scripted sequence of `pdomain-ocr-ops` `JobEvent`s and
 advances `JobStatus.state` through the lifecycle. Tests pin the
 script:
 
@@ -93,7 +93,7 @@ are available; selection is driven by `Settings.<adapter>_kind="fake"`.
 
 `config_build` and `worker_cmd` are tested as **pure functions** —
 no fake needed: assert a given `Run.args` produces a valid
-`pd_ocr_training.DetectionConfig` / `RecognitionConfig` and the
+`pdomain_ocr_training.DetectionConfig` / `RecognitionConfig` and the
 expected argv.
 
 ### 2.2 Endpoint tests
@@ -140,14 +140,14 @@ subprocess, no GPU.
 
 Hooks consuming react-query are tested via `renderHook` inside a
 `QueryClientProvider`; msw handlers per test simulate backend
-responses. The `pd-ui` `useLongJob` hook is pd-ui's own test
+responses. The `pdomain-ui` `useLongJob` hook is pdomain-ui's own test
 surface — the SPA tests only its *consumption* (e.g.
 `useNotificationStream` toasting on a terminal `state` event).
 
 ### 3.3 Kanban interaction
 
-The DnD kanban is the `pd-ui` `KanbanBoard` component (D-T4) —
-dnd-kit internals and keyboard-sensor behaviour are pd-ui's test
+The DnD kanban is the `pdomain-ui` `KanbanBoard` component (D-T4) —
+dnd-kit internals and keyboard-sensor behaviour are pdomain-ui's test
 responsibility. The SPA tests its **composition**: that staged
 moves accumulate in client state, that `Apply` POSTs the correct
 `ApplyAssignmentRequest` diff, and that `Discard` reverts to
@@ -197,7 +197,7 @@ The test surface decomposes into three layers.
 
 ### 5.1 The `LongJobRunner` seam
 
-The CI-safe seam is the `pd-ocr-ops` `LongJobRunner` Protocol. CI
+The CI-safe seam is the `pdomain-ocr-ops` `LongJobRunner` Protocol. CI
 never instantiates a runner that spawns the real worker; tests use
 `FakeLongJobRunner` (`job_runner_kind="fake"`). This covers:
 
@@ -212,8 +212,8 @@ never instantiates a runner that spawns the real worker; tests use
 Two pure-unit surfaces, no GPU:
 
 - **Worker `@@PDEVENT@@` emission** — given a scripted
-  `pd-ocr-training` `TrainingEvent` sequence, assert `worker/train.py`
-  writes the correct `@@PDEVENT@@ {json}` stdout lines. `pd-ocr-training`'s
+  `pdomain-ocr-training` `TrainingEvent` sequence, assert `worker/train.py`
+  writes the correct `@@PDEVENT@@ {json}` stdout lines. `pdomain-ocr-training`'s
   `LocalTrainingRunner` is itself driven by an injected fake
   training callable (its iterator API makes this trivial — no
   `torch`).
@@ -234,8 +234,8 @@ Checked-in transcripts captured once and frozen; a manual
 `scripts/refresh_log_fixtures.py` re-records them on demand.
 
 > The stdout → `JobEvent` parse on the *runner* side is
-> `pd-ocr-ops`' responsibility ([Q27](../OPEN_QUESTIONS.md),
-> `pd-ocr-ops#76`) and is tested there.
+> `pdomain-ocr-ops`' responsibility ([Q27](../OPEN_QUESTIONS.md),
+> `pdomain-ocr-ops#76`) and is tested there.
 
 ### 5.3 Stub worker for slow tests
 
@@ -265,7 +265,7 @@ Real DocTR training is **never** invoked from CI.
 
 ## 6. SPA-serving contract tests
 
-`pd-ocr-trainer-spa` is a FastAPI backend that bundles and serves a
+`pdomain-ocr-trainer-spa` is a FastAPI backend that bundles and serves a
 React/Vite SPA (a `StaticFiles` mount + `/{full_path:path}`
 catch-all), so per the workspace contract it **must** carry a
 `tests/test_routes_root.py` covering:
@@ -280,7 +280,7 @@ catch-all), so per the workspace contract it **must** carry a
 These tests **must not skip** when the frontend isn't built. They
 use `monkeypatch` + `tmp_path` to create a minimal fake `index.html`
 at the `static/` path so they always run in pure-Python mode.
-Reference: `pd-ocr-simple-gui/tests/test_routes_root.py`.
+Reference: `pdomain-ocr-simple-gui/tests/test_routes_root.py`.
 
 ---
 
@@ -328,8 +328,8 @@ A nightly `slow` job runs `make test-slow` — real subprocess
 
 ## 10. Citations
 
-- Test layout: `pd-ocr-labeler-spa/specs/14-testing.md`.
-- Adapter-fake pattern: `pd-prep-for-pgdp/tests/conftest.py`.
-- SPA-serving contract test: `pd-ocr-simple-gui/tests/test_routes_root.py`.
+- Test layout: `pdomain-ocr-labeler-spa/specs/14-testing.md`.
+- Adapter-fake pattern: `pdomain-prep-for-pgdp/tests/conftest.py`.
+- SPA-serving contract test: `pdomain-ocr-simple-gui/tests/test_routes_root.py`.
 - `LongJobRunner` Protocol (the fake's target):
-  `pd-ocr-ops/pd_ocr_ops/gpu/protocols.py:27-45`.
+  `pdomain-ocr-ops/pdomain_ocr_ops/gpu/protocols.py:27-45`.

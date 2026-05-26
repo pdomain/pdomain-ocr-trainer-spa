@@ -132,5 +132,5 @@ git push origin main --follow-tags
 
 echo ""
 echo "✅ Released $VERSION."
-echo "   Watch the release workflow: https://github.com/ConcaveTrillion/pd-ocr-trainer-spa/actions"
-echo "   Release page (once workflow finishes): https://github.com/ConcaveTrillion/pd-ocr-trainer-spa/releases/tag/$VERSION"
+echo "   Watch the release workflow: https://github.com/pdomain/pdomain-ocr-trainer-spa/actions"
+echo "   Release page (once workflow finishes): https://github.com/pdomain/pdomain-ocr-trainer-spa/releases/tag/$VERSION"

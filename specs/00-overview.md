@@ -1,16 +1,16 @@
 # 00 — Overview
 
-`pd-ocr-trainer-spa` reimplements the existing `pd-ocr-trainer` (NiceGUI
+`pdomain-ocr-trainer-spa` reimplements the existing `pd-ocr-trainer` (NiceGUI
 training/dataset UI) as a **FastAPI + React/Vite/TypeScript SPA**, built on
-the workspace-standard **`pd-ui` + `pd-ocr-ops` + `pd-ocr-training`** stack
-and structurally modelled on the shipped `pd-ocr-labeler-spa`.
+the workspace-standard **`pdomain-ui` + `pdomain-ocr-ops` + `pdomain-ocr-training`** stack
+and structurally modelled on the shipped `pdomain-ocr-labeler-spa`.
 
 This document is the entry point for every other spec. Read it once,
 then jump to the per-area spec for whatever you're implementing.
 
 > **Re-spec note.** This overview supersedes the original `00`/`17` specs,
-> which predated the workspace decision to standardize SPAs on `pd-ui` +
-> `pd-ocr-ops`. The old specs rejected `pd-ui` (shadcn/ui + Tailwind) and
+> which predated the workspace decision to standardize SPAs on `pdomain-ui` +
+> `pdomain-ocr-ops`. The old specs rejected `pdomain-ui` (shadcn/ui + Tailwind) and
 > assumed the legacy trainer kept existing (training driven by subprocess
 > calls into `pd_ocr_trainer.train_*`). Both assumptions are gone. See the
 > cross-cut retirement design
@@ -31,7 +31,7 @@ then jump to the per-area spec for whatever you're implementing.
    FastAPI endpoint; the SPA consumes it via a generated TS client.
    See [`02-backend.md`](02-backend.md).
 3. **Single-wheel distribution.** End users install with
-   `uv tool install pd-ocr-trainer-spa` and get one binary
+   `uv tool install pdomain-ocr-trainer-spa` and get one binary
    (`pd-ocr-trainer-ui`) that serves both API and SPA.
    See [`15-deployment-dev.md`](15-deployment-dev.md).
 4. **Milestone-implementable by AI agents.** Each milestone in
@@ -51,15 +51,15 @@ intent survives the legacy repo's deletion — see *Deferred scope* below.
   `ml-training/` tree until `pd-ocr-trainer` is retired. Disk format
   does not change.
 - **No new training algorithms.** Detection / recognition training
-  entry points live in **`pd-ocr-training`** (extracted from the legacy
+  entry points live in **`pdomain-ocr-training`** (extracted from the legacy
   `pd_ocr_trainer.train_*` modules); the SPA only drives them through
   the `ITrainingRunner` Protocol. See [`02-backend.md`](02-backend.md).
 - **No `torch` in the SPA process.** `torch`/DocTR live only in
-  `pd-ocr-training`. The FastAPI backend imports the *Protocol* and the
+  `pdomain-ocr-training`. The FastAPI backend imports the *Protocol* and the
   typed config models, never the concrete training code; training runs
   in a worker subprocess. ([D-T1](17-decisions.md))
 - **No NiceGUI / Quasar, no shadcn/ui or direct Tailwind.** The UI is
-  React built on the shared **`pd-ui`** component library.
+  React built on the shared **`pdomain-ui`** component library.
   ([D-T19](17-decisions.md))
 - **No multi-user collaboration.** One user, possibly multiple browser
   tabs against the same backend, sharing in-memory state.
@@ -84,10 +84,10 @@ intent survives the legacy repo's deletion — see *Deferred scope* below.
 |---|---|---|
 | Web framework | **FastAPI** | Same as labeler-spa / pgdp-prep. Pydantic v2, async, OpenAPI export. |
 | Server | **uvicorn[standard]** | Same as labeler-spa. |
-| Suite plumbing | **`pd-ocr-ops` `mount_routes`** | Registry, UI-prefs, sibling-spawn, `/healthz` — not hand-rolled. ([D-T21](17-decisions.md)) |
+| Suite plumbing | **`pdomain-ocr-ops` `mount_routes`** | Registry, UI-prefs, sibling-spawn, `/healthz` — not hand-rolled. ([D-T21](17-decisions.md)) |
 | Persistence | **Filesystem only** | Single user; profile state, run metadata, datasets all live on disk. |
-| Training runner | **`ITrainingRunner` Protocol** from `pd-ocr-training`; concrete training runs in a **worker subprocess** running `LocalTrainingRunner` | FastAPI process stays `torch`-free; CUDA isolation + SIGKILL cancellation preserved. ([D-T1](17-decisions.md)) |
-| Long jobs | **`pd-ocr-ops` `LongJobRunner`** | Job registry, status, SSE progress stream. Training jobs run *minutes to hours* — see [`10-jobs-and-sse.md`](10-jobs-and-sse.md). ([D-T20](17-decisions.md)) |
+| Training runner | **`ITrainingRunner` Protocol** from `pdomain-ocr-training`; concrete training runs in a **worker subprocess** running `LocalTrainingRunner` | FastAPI process stays `torch`-free; CUDA isolation + SIGKILL cancellation preserved. ([D-T1](17-decisions.md)) |
+| Long jobs | **`pdomain-ocr-ops` `LongJobRunner`** | Job registry, status, SSE progress stream. Training jobs run *minutes to hours* — see [`10-jobs-and-sse.md`](10-jobs-and-sse.md). ([D-T20](17-decisions.md)) |
 | Auth | **`IAuth` Protocol**, `none` impl only | Same seam as labeler-spa. |
 | Dataset source | **`local` only in core**; `huggingface` is a deferred milestone | HF roadmap deferred — see *Deferred scope*. ([D-T2](17-decisions.md)) |
 | Model registry | **`filesystem` (`dist/`) in core**; `huggingface_hub` deferred | Trainer ROADMAP (b)/(d), deferred. |
@@ -97,16 +97,16 @@ intent survives the legacy repo's deletion — see *Deferred scope* below.
 
 | Layer | Choice | Why |
 |---|---|---|
-| Component library | **`pd-ui`** (`@concavetrillion/pd-ui`) | `AppShell`, `TopNav`, `Card`, `Accordion`, `Field`/`FieldRow`, `Button`, `Select`, `Progress`, `JobStatusPip`, `useLongJob`, design tokens. ([D-T19](17-decisions.md)) |
+| Component library | **`pdomain-ui`** (`@pdomain/pdomain-ui`) | `AppShell`, `TopNav`, `Card`, `Accordion`, `Field`/`FieldRow`, `Button`, `Select`, `Progress`, `JobStatusPip`, `useLongJob`, design tokens. ([D-T19](17-decisions.md)) |
 | Build | **Vite** | Same as labeler-spa. |
 | Framework | **React 19** | Same as labeler-spa. |
 | Lang | **TypeScript** strict | Same as labeler-spa. |
 | Routing | **`react-router-dom` v7** | Same as labeler-spa. |
 | Server state | **`@tanstack/react-query` v5** | Same as labeler-spa. |
 | Local state | `useState` + `useReducer`; **`zustand`** for cross-page UI prefs (selected profile, kanban filters, log auto-scroll). | Same pattern as labeler-spa. |
-| Styling | **`pd-ui` design tokens** (`tokens.css` / `primitives.css`) | No direct Tailwind, no shadcn/ui. ([D-T19](17-decisions.md)) |
-| Kanban | pd-ui **`KanbanBoard`** (`@dnd-kit`) | Dataset kanban — a pd-ui component. ([D-T4](17-decisions.md)) |
-| Log viewer | pd-ui **`LogViewer`** (`@tanstack/react-virtual`) | Streaming-log viewer — a pd-ui component. ([D-T4](17-decisions.md)) |
+| Styling | **`pdomain-ui` design tokens** (`tokens.css` / `primitives.css`) | No direct Tailwind, no shadcn/ui. ([D-T19](17-decisions.md)) |
+| Kanban | pdomain-ui **`KanbanBoard`** (`@dnd-kit`) | Dataset kanban — a pdomain-ui component. ([D-T4](17-decisions.md)) |
+| Log viewer | pdomain-ui **`LogViewer`** (`@tanstack/react-virtual`) | Streaming-log viewer — a pdomain-ui component. ([D-T4](17-decisions.md)) |
 | Toasts | **`sonner`** | Same as labeler-spa. |
 | Hotkeys | **`react-hotkeys-hook`** | Same as labeler-spa. |
 | Charts (loss curves, eval) | **`recharts`** | Lightweight, plays well with React 19. ([D-T14](17-decisions.md)) |
@@ -115,13 +115,13 @@ intent survives the legacy repo's deletion — see *Deferred scope* below.
 | HTTP mocking | **msw** | Same as labeler-spa. |
 | E2E | **Playwright** (Chromium) | Same as labeler-spa. |
 
-**New `pd-ui` components.** The trainer needs four components `pd-ui`
+**New `pdomain-ui` components.** The trainer needs four components `pdomain-ui`
 does not yet have — `KanbanBoard`/`KanbanColumn`/`PageChip`, `LogViewer`,
-`Field`/`FieldRow`, and `JobStatusPip`. These are added to `pd-ui`
+`Field`/`FieldRow`, and `JobStatusPip`. These are added to `pdomain-ui`
 itself rather than built SPA-local, so the suite shares one
 implementation. The trainer-spa kanban / log / config milestones depend
-on them being specced and built in `pd-ui` first; they are tracked as
-cross-repo additions to the `pd-ui` spec. ([D-T4](17-decisions.md))
+on them being specced and built in `pdomain-ui` first; they are tracked as
+cross-repo additions to the `pdomain-ui` spec. ([D-T4](17-decisions.md))
 
 ### Tooling
 
@@ -130,12 +130,12 @@ cross-repo additions to the `pd-ui` spec. ([D-T4](17-decisions.md))
 | Python build | `hatchling` + `hatch-vcs`. |
 | Wheel-with-SPA | `force-include` the built SPA static dir + a build-hook SPA assertion. |
 | Lockfile | `uv.lock`. |
-| npm registry | `pd-ui` consumed from the self-hosted `pd-index-npm` registry. |
+| npm registry | `pdomain-ui` consumed from the self-hosted `pdomain-index-npm` registry. |
 | Lint | `ruff` (Python) + `eslint` flat config (TS). |
 | Format | `ruff format` + `prettier`. |
 | Type-check | TypeScript `strict` + `basedpyright`. |
 | Pre-commit | Same hooks as labeler-spa. |
-| CI | `lint → test → frontend-build → wheel-build (with SPA assertion) → e2e-browser`; on tag, attach wheel to GitHub Release + publish to `pd-index-pip`. |
+| CI | `lint → test → frontend-build → wheel-build (with SPA assertion) → e2e-browser`; on tag, attach wheel to GitHub Release + publish to `pdomain-index-pip`. |
 | Versions | `mise.toml` pinning Node + Python per workspace standard. |
 
 ---
@@ -144,7 +144,7 @@ cross-repo additions to the `pd-ui` spec. ([D-T4](17-decisions.md))
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│  Browser (SPA — pd-ui components)                            │
+│  Browser (SPA — pdomain-ui components)                            │
 │  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌───────────┐  │
 │  │ Profiles   │ │ Datasets   │ │ Training   │ │ Models    │  │
 │  │ + Config   │ │ Kanban     │ │ Runs + Log │ │ + Eval    │  │
@@ -161,26 +161,26 @@ cross-repo additions to the `pd-ui` spec. ([D-T4](17-decisions.md))
 │  │  /api/datasets/*     │  │  /api/jobs/{id}/events SSE │    │
 │  │  /api/models/*       │  │  /api/eval/*               │    │
 │  └──────────────────────┘  └────────────────────────────┘    │
-│  pd-ocr-ops mount_routes: registry · prefs · /healthz        │
+│  pdomain-ocr-ops mount_routes: registry · prefs · /healthz        │
 │                              │                               │
 │  ┌────────── core (in-memory) ────────────────────────┐      │
 │  │  AppState ─ Profiles ─ Runs ─ Jobs                 │      │
 │  └────────────────────────────────────────────────────┘      │
 │                              │                               │
-│  ┌─── pd-ocr-ops LongJobRunner ───────────────────────┐      │
+│  ┌─── pdomain-ocr-ops LongJobRunner ───────────────────────┐      │
 │  │  job registry · status · SSE event stream          │      │
 │  └────────────────────────────┬───────────────────────┘      │
 └───────────────────────────────┼───────────────────────────────┘
                                 │ spawns
                 ┌───────────────▼───────────────┐
                 │  training worker subprocess   │
-                │  pd-ocr-training              │
+                │  pdomain-ocr-training              │
                 │  LocalTrainingRunner →        │
                 │  detect / recog (torch+DocTR) │
                 └───────────────┬───────────────┘
                                 │
                 ┌───────────────▼───────────────┐
-                │  pd-book-tools (Page, Block,  │
+                │  pdomain-book-tools (Page, Block,  │
                 │   Word, BBox)                 │
                 └───────────────────────────────┘
 ```
@@ -207,7 +207,7 @@ cross-repo additions to the `pd-ui` spec. ([D-T4](17-decisions.md))
 7. **Driver-facing surface is part of the contract.** Every
    `data-testid` and URL shape lives in
    [`13-driver-contract.md`](13-driver-contract.md).
-8. **The SPA never imports `torch`.** It drives `pd-ocr-training`'s
+8. **The SPA never imports `torch`.** It drives `pdomain-ocr-training`'s
    `ITrainingRunner` Protocol and the typed `DetectionConfig` /
    `RecognitionConfig` models (which are `torch`-free); the concrete
    `LocalTrainingRunner` runs only inside the worker subprocess.
@@ -227,7 +227,7 @@ cross-repo additions to the `pd-ui` spec. ([D-T4](17-decisions.md))
   `args.json`, `stdout`/`stderr`, `progress.jsonl`, status, and
   artefact paths. (The legacy trainer kept runs in-memory only and lost
   logs on tab close — the SPA fixes this.)
-- **Jobs** — managed by `pd-ocr-ops` `LongJobRunner`: a job registry,
+- **Jobs** — managed by `pdomain-ocr-ops` `LongJobRunner`: a job registry,
   per-job status, and an SSE event stream. The training subprocess is
   the job's work. The job is **surfaced in the UI** — status pip, live
   progress, streaming log, run history. ([D-T20](17-decisions.md),
@@ -255,7 +255,7 @@ applies uniformly.
 - On "Apply": `POST /api/profiles/{profile}/datasets/apply` with the
   full target assignment
   (`{train: [...], val: [...], unassigned: [...]}`).
-- Server: `ExportManager` (from `pd-ocr-training`) reconciles the
+- Server: `ExportManager` (from `pdomain-ocr-training`) reconciles the
   on-disk layout (`ml-training/` / `ml-validation/`) to match; returns
   the new kanban state.
 - SPA reconciles cache; staging state clears. "Discard" resets staging
@@ -266,7 +266,7 @@ applies uniformly.
 - SPA calls `POST /api/runs` with `{profile, task: "recognition",
   config: {epochs, batch_size, vocab, ...}}`.
 - Server creates `runs/<run_id>/`, writes `args.json`, hands a job to
-  the `pd-ocr-ops` `LongJobRunner`, returns `202 Accepted` with
+  the `pdomain-ocr-ops` `LongJobRunner`, returns `202 Accepted` with
   `{run_id, job_id}`.
 - The `LongJobRunner` spawns the **training worker subprocess**, which
   builds a `RecognitionConfig` and drives
@@ -295,7 +295,7 @@ These get their own deferred-milestone specs (retirement plan Task 13).
 ## Milestone contract for AI agents
 
 Every milestone in [`16-milestones.md`](16-milestones.md) follows the
-format used in `pd-ocr-labeler-spa`:
+format used in `pdomain-ocr-labeler-spa`:
 
 ```
 ## Mn — short title

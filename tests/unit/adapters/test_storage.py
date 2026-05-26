@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import pytest
 
-from pd_ocr_trainer_spa.adapters.storage import IStorage
-from pd_ocr_trainer_spa.adapters.storage.filesystem import FilesystemStorage
-from pd_ocr_trainer_spa.adapters.storage.s3 import S3Storage
-from pd_ocr_trainer_spa.core.errors import AdapterNotImplementedError
+from pdomain_ocr_trainer_spa.adapters.storage import IStorage
+from pdomain_ocr_trainer_spa.adapters.storage.filesystem import FilesystemStorage
+from pdomain_ocr_trainer_spa.adapters.storage.s3 import S3Storage
+from pdomain_ocr_trainer_spa.core.errors import AdapterNotImplementedError
 
 
 def test_filesystem_storage_satisfies_protocol() -> None:

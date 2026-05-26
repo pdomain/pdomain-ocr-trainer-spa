@@ -6,7 +6,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Button, Card } from "@concavetrillion/pd-ui/primitives";
+import { Button, Card } from "@pdomain/pdomain-ui/primitives";
 import { RunArgsEditor } from "../components/RunArgsEditor";
 import { fetchProfiles, fetchTrainingDefaultsOrSeed } from "../api/profiles";
 import type { Profile, TrainingArgs } from "../api/profiles";

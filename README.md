@@ -1,10 +1,10 @@
-# pd-ocr-trainer-spa
+# pdomain-ocr-trainer-spa
 
 FastAPI + React/Vite/TS replacement for the NiceGUI-based
 [`pd-ocr-trainer`](../pd-ocr-trainer/) UI. Same training and dataset
 machinery, web SPA front-end, structurally modelled on
-[`pd-ocr-labeler-spa`](../pd-ocr-labeler-spa/) and
-[`pd-prep-for-pgdp`](../pd-prep-for-pgdp/).
+[`pdomain-ocr-labeler-spa`](../pdomain-ocr-labeler-spa/) and
+[`pdomain-prep-for-pgdp`](../pdomain-prep-for-pgdp/).
 
 > **Status:** M0–M9 shipped. M10 (HF read path) in progress.
 > Implementation is milestone-driven (see

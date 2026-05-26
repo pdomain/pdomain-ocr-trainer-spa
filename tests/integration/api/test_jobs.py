@@ -11,11 +11,11 @@ import json
 from typing import TYPE_CHECKING
 
 import pytest
-from pd_ocr_ops.gpu.types import JobEvent
+from pdomain_ocr_ops.gpu.types import JobEvent
 
 if TYPE_CHECKING:
 
-    from pd_ocr_trainer_spa.training.fake_runner import FakeLongJobRunner
+    from pdomain_ocr_trainer_spa.training.fake_runner import FakeLongJobRunner
 
 
 @pytest.fixture

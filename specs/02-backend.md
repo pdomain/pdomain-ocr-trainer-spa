@@ -9,7 +9,7 @@ full route map.
 > [`10-jobs-and-sse.md`](10-jobs-and-sse.md).
 >
 > **Re-spec note (2026-05-21).** This spec was rewritten onto the
-> `pd-ui` + `pd-ocr-ops` + `pd-ocr-training` stack. Decisions D-T1,
+> `pdomain-ui` + `pdomain-ocr-ops` + `pdomain-ocr-training` stack. Decisions D-T1,
 > D-T9, D-T10, D-T19–D-T22 in [`17-decisions.md`](17-decisions.md)
 > are authoritative; where this spec and a decision disagree, the
 > decision wins. The original SPA-local `core/job_runner.py` and the
@@ -20,7 +20,7 @@ full route map.
 ## 1. Module layout
 
 ```
-src/pd_ocr_trainer_spa/
+src/pdomain_ocr_trainer_spa/
 ├── __init__.py
 ├── __main__.py                # uvicorn entry; reads env, calls build_app, runs server
 ├── bootstrap.py               # build_app(settings) factory
@@ -42,12 +42,12 @@ src/pd_ocr_trainer_spa/
 │   ├── model_registry/filesystem.py
 │   └── model_registry/huggingface_hub.py
 ├── training/
-│   ├── config_build.py        # Run.args → pd_ocr_training DetectionConfig / RecognitionConfig
+│   ├── config_build.py        # Run.args → pdomain_ocr_training DetectionConfig / RecognitionConfig
 │   ├── worker_cmd.py           # build_worker_cmd(run, settings) → list[str]
 │   └── events.py               # TrainingEvent (worker stdout) ↔ Job event mapping
 ├── worker/
 │   ├── __init__.py
-│   └── train.py                # `python -m pd_ocr_trainer_spa.worker.train` — the training subprocess
+│   └── train.py                # `python -m pdomain_ocr_trainer_spa.worker.train` — the training subprocess
 ├── domain/
 │   ├── profiles.py            # Profile, ProfileCounts, profile.toml IO
 │   ├── datasets.py            # DatasetView assembly, kanban move logic
@@ -55,7 +55,7 @@ src/pd_ocr_trainer_spa/
 │   ├── models.py              # TrainedModel discovery, sidecar IO
 │   └── publish.py             # HF publish orchestration
 ├── api/
-│   ├── healthz.py             # (delegated — see §3; pd-ocr-ops owns /healthz)
+│   ├── healthz.py             # (delegated — see §3; pdomain-ocr-ops owns /healthz)
 │   ├── env_js.py              # GET /env.js (build version, feature flags)
 │   ├── profiles.py            # /api/profiles/...
 │   ├── datasets.py            # /api/profiles/{p}/datasets/...
@@ -76,18 +76,18 @@ src/pd_ocr_trainer_spa/
 
 **Two import boundaries matter (D-T1, D-T9):**
 
-- The **long-lived FastAPI process** imports `pd-ocr-ops` (suite +
-  `LongJobRunner`) and the **`torch`-free** half of `pd-ocr-training`
+- The **long-lived FastAPI process** imports `pdomain-ocr-ops` (suite +
+  `LongJobRunner`) and the **`torch`-free** half of `pdomain-ocr-training`
   — only the typed config models `DetectionConfig` /
   `RecognitionConfig` / `TrainingEvent` and the `ITrainingRunner`
   Protocol. It never imports `torch`, DocTR, or
-  `pd_ocr_training.LocalTrainingRunner`.
+  `pdomain_ocr_training.LocalTrainingRunner`.
 - The **`worker/train.py` subprocess** is the only place that imports
-  `pd_ocr_training.LocalTrainingRunner` (and therefore `torch` /
-  DocTR). It is launched, supervised, and killed by the `pd-ocr-ops`
+  `pdomain_ocr_training.LocalTrainingRunner` (and therefore `torch` /
+  DocTR). It is launched, supervised, and killed by the `pdomain-ocr-ops`
   `LongJobRunner`; the web process stays `torch`-free.
 
-`pd_ocr_training.datasets` (`ExportManager`) has **import-time
+`pdomain_ocr_training.datasets` (`ExportManager`) has **import-time
 filesystem side effects** and still carries `PD_OCR_TRAINER_*` env
 prefixes — see §4.4. Import it lazily, inside the worker or inside a
 function, never at web-process module scope.
@@ -116,7 +116,7 @@ class Settings(BaseSettings):
     model_registry_kind: Literal["filesystem", "huggingface_hub"] = "filesystem"
 
     # Jobs / GPU
-    jobs_db_path: Path | None = None      # default: pd-ocr-ops suite paths.jobs_db_path()
+    jobs_db_path: Path | None = None      # default: pdomain-ocr-ops suite paths.jobs_db_path()
 
     # HF
     hf_token_path: Path | None = None     # default: ~/.huggingface/token
@@ -143,10 +143,10 @@ class Settings(BaseSettings):
 Defaults match the legacy trainer's `dataset_store.py:18-54` — same
 OS-aware fallbacks, same env var precedence. Prefix is
 `PD_OCR_TRAINER_SPA_` (D-T7) so the new binary coexists with the
-legacy trainer. `job_runner_kind` selects which `pd-ocr-ops`
+legacy trainer. `job_runner_kind` selects which `pdomain-ocr-ops`
 `LongJobRunner` implementation backs long jobs (`local` is the only
 one wired for core parity; `modal` / `shared_container` are
-`pd-ocr-ops` concerns, not SPA adapters). ([Q7](../OPEN_QUESTIONS.md))
+`pdomain-ocr-ops` concerns, not SPA adapters). ([Q7](../OPEN_QUESTIONS.md))
 
 ---
 
@@ -155,7 +155,7 @@ one wired for core parity; `modal` / `shared_container` are
 ```python
 def build_app(settings: Settings) -> FastAPI:
     app = FastAPI(
-        title="pd-ocr-trainer-spa",
+        title="pdomain-ocr-trainer-spa",
         version=_version.__version__,
         openapi_url="/api/openapi.json",
         docs_url="/api/docs",
@@ -168,7 +168,7 @@ def build_app(settings: Settings) -> FastAPI:
     auth = _build_auth(settings)
     dataset_sources = _build_dataset_sources(settings)
     model_registry = _build_model_registry(settings)
-    job_runner = _build_job_runner(settings)        # pd-ocr-ops LongJobRunner (D-T20)
+    job_runner = _build_job_runner(settings)        # pdomain-ocr-ops LongJobRunner (D-T20)
 
     state = AppState(
         settings=settings,
@@ -179,7 +179,7 @@ def build_app(settings: Settings) -> FastAPI:
     state.hydrate_from_disk()                       # reconciles running-at-boot runs — D-T3
     app.state.app_state = state
 
-    # pd-ocr-ops suite plumbing: registry, UI-prefs, sibling-spawn, /healthz (D-T21)
+    # pdomain-ocr-ops suite plumbing: registry, UI-prefs, sibling-spawn, /healthz (D-T21)
     mount_routes(app, _suite_adapters(settings))
 
     app.include_router(env_js.router)
@@ -202,15 +202,15 @@ def build_app(settings: Settings) -> FastAPI:
 `__main__.py` reads env vars, constructs `Settings()`, and runs
 `uvicorn.run(build_app(settings), host=..., port=...)`.
 
-`mount_routes` is `pd_ocr_ops.suite.mount_routes` (D-T21). It owns
+`mount_routes` is `pdomain_ocr_ops.suite.mount_routes` (D-T21). It owns
 `/healthz`, `/api/suite/installed`, `/api/suite/launch`,
 `/api/suite/prefs*`, and `/api/icons/*`. The SPA does **not** define
 `/healthz` or any `/api/suite/*` route itself; `api/healthz.py` is a
 thin shim only if a SPA-specific readiness probe is later needed.
-`pd-ocr-ops` `mount_routes` deliberately exposes **no** job/SSE
+`pdomain-ocr-ops` `mount_routes` deliberately exposes **no** job/SSE
 routes, so the SPA owns `/api/jobs/*` itself (§5.5).
 
-`_build_job_runner` returns a `pd-ocr-ops` `LongJobRunner`. For
+`_build_job_runner` returns a `pdomain-ocr-ops` `LongJobRunner`. For
 `job_runner_kind="local"` it is `LocalLongJobRunner(db_path=
 settings.jobs_db_path or <suite default>)`.
 
@@ -244,9 +244,9 @@ The `none` impl returns a fixed `AuthedUser(id="local", roles=["admin"])`.
 ### 4.3 Training — `ITrainingRunner` is imported, not defined here
 
 The SPA does **not** declare its own training Protocol. Training is
-owned by `pd-ocr-training`:
+owned by `pdomain-ocr-training`:
 
-- `pd_ocr_training.ITrainingRunner` — `@runtime_checkable` Protocol
+- `pdomain_ocr_training.ITrainingRunner` — `@runtime_checkable` Protocol
   with two **generator** methods:
 
   ```python
@@ -269,7 +269,7 @@ owned by `pd-ocr-training`:
   `message: str`, `progress: float | None` (normalized `[0,1]`, set
   on `epoch` events), `data: dict | None`.
 
-- `pd_ocr_training.LocalTrainingRunner` — the concrete
+- `pdomain_ocr_training.LocalTrainingRunner` — the concrete
   `ITrainingRunner`. It runs the blocking DocTR training in an
   **in-process daemon thread** and bridges its callback into the
   iterator. It has **no cancellation hook**: abandoning the iterator
@@ -291,7 +291,7 @@ no `torch`:
 - `events.py` — parses the worker's stdout event protocol (§5.2) back
   into the SPA `Job` event shape consumed by the SSE route.
 
-`modal` / `shared_container` execution targets are `pd-ocr-ops`
+`modal` / `shared_container` execution targets are `pdomain-ocr-ops`
 `LongJobRunner` implementations, not SPA adapters; selecting one is
 `Settings.job_runner_kind`.
 
@@ -305,7 +305,7 @@ class IDatasetSource(Protocol):
     """Materialize the source data into a local DocTR-compatible directory and return its path."""
 ```
 
-`local` impl wraps `pd_ocr_training.datasets.ExportManager` — the
+`local` impl wraps `pdomain_ocr_training.datasets.ExportManager` — the
 dataset directory layout is:
 
 ```
@@ -348,7 +348,7 @@ class IModelRegistry(Protocol):
 ## 5. Training-worker subprocess
 
 A training run executes as a worker subprocess whose lifecycle is
-owned by the `pd-ocr-ops` `LongJobRunner` (D-T1, D-T20). The full
+owned by the `pdomain-ocr-ops` `LongJobRunner` (D-T1, D-T20). The full
 run lifecycle is [`06-training-runs.md`](06-training-runs.md); the
 job/SSE transport is [`10-jobs-and-sse.md`](10-jobs-and-sse.md).
 This section fixes the **backend ↔ worker contract**.
@@ -360,7 +360,7 @@ builds the worker argv, and submits it:
 
 ```python
 cmd = build_worker_cmd(run, settings)
-#   → [sys.executable, "-m", "pd_ocr_trainer_spa.worker.train",
+#   → [sys.executable, "-m", "pdomain_ocr_trainer_spa.worker.train",
 #      "--run-dir", str(settings.runs_dir / run.id)]
 job_id = await job_runner.submit_with_process(
     kind=f"train.{run.task}",          # "train.detection" | "train.recognition" | ...
@@ -384,7 +384,7 @@ provide in-process.
 2. Builds the typed config via `training/config_build.py`.
 3. Sets `HF_HOME`, `CUDA_VISIBLE_DEVICES`, and
    `PD_OCR_TRAINER_*` dataset-dir env vars from the manifest.
-4. Instantiates `pd_ocr_training.LocalTrainingRunner` and iterates
+4. Instantiates `pdomain_ocr_training.LocalTrainingRunner` and iterates
    `train_detection` / `train_recognition` to completion (it **must**
    drain the iterator fully — abandoning it strands the GPU).
 5. For every `TrainingEvent`, writes **one line** to stdout:
@@ -400,7 +400,7 @@ provide in-process.
    `LongJobRunner` surfaces it on the `JobStatus`).
 
 The `@@PDEVENT@@`-prefixed JSON line is the **structured progress
-channel**. `pd-ocr-ops` `LongJobRunner` parses these lines from the
+channel**. `pdomain-ocr-ops` `LongJobRunner` parses these lines from the
 supervised subprocess stdout into `JobEvent`s exposed by
 `stream_events(job_id)`; the `TrainingEvent.kind` values map to
 `JobEvent.kind` as: `epoch`/`metric` → `progress`/`metric`,
@@ -409,11 +409,11 @@ supervised subprocess stdout into `JobEvent`s exposed by
 > **Cross-repo prerequisite.** As of 2026-05-21 `LocalLongJobRunner`
 > supervises a subprocess but does **not yet** parse its stdout into
 > `job_events` (`_append_event` is private; no public emit/parse
-> API). This re-spec therefore depends on a `pd-ocr-ops` enhancement:
+> API). This re-spec therefore depends on a `pdomain-ocr-ops` enhancement:
 > a documented subprocess-stdout → `JobEvent` parser keyed on the
 > `@@PDEVENT@@` prefix. Until that lands, `stream_events()` yields
 > only terminal state and the SPA progress bar/log stream are blank
-> mid-run. Tracked as a `pd-ocr-ops` feature request — see
+> mid-run. Tracked as a `pdomain-ocr-ops` feature request — see
 > [Q27](../OPEN_QUESTIONS.md). The `@@PDEVENT@@` line format above is
 > the proposed contract for that parser.
 
@@ -441,7 +441,7 @@ chart series.
 
 | Method | Path | Body | Returns | Notes |
 |---|---|---|---|---|
-| GET | `/healthz` | — | `{"status":"ok"}` | Owned by `pd-ocr-ops` `mount_routes` (D-T21). |
+| GET | `/healthz` | — | `{"status":"ok"}` | Owned by `pdomain-ocr-ops` `mount_routes` (D-T21). |
 | GET | `/env.js` | — | JS file | Inlines `__APP_ENV__ = {version, features}` for the SPA. |
 
 ### 6.2 Profiles (`api/profiles.py`)
@@ -502,7 +502,7 @@ run's active job and calls `LongJobRunner.cancel`.
 | POST | `/api/jobs/{job_id}/cancel` | — | `202 Job` |
 | GET | `/api/jobs/active-count` | — | `{count, by_kind}` |
 
-`pd-ocr-ops` `mount_routes` exposes **no** job routes, so the SPA
+`pdomain-ocr-ops` `mount_routes` exposes **no** job routes, so the SPA
 defines these itself, wrapping the `LongJobRunner`:
 
 - `GET /api/jobs/{job_id}` projects `LongJobRunner.status(job_id)`
@@ -588,7 +588,7 @@ messages and field-level errors. See
 make openapi-export
 ```
 
-Runs `python -m pd_ocr_trainer_spa.scripts.export_openapi` →
+Runs `python -m pdomain_ocr_trainer_spa.scripts.export_openapi` →
 `frontend/openapi.json` → `openapi-typescript` →
 `frontend/src/api/types.ts`. CI enforces `git diff --exit-code` after
 re-running. Mirrors labeler-spa.
@@ -601,12 +601,12 @@ re-running. Mirrors labeler-spa.
 - Profile listing: `dataset_store.py:104-122`.
 - Legacy migration: `dataset_store.py:192-200+`.
 - `ITrainingRunner` / `TrainingEvent` / config models:
-  `pd-ocr-training/pd_ocr_training/protocols.py:58-247`.
+  `pdomain-ocr-training/pdomain_ocr_training/protocols.py:58-247`.
 - `LocalTrainingRunner` (in-process thread, no cancellation):
-  `pd-ocr-training/pd_ocr_training/local.py:253-420`.
+  `pdomain-ocr-training/pdomain_ocr_training/local.py:253-420`.
 - `ExportManager` dataset layout + import-time side effects:
-  `pd-ocr-training/pd_ocr_training/datasets.py:19-58, 242-609`.
+  `pdomain-ocr-training/pdomain_ocr_training/datasets.py:19-58, 242-609`.
 - `LongJobRunner` Protocol + `LocalLongJobRunner.submit_with_process`:
-  `pd-ocr-ops/pd_ocr_ops/gpu/protocols.py:27-45`,
-  `pd-ocr-ops/pd_ocr_ops/gpu/local_jobs.py:104-272`.
-- Suite `mount_routes`: `pd-ocr-ops/pd_ocr_ops/suite/routes.py:14`.
+  `pdomain-ocr-ops/pdomain_ocr_ops/gpu/protocols.py:27-45`,
+  `pdomain-ocr-ops/pdomain_ocr_ops/gpu/local_jobs.py:104-272`.
+- Suite `mount_routes`: `pdomain-ocr-ops/pdomain_ocr_ops/suite/routes.py:14`.

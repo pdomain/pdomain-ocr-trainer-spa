@@ -2,13 +2,13 @@
 //
 // M5 ships the "Defaults" tab: a task selector (detection / recognition) and
 // the reusable RunArgsEditor pre-filled from the saved per-profile training
-// defaults (or the pd-ocr-training seed when nothing is saved yet). Save → PUT;
+// defaults (or the pdomain-ocr-training seed when nothing is saved yet). Save → PUT;
 // Reset → DELETE then re-load the seed. The Datasets / Runs / Models tabs are
 // thin links into their own pages until later milestones flesh them out.
 
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Button, Card } from "@concavetrillion/pd-ui/primitives";
+import { Button, Card } from "@pdomain/pdomain-ui/primitives";
 import {
   deleteTrainingDefaults,
   fetchTrainingDefaultsOrSeed,

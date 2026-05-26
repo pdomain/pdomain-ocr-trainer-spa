@@ -1,4 +1,4 @@
-# Open Questions for `pd-ocr-trainer-spa`
+# Open Questions for `pdomain-ocr-trainer-spa`
 
 Questions the spec authors could not resolve from the source
 material alone. Each entry: **Q** (the question), **Context**
@@ -19,8 +19,8 @@ ADR added to [`specs/17-decisions.md`](specs/17-decisions.md).
 > **✅ Superseded — resolved by the retirement re-spec (2026-05-21).**
 > Training code is neither imported from the legacy `pd-ocr-trainer`
 > nor extracted into a `-core` package: it now lives in the
-> `pd-ocr-training` library behind the `ITrainingRunner` Protocol
-> (D-T1). The SPA worker imports `pd_ocr_training.LocalTrainingRunner`;
+> `pdomain-ocr-training` library behind the `ITrainingRunner` Protocol
+> (D-T1). The SPA worker imports `pdomain_ocr_training.LocalTrainingRunner`;
 > the web process imports only the `torch`-free config models. None
 > of options (A)/(B)/(C) below apply. **Resolution:** D-T1.
 
@@ -38,9 +38,9 @@ ADR added to [`specs/17-decisions.md`](specs/17-decisions.md).
   only `dataset_store.py`, `train_detect.py`, `train_recog.py`,
   `train_typeface.py` (when it lands), `train_glyph.py`,
   `utils.py`. The legacy `pd-ocr-trainer` (UI) and the new
-  `pd-ocr-trainer-spa` both depend on it. `pd-ocr-trainer-core`
+  `pdomain-ocr-trainer-spa` both depend on it. `pd-ocr-trainer-core`
   ships with no UI dependencies.
-- **(C) Vendor copies inside `pd-ocr-trainer-spa`.** Worst — fork.
+- **(C) Vendor copies inside `pdomain-ocr-trainer-spa`.** Worst — fork.
 
 **Recommendation.** **(B)** if we're committing to retire the
 legacy UI eventually. **(A)** if we want to ship the SPA without
@@ -83,7 +83,7 @@ say otherwise.
 **Options.**
 
 - **(A) `PD_OCR_TRAINER_SPA_*`** — explicit, no overlap.
-- **(B) `PD_TRAINER_*`** — shorter; risks collision if pd-ocr-cli
+- **(B) `PD_TRAINER_*`** — shorter; risks collision if pdomain-ocr-cli
   ever invents a related prefix.
 - **(C) `PD_OCR_TRAINER_*`** with a runtime check that warns when
   legacy values are detected.
@@ -98,9 +98,9 @@ vars users set once and forget.
 ### Q26. doctr clone — same external as legacy or vendored?
 
 > **✅ Superseded — resolved by the retirement re-spec (2026-05-21).**
-> DocTR is a normal dependency of `pd-ocr-training`, declared in that
+> DocTR is a normal dependency of `pdomain-ocr-training`, declared in that
 > package's `pyproject.toml`. The SPA neither clones nor vendors
-> doctr, and any `CUSTOM:` vocab handling is a `pd-ocr-training`
+> doctr, and any `CUSTOM:` vocab handling is a `pdomain-ocr-training`
 > concern. Options (A)/(B)/(C) no longer apply. **Resolution:** D-T9.
 
 **Context.** Legacy trainer requires the user to clone
@@ -110,7 +110,7 @@ convention.
 **Options.**
 
 - **(A)** Same external clone as legacy.
-- **(B)** Vendor a fork as a git submodule under `pd-ocr-trainer-spa/vendor/doctr`.
+- **(B)** Vendor a fork as a git submodule under `pdomain-ocr-trainer-spa/vendor/doctr`.
 - **(C)** Upstream the `CUSTOM:` patch into mindee/doctr; eliminate
   the vendoring problem entirely.
 
@@ -223,7 +223,7 @@ intentionality.
 
 ---
 
-### Q24. Build a peer `pd-ocr-trainer-spa-driver` repo?
+### Q24. Build a peer `pdomain-ocr-trainer-spa-driver` repo?
 
 **Context.** D-T12 keeps the door open but doesn't build it.
 
@@ -241,9 +241,9 @@ need emerges.
 
 ---
 
-### Q27. `pd-ocr-ops` `LongJobRunner` subprocess-stdout event parser
+### Q27. `pdomain-ocr-ops` `LongJobRunner` subprocess-stdout event parser
 
-**Context.** D-T20 puts long-job lifecycle on the `pd-ocr-ops`
+**Context.** D-T20 puts long-job lifecycle on the `pdomain-ocr-ops`
 `LongJobRunner`. `LocalLongJobRunner.submit_with_process` spawns and
 supervises the training worker subprocess, but as of 2026-05-21 it
 only records the exit code and the last stderr line — it does **not**
@@ -258,11 +258,11 @@ must parse those into `JobEvent`s.
 
 **Options.**
 
-- **(A)** `pd-ocr-ops` adds a documented subprocess-stdout →
+- **(A)** `pdomain-ocr-ops` adds a documented subprocess-stdout →
   `JobEvent` parser keyed on the `@@PDEVENT@@` prefix, wired into
-  `_supervise`. The canonical contract lives in `pd-ocr-ops`; every
+  `_supervise`. The canonical contract lives in `pdomain-ocr-ops`; every
   `pd-*` SPA reusing `submit_with_process` gets progress for free.
-- **(B)** `pd-ocr-ops` exposes a public `emit_event(job_id, ...)` API
+- **(B)** `pdomain-ocr-ops` exposes a public `emit_event(job_id, ...)` API
   and the worker calls back over HTTP/IPC. More moving parts; needs a
   reachable endpoint.
 - **(C)** The SPA does not use `submit_with_process`; it manages the
@@ -270,16 +270,16 @@ must parse those into `JobEvent`s.
   only as a status registry. Rejected — contradicts D-T20 ("the SPA
   does not hand-roll a job runner") and forks job-lifecycle code.
 
-**Recommendation.** **(A)** — a stdout-line parser in `pd-ocr-ops` is
+**Recommendation.** **(A)** — a stdout-line parser in `pdomain-ocr-ops` is
 the smallest change and keeps the job contract in one place. The
 `@@PDEVENT@@` line format in `02-backend.md` §5.2 is the proposed
 wire contract.
 
-**Tracking.** Filed as `ConcaveTrillion/pd-ocr-ops#76`.
+**Tracking.** Filed as `pdomain/pdomain-ocr-ops#76`.
 
 **Blocks.** M6 progress streaming (training runs are submittable
 without it, but show no live progress until it lands). Cross-repo:
-the work itself is `pd-ocr-ops#76`.
+the work itself is `pdomain-ocr-ops#76`.
 
 ---
 
@@ -393,7 +393,7 @@ event per training step for a 50-epoch run with 1000 steps each.
 ### Q14. parser_drift soft warning threshold
 
 > **✅ Superseded — resolved by the retirement re-spec (2026-05-21).**
-> `pd-ocr-training` emits structured `TrainingEvent`s, so the SPA no
+> `pdomain-ocr-training` emits structured `TrainingEvent`s, so the SPA no
 > longer regex-parses stdout for progress. The `training.parser_drift`
 > failure mode is retired; the residual "no progress" case (a worker
 > that never reaches its first `epoch` event) surfaces as
@@ -412,7 +412,7 @@ mentions a CI webhook for regressions. Spec lives where?
 
 **Options.**
 
-- **(A)** `pd-ocr-trainer-spa/scripts/regression_alert.py` + a
+- **(A)** `pdomain-ocr-trainer-spa/scripts/regression_alert.py` + a
   README. Single-script, single-repo.
 - **(B)** New `pd-ml-ci/` repo for cross-repo CI helpers.
 
@@ -578,7 +578,7 @@ the user who knows what they're doing.
 | Q12 | training queue cap | Important | M6 |
 | Q15 | HF read/publish flag split | Important | M10, M11 |
 | Q24 | build peer driver repo | Important | none |
-| Q27 | pd-ocr-ops stdout event parser | Important | M6 progress |
+| Q27 | pdomain-ocr-ops stdout event parser | Important | M6 progress |
 | Q4 | typeface enum validation timing | Nice-to-have | M3 / M11 |
 | Q6 | explicit sidecar_schema field | Nice-to-have | M7 |
 | Q8 | HF publish path | Nice-to-have | M11 |
@@ -598,6 +598,6 @@ the user who knows what they're doing.
 
 The two remaining **Critical** ones (Q5, Q7) are the only blockers
 for starting M0 — Q3 and Q26 were resolved by the 2026-05-21
-retirement re-spec. Q27 (the `pd-ocr-ops` stdout event parser) is a
+retirement re-spec. Q27 (the `pdomain-ocr-ops` stdout event parser) is a
 cross-repo dependency for M6 live progress. Everything else can flow
 under the spec author's recommendations until you say otherwise.

@@ -7,14 +7,14 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from pd_ocr_trainer_spa.core.enums import TaskEnum, TypefaceEnum
-from pd_ocr_trainer_spa.core.errors import AppError
-from pd_ocr_trainer_spa.core.models import ModelSidecar
-from pd_ocr_trainer_spa.domain import models as dom
-from pd_ocr_trainer_spa.domain.profiles import create_profile
+from pdomain_ocr_trainer_spa.core.enums import TaskEnum, TypefaceEnum
+from pdomain_ocr_trainer_spa.core.errors import AppError
+from pdomain_ocr_trainer_spa.core.models import ModelSidecar
+from pdomain_ocr_trainer_spa.domain import models as dom
+from pdomain_ocr_trainer_spa.domain.profiles import create_profile
 
 if TYPE_CHECKING:
-    from pd_ocr_trainer_spa.settings import Settings
+    from pdomain_ocr_trainer_spa.settings import Settings
 
 
 # --- model-name parsing (spec 08 §2) -------------------------------------

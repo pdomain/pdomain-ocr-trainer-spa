@@ -1,11 +1,11 @@
-// VENDORED pd-ui KanbanBoard — TEMPORARY SHIM.
+// VENDORED pdomain-ui KanbanBoard — TEMPORARY SHIM.
 //
 // D-T4 designates the dataset kanban (KanbanBoard / KanbanColumn / PageChip)
-// as a `pd-ui` component imported from `@concavetrillion/pd-ui/primitives`.
-// As of `@concavetrillion/pd-ui@0.1.0-alpha` that component is NOT published
-// (the pd-ui kanban-board spec, `pd-ui/docs/specs/2026-05-21-kanban-board.md`,
+// as a `pdomain-ui` component imported from `@pdomain/pdomain-ui/primitives`.
+// As of `@pdomain/pdomain-ui@0.1.0-alpha` that component is NOT published
+// (the pdomain-ui kanban-board spec, `pdomain-ui/docs/specs/2026-05-21-kanban-board.md`,
 // is still "Status: Spec — not yet implemented", blocked on `@dnd-kit` being
-// added to pd-ui's package.json).
+// added to pdomain-ui's package.json).
 //
 // To unblock M4 this module implements the spec'd KanbanBoard *prop contract*
 // verbatim (KanbanColumnDef / KanbanItemDef / KanbanMoveEvent / KanbanSelectEvent,
@@ -14,8 +14,8 @@
 // (Space grab, arrows, Space drop, Esc abort) — see spec 12 §9 scenario 3.
 //
 // REMOVE this file and switch the import to
-//   `import { KanbanBoard } from "@concavetrillion/pd-ui/primitives";`
-// once pd-ui publishes the real component. See the M4 cross-repo recommendation.
+//   `import { KanbanBoard } from "@pdomain/pdomain-ui/primitives";`
+// once pdomain-ui publishes the real component. See the M4 cross-repo recommendation.
 
 import { useCallback, useRef, useState } from "react";
 

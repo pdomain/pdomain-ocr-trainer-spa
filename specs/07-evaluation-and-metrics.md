@@ -248,7 +248,7 @@ Spec for the webhook lives outside this repo
 ## 9. Citations
 
 - Eval-slicing motivation + math: `pd-ocr-trainer/docs/specs/glyph-annotation-eval-slicing.md`.
-- Glyph data model: `pd-book-tools` `GlyphAnnotations` (cross-repo).
+- Glyph data model: `pdomain-book-tools` `GlyphAnnotations` (cross-repo).
 - Detection eval shape: existing `train_detect.py` post-train eval
   pass.
 - Recognition eval shape: existing `train_recog.py` post-train eval

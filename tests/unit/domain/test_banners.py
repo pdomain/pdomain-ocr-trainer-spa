@@ -7,12 +7,12 @@ from typing import TYPE_CHECKING, NamedTuple
 
 import pytest
 
-from pd_ocr_trainer_spa.domain import banners as dom
+from pdomain_ocr_trainer_spa.domain import banners as dom
 
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from pd_ocr_trainer_spa.settings import Settings
+    from pdomain_ocr_trainer_spa.settings import Settings
 
 
 class _Usage(NamedTuple):

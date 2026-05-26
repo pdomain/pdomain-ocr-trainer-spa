@@ -7,11 +7,11 @@ OCR-config and training-config knobs surface in the SPA.
 > [`02-backend.md`](02-backend.md) §4.3.
 >
 > **Re-spec note (2026-05-21).** Training-config schemas are now
-> aligned to `pd-ocr-training`'s `DetectionConfig` /
+> aligned to `pdomain-ocr-training`'s `DetectionConfig` /
 > `RecognitionConfig` (the typed, `torch`-free config models), not
 > the legacy `ui.py` config classes. The UI surface references
-> `pd-ui` components (D-T19). Dataset discovery uses
-> `pd_ocr_training.datasets.ExportManager`.
+> `pdomain-ui` components (D-T19). Dataset discovery uses
+> `pdomain_ocr_training.datasets.ExportManager`.
 
 ---
 
@@ -26,11 +26,11 @@ OCR-config and training-config knobs surface in the SPA.
 2. `<ml_validation_dir>/<name>/...` — same rule.
 3. `<shared_models_dir>/<name>/` — any subdir with model weights.
 4. The labeler export root — every export-profile subfolder name
-   (`pd_ocr_training.datasets.ExportManager.get_export_root()`).
+   (`pdomain_ocr_training.datasets.ExportManager.get_export_root()`).
 
 The union is normalized: lowercase, hyphenated, `base-ocr → all`,
 empty → `all` (the `BASE_OCR_PROFILE` rule in
-`pd_ocr_training.datasets`).
+`pdomain_ocr_training.datasets`).
 
 ### 1.2 The `all` profile is special
 
@@ -121,7 +121,7 @@ version.
 ### 2.2 Custom characters
 
 The seed custom-characters string is `DEFAULT_CUSTOM_CHARACTERS` from
-`pd_book_tools.ocr.doctr_support`. The SPA uses it as the seed for a
+`pdomain_book_tools.ocr.doctr_support`. The SPA uses it as the seed for a
 new recognition run form; the *active* set lives only on run-form
 state — there is no project-wide persisted "custom chars".
 
@@ -148,14 +148,14 @@ in the recognition run form ("Scan training set for missing chars").
   nothing else reads it; editing it never affects an existing run.
 - **Per-run frozen args** at `runs/<run_id>/args.json` — the run
   form's payload, frozen at submit time. The worker's
-  `training/config_build.py` maps `args` onto a `pd-ocr-training`
+  `training/config_build.py` maps `args` onto a `pdomain-ocr-training`
   `DetectionConfig` / `RecognitionConfig`
   ([`02-backend.md`](02-backend.md) §4.3).
 
 ### 3.2 Args schema per task
 
 `Run.args` is the run-form payload. Detection `args` is structurally
-the `pd-ocr-training` `DetectionConfig` tunable subset; recognition
+the `pdomain-ocr-training` `DetectionConfig` tunable subset; recognition
 `args` is the `RecognitionConfig` subset **except** the single
 `vocab: str` field is presented as the two form fields
 `vocab_library` + `custom_characters`, which `config_build` collapses
@@ -165,7 +165,7 @@ derived, [`06-training-runs.md`](06-training-runs.md) §6), `device`
 (← `CreateRunRequest.device`), and `output_dir` (← the run's model
 output path).
 
-Seed defaults match the `pd-ocr-training` config-model defaults
+Seed defaults match the `pdomain-ocr-training` config-model defaults
 exactly (`protocols.py:85-188`).
 
 **Detection** (`DetectionConfig`):
@@ -215,7 +215,7 @@ not the legacy `100`, and the `vocab` substitution):
 ```
 
 **Typeface classification** (new task; the config model is a future
-`pd-ocr-training` addition — [Q9](../OPEN_QUESTIONS.md)):
+`pdomain-ocr-training` addition — [Q9](../OPEN_QUESTIONS.md)):
 
 ```json
 {
@@ -229,7 +229,7 @@ not the legacy `100`, and the `vocab` substitution):
 }
 ```
 
-**Glyph classification** (new task; future `pd-ocr-training`
+**Glyph classification** (new task; future `pdomain-ocr-training`
 addition — [Q10](../OPEN_QUESTIONS.md)):
 
 ```json
@@ -257,7 +257,7 @@ DELETE /api/profiles/{name}/training-defaults/{task}   → 204, falls back to se
 ```
 
 When `training_defaults.json` is absent, the seed is the
-`pd-ocr-training` config-model default set (§3.2). A test asserts the
+`pdomain-ocr-training` config-model default set (§3.2). A test asserts the
 seed values field-for-field against `protocols.py`.
 
 ### 3.4 GPU / batch-size auto-suggest
@@ -268,7 +268,7 @@ GET /api/runtime/suggest-batch-size?task=detection|recognition
 ```
 
 Picks a power-of-2 batch size from available VRAM. Device discovery
-goes through `pd-ocr-ops` (`pd_ocr_ops.gpu.pick_device` and
+goes through `pdomain-ocr-ops` (`pdomain_ocr_ops.gpu.pick_device` and
 friends) rather than a SPA-local CUDA probe. No GPU →
 `vram_gb: 0`, `suggested_batch_size: 1`. The frontend offers the
 value as a one-click "Use suggested" on the batch-size field.
@@ -282,7 +282,7 @@ GET /api/runtime/devices
 
 The run form lets the user pin a device or leave it on `auto`. A
 pinned device becomes `CreateRunRequest.device` (a GPU index — the
-`pd-ocr-training` config `device` field is `int | None`); `auto`
+`pdomain-ocr-training` config `device` field is `int | None`); `auto`
 sends `device=None` and the worker resolves the default device at
 start.
 
@@ -309,14 +309,14 @@ Training-side and validation-side files are kept in sync (D-T5).
 
 ## 5. UI surface
 
-Built on `pd-ui` (D-T19) — `AppShell`, `Card`, `Field`/`FieldRow`,
+Built on `pdomain-ui` (D-T19) — `AppShell`, `Card`, `Field`/`FieldRow`,
 `Select`, `Button`. Profile data is held in a SPA **profiles store**
-(a `pd-ui` store factory instance) feeding the table and dialogs;
+(a `pdomain-ui` store factory instance) feeding the table and dialogs;
 mutations invalidate `["profiles"]` / `["profile", name]`.
 
 `ProfilesPage` (route `/profiles`):
 
-- `pd-ui` table — columns: name | display_name | language | typeface
+- `pdomain-ui` table — columns: name | display_name | language | typeface
   | detection / recognition / typeface / glyph counts | actions.
 - "New profile" `Button` opens `ProfileEditDialog` in create mode.
 - Each row clickable → `/profiles/{name}`.
@@ -331,8 +331,8 @@ mutations invalidate `["profiles"]` / `["profile", name]`.
 
 `ProfileEditDialog`:
 
-- `pd-ui` `FieldRow`s: display_name (text `Field`), language
-  (`Select` / combobox with BCP-47 hints), typeface (`pd-ui Select`
+- `pdomain-ui` `FieldRow`s: display_name (text `Field`), language
+  (`Select` / combobox with BCP-47 hints), typeface (`pdomain-ui Select`
   over `TypefaceEnum` minus `typeface`), notes (textarea `Field`).
 - On submit: PATCH (or POST in create mode), then invalidate the
   profiles store queries.
@@ -362,10 +362,10 @@ mutations invalidate `["profiles"]` / `["profile", name]`.
 ## 7. Citations
 
 - Profile constants / discovery / `BASE_OCR_PROFILE` / legacy
-  migration: `pd-ocr-training/pd_ocr_training/datasets.py:19-86, 242-609`.
+  migration: `pdomain-ocr-training/pdomain_ocr_training/datasets.py:19-86, 242-609`.
 - `DetectionConfig` / `RecognitionConfig` canonical defaults:
-  `pd-ocr-training/pd_ocr_training/protocols.py:85-188`.
-- Custom-characters seed: `pd_book_tools.ocr.doctr_support.DEFAULT_CUSTOM_CHARACTERS`.
-- GPU device selection: `pd-ocr-ops/pd_ocr_ops/gpu` (`pick_device`).
+  `pdomain-ocr-training/pdomain_ocr_training/protocols.py:85-188`.
+- Custom-characters seed: `pdomain_book_tools.ocr.doctr_support.DEFAULT_CUSTOM_CHARACTERS`.
+- GPU device selection: `pdomain-ocr-ops/pdomain_ocr_ops/gpu` (`pick_device`).
 - Historical origin of the config knobs (legacy, repo being
   retired): `pd-ocr-trainer/src/pd_ocr_trainer/ui.py:74-318`.

@@ -50,8 +50,8 @@ repos:
 
     -   id: basedpyright
         name: basedpyright type check (recommended mode; workspace canonical)
-        entry: uv run basedpyright src/pd_ocr_trainer_spa --level error
+        entry: uv run basedpyright src/pdomain_ocr_trainer_spa --level error
         language: system
         stages: [pre-commit]
         pass_filenames: false
-        files: ^src/pd_ocr_trainer_spa/.*\.py$
+        files: ^src/pdomain_ocr_trainer_spa/.*\.py$

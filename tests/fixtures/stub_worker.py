@@ -1,6 +1,6 @@
 """Torch-free stub training worker for slow subprocess tests (spec 14 §5.3).
 
-A drop-in stand-in for ``pd_ocr_trainer_spa.worker.train`` that prints a
+A drop-in stand-in for ``pdomain_ocr_trainer_spa.worker.train`` that prints a
 scripted ``@@PDEVENT@@`` sequence and exits — exercising the real
 ``LocalLongJobRunner.submit_with_process`` plumbing (env passing, line
 buffering, signal handling, exit-code -> state) without CUDA or DocTR.

@@ -8,12 +8,12 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from pd_ocr_trainer_spa.core.enums import TypefaceEnum
-from pd_ocr_trainer_spa.core.errors import AppError
-from pd_ocr_trainer_spa.domain import profiles as dom
+from pdomain_ocr_trainer_spa.core.enums import TypefaceEnum
+from pdomain_ocr_trainer_spa.core.errors import AppError
+from pdomain_ocr_trainer_spa.domain import profiles as dom
 
 if TYPE_CHECKING:
-    from pd_ocr_trainer_spa.settings import Settings
+    from pdomain_ocr_trainer_spa.settings import Settings
 
 
 def _toml(settings: Settings, split: str, name: str) -> dict[str, object]:

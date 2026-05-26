@@ -6,10 +6,10 @@ from typing import TYPE_CHECKING
 
 from fastapi.testclient import TestClient
 
-from pd_ocr_trainer_spa.bootstrap import build_app
+from pdomain_ocr_trainer_spa.bootstrap import build_app
 
 if TYPE_CHECKING:
-    from pd_ocr_trainer_spa.settings import Settings
+    from pdomain_ocr_trainer_spa.settings import Settings
 
 
 def test_banners_empty_when_hf_disabled_and_disk_ok(client: TestClient) -> None:

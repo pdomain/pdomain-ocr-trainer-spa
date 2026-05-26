@@ -10,9 +10,9 @@ this surface; per-task differences are §5.
 > [`10-jobs-and-sse.md`](10-jobs-and-sse.md).
 >
 > **Re-spec note (2026-05-21).** Rewritten onto the
-> `pd-ocr-training` + `pd-ocr-ops` stack (D-T1, D-T20). A training
-> run now drives `pd-ocr-training`'s `ITrainingRunner` inside a
-> worker subprocess supervised by the `pd-ocr-ops` `LongJobRunner`.
+> `pdomain-ocr-training` + `pdomain-ocr-ops` stack (D-T1, D-T20). A training
+> run now drives `pdomain-ocr-training`'s `ITrainingRunner` inside a
+> worker subprocess supervised by the `pdomain-ocr-ops` `LongJobRunner`.
 > The original raw-`pd-ocr-trainer` subprocess and the per-task
 > stdout regex parser are superseded — progress now arrives as
 > structured `TrainingEvent`s, not parsed log lines.
@@ -67,7 +67,7 @@ class CreateRunRequest(BaseModel):
     sources: list[DatasetSourceRef] | None = None   # default: one local source for this profile+task
 
     # Optional overrides
-    device: int | None = None             # GPU index; None = pd-ocr-training default device
+    device: int | None = None             # GPU index; None = pdomain-ocr-training default device
     seed: int | None = None
     notes: str | None = None              # free-form, persisted in manifest.json
     model_name: str | None = None         # if absent, derived via §6
@@ -86,7 +86,7 @@ Validation:
 
 - `task` must be enabled (`Settings.enable_typeface_training`,
   `Settings.enable_glyph_training` for the new tasks).
-- `args` must validate against the task's `pd-ocr-training` config
+- `args` must validate against the task's `pdomain-ocr-training` config
   model (`DetectionConfig` / `RecognitionConfig` — both `extra`-
   forbidding pydantic models, so unknown keys are `422` with
   field-level errors).
@@ -121,7 +121,7 @@ The run executes as the worker subprocess specified in
 behaviour:
 
 ```
-python -m pd_ocr_trainer_spa.worker.train --run-dir runs/<id>
+python -m pdomain_ocr_trainer_spa.worker.train --run-dir runs/<id>
 ```
 
 The worker:
@@ -131,8 +131,8 @@ The worker:
 3. Sets process env from the manifest: `HF_HOME`,
    `CUDA_VISIBLE_DEVICES` filtered to the chosen `device`, and the
    legacy `PD_OCR_TRAINER_ML_TRAINING_DIR` / `..._ML_VALIDATION_DIR`
-   that `pd_ocr_training.datasets` reads at import.
-4. Instantiates `pd_ocr_training.LocalTrainingRunner` and **fully
+   that `pdomain_ocr_training.datasets` reads at import.
+4. Instantiates `pdomain_ocr_training.LocalTrainingRunner` and **fully
    drains** `train_detection(profile, cfg)` /
    `train_recognition(profile, cfg)` — the iterator must be consumed
    to completion; abandoning it strands the in-process training
@@ -142,7 +142,7 @@ The worker:
    stderr flow to `runs/<id>/stderr.log`.
 6. Exits `0` after the `done` event, non-zero after `error`.
 
-The `pd-ocr-ops` `LongJobRunner` owns this subprocess: `submit_with_
+The `pdomain-ocr-ops` `LongJobRunner` owns this subprocess: `submit_with_
 process` spawns and supervises it; `cancel(job_id)` terminates it.
 
 Cancellation:
@@ -167,7 +167,7 @@ Crash recovery:
 
 ## 4. Progress + metric events
 
-`pd-ocr-training` already emits **structured** `TrainingEvent`s — the
+`pdomain-ocr-training` already emits **structured** `TrainingEvent`s — the
 SPA does **not** regex-parse log lines. Each `TrainingEvent` has:
 
 ```python
@@ -177,7 +177,7 @@ progress: float | None       # normalized [0,1]; set on `epoch` events
 data: dict | None             # loss / lr / batch / recall / ... per kind
 ```
 
-How each `kind` arises (from `pd-ocr-training`'s raw→public mapping):
+How each `kind` arises (from `pdomain-ocr-training`'s raw→public mapping):
 
 | `kind`  | Source | Carries |
 |---|---|---|
@@ -188,7 +188,7 @@ How each `kind` arises (from `pd-ocr-training`'s raw→public mapping):
 | `error`  | synthesized terminal | `message = "<ExcType>: <msg>\n<traceback>"` |
 
 The worker serializes each event to a `@@PDEVENT@@`-prefixed stdout
-JSON line. The `pd-ocr-ops` `LongJobRunner` parses those lines into
+JSON line. The `pdomain-ocr-ops` `LongJobRunner` parses those lines into
 `JobEvent`s surfaced by `stream_events(job_id)`; the SPA SSE route
 (`/api/jobs/{job_id}/events`) re-emits them. `kind` mapping to the
 SPA wire `JobEvent.type`:
@@ -252,7 +252,7 @@ file hits the cap. ([Q13](../OPEN_QUESTIONS.md))
 
 - Reads `<ml_training_dir>/<profile>/typeface/metadata.jsonl`.
 - Architecture TBD ([Q9](../OPEN_QUESTIONS.md)); config model is a
-  future `pd-ocr-training` addition.
+  future `pdomain-ocr-training` addition.
 - `metric`-kind events carry `accuracy`, `f1_macro`, per-class
   accuracy in `data`.
 
@@ -285,7 +285,7 @@ pd-{language}-{typeface}-{task}-{date}[-{qualifier}]
   minted; it is accepted only as an explicit `model_name` override
   the user types (D-T6).
 
-The derived name becomes `config.name` (the `pd-ocr-training`
+The derived name becomes `config.name` (the `pdomain-ocr-training`
 checkpoint stem). The frontend `lib/modelName.ts` parses + renders
 both shapes for display.
 
@@ -313,7 +313,7 @@ Layout:
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-`JobStatusPip`, `Progress`, and the `LogViewer` are **pd-ui
+`JobStatusPip`, `Progress`, and the `LogViewer` are **pdomain-ui
 components** driven by the `useLongJob` SSE hook (D-T4, D-T19,
 D-T22); `LossChart` is the SPA's only app-specific chart.
 
@@ -355,7 +355,7 @@ A `TrainingEvent` of `kind="error"` carries `<ExcType>: <msg>` in
 | `training.no_training_data` | Empty `labels.json` detected at create-run validation | Form-level error before submit; never reaches the worker. |
 | `training.cuda_unavailable` | Worker fails to acquire the requested GPU device | Form warning if `device` is unset; outright error if a device was pinned. |
 | `training.import_error` | Worker exits non-zero before the first `@@PDEVENT@@` line | Run goes `failed`; sidebar shows captured `stderr.log` verbatim. |
-| `training.worker_died` | Worker thread died without an error sentinel (`pd-ocr-training` emits `"Worker thread died without reporting an error."`) | Run `failed`; sidebar shows the message. |
+| `training.worker_died` | Worker thread died without an error sentinel (`pdomain-ocr-training` emits `"Worker thread died without reporting an error."`) | Run `failed`; sidebar shows the message. |
 
 ---
 
@@ -382,16 +382,16 @@ A `TrainingEvent` of `kind="error"` carries `<ExcType>: <msg>` in
 ## 11. Citations
 
 - `ITrainingRunner` generator methods + `TrainingEvent` shape:
-  `pd-ocr-training/pd_ocr_training/protocols.py:58-247`.
+  `pdomain-ocr-training/pdomain_ocr_training/protocols.py:58-247`.
 - Raw→public event translation (`epoch`/`metric`/`log`/`done`/`error`):
-  `pd-ocr-training/pd_ocr_training/local.py:78-132, 367-420`.
+  `pdomain-ocr-training/pdomain_ocr_training/local.py:78-132, 367-420`.
 - `LocalTrainingRunner` in-process thread, no cancellation hook:
-  `pd-ocr-training/pd_ocr_training/local.py:253-364` (docstrings
+  `pdomain-ocr-training/pdomain_ocr_training/local.py:253-364` (docstrings
   `:25-31, 265-270`).
 - `DetectionConfig` / `RecognitionConfig` defaults:
-  `pd-ocr-training/pd_ocr_training/protocols.py:85-188`.
+  `pdomain-ocr-training/pdomain_ocr_training/protocols.py:85-188`.
 - Subprocess submit / supervise / cancel:
-  `pd-ocr-ops/pd_ocr_ops/gpu/local_jobs.py:104-179`.
-- Crash-recovery model: `pd-ocr-labeler-spa/specs/10-jobs-and-sse.md`.
+  `pdomain-ocr-ops/pdomain_ocr_ops/gpu/local_jobs.py:104-179`.
+- Crash-recovery model: `pdomain-ocr-labeler-spa/specs/10-jobs-and-sse.md`.
 - Trainer ROADMAP for typeface (a.5) and glyph (g1)/(g2):
   `pd-ocr-trainer/docs/ROADMAP.md`.

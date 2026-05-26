@@ -15,9 +15,9 @@ from __future__ import annotations
 import pytest
 from fastapi.testclient import TestClient
 
-import pd_ocr_trainer_spa.bootstrap as bootstrap_module
-from pd_ocr_trainer_spa.bootstrap import build_app
-from pd_ocr_trainer_spa.settings import Settings
+import pdomain_ocr_trainer_spa.bootstrap as bootstrap_module
+from pdomain_ocr_trainer_spa.bootstrap import build_app
+from pdomain_ocr_trainer_spa.settings import Settings
 
 
 @pytest.fixture
@@ -43,7 +43,7 @@ def app_with_frontend(tmp_path, monkeypatch, base_settings):
     static_dir = tmp_path / "fake-static"
     (static_dir / "assets").mkdir(parents=True)
     (static_dir / "index.html").write_text(
-        "<!DOCTYPE html><html><body>pd-ocr-trainer-spa SPA</body></html>"
+        "<!DOCTYPE html><html><body>pdomain-ocr-trainer-spa SPA</body></html>"
     )
     (static_dir / "assets" / "index.js").write_text("// fake asset")
 

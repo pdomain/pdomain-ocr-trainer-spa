@@ -2,7 +2,7 @@
 // Spec: 09-hf-integration §5–§6, M11. Route: /publish.
 
 import { useCallback, useEffect, useState } from "react";
-import { Button } from "@concavetrillion/pd-ui/primitives";
+import { Button } from "@pdomain/pdomain-ui/primitives";
 import { fetchModels } from "../api/models";
 import type { ModelListItem } from "../api/models";
 import { fetchProfiles } from "../api/profiles";

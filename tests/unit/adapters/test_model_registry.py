@@ -4,14 +4,14 @@ from __future__ import annotations
 
 import pytest
 
-from pd_ocr_trainer_spa.adapters.model_registry import IModelRegistry
-from pd_ocr_trainer_spa.adapters.model_registry.fake import FakeModelRegistry
-from pd_ocr_trainer_spa.adapters.model_registry.filesystem import FilesystemModelRegistry
-from pd_ocr_trainer_spa.adapters.model_registry.huggingface_hub import (
+from pdomain_ocr_trainer_spa.adapters.model_registry import IModelRegistry
+from pdomain_ocr_trainer_spa.adapters.model_registry.fake import FakeModelRegistry
+from pdomain_ocr_trainer_spa.adapters.model_registry.filesystem import FilesystemModelRegistry
+from pdomain_ocr_trainer_spa.adapters.model_registry.huggingface_hub import (
     HuggingFaceHubModelRegistry,
 )
-from pd_ocr_trainer_spa.core.errors import AdapterNotImplementedError
-from pd_ocr_trainer_spa.core.models import ModelPaths, ModelSidecar
+from pdomain_ocr_trainer_spa.core.errors import AdapterNotImplementedError
+from pdomain_ocr_trainer_spa.core.models import ModelPaths, ModelSidecar
 
 
 class _Run:

@@ -1,6 +1,6 @@
 // AppHeader — minimal app chrome: header bar + sidebar nav (spec 13 §4.1).
 //
-// Spec 03 §6.1 calls for the full pd-ui `AppShell` + `TopNav`; that
+// Spec 03 §6.1 calls for the full pdomain-ui `AppShell` + `TopNav`; that
 // integration is a later milestone. M9 ships the minimal header the
 // driver-contract conformance test (spec 13 §5) needs: a stable
 // `header-bar` with a version badge and help button, and a

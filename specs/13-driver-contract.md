@@ -134,9 +134,9 @@ buttons / inputs / `<a>` without a `data-testid`.
 | `kanban-footer-apply` | Primary apply button |
 | `kanban-footer-status` | Status text |
 
-The kanban chrome is composed around the `pd-ui` `KanbanBoard`
+The kanban chrome is composed around the `pdomain-ui` `KanbanBoard`
 component (D-T4); these testids are the SPA's stable contract
-regardless of the underlying pd-ui markup.
+regardless of the underlying pdomain-ui markup.
 
 ### 4.4 Run detail
 
@@ -285,6 +285,6 @@ Initial version: `1`.
 
 ## 7. Citations
 
-- Contract pattern: `pd-ocr-labeler-spa/specs/13-driver-contract.md`.
+- Contract pattern: `pdomain-ocr-labeler-spa/specs/13-driver-contract.md`.
 - Driver agent precedent: `pd-ocr-labeler-driver` (Playwright MCP-
   driven mechanical pre-pass agent).

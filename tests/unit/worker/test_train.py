@@ -1,6 +1,6 @@
 """Unit tests for worker/train.py — torch-free, with an injected fake runner.
 
-The worker drives ``pd_ocr_training``'s ``ITrainingRunner``; here we inject a
+The worker drives ``pdomain_ocr_training``'s ``ITrainingRunner``; here we inject a
 fake runner whose ``train_*`` methods yield plain dicts, so no torch / DocTR /
 GPU is touched (spec 14-testing §5.2).
 """
@@ -10,7 +10,7 @@ from __future__ import annotations
 import json
 from typing import TYPE_CHECKING
 
-from pd_ocr_trainer_spa.worker import train as worker
+from pdomain_ocr_trainer_spa.worker import train as worker
 
 if TYPE_CHECKING:
     from collections.abc import Iterator

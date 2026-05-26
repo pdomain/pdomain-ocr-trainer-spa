@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from fastapi.testclient import TestClient
 
-    from pd_ocr_trainer_spa.settings import Settings
+    from pdomain_ocr_trainer_spa.settings import Settings
 
 
 def test_scenario_1_fresh_install_lists_only_all(client: TestClient) -> None:

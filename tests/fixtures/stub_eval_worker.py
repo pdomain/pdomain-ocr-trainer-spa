@@ -1,6 +1,6 @@
 """Torch-free stub eval worker for slow subprocess tests (spec 14 §5).
 
-A drop-in stand-in for ``pd_ocr_trainer_spa.worker.evaluate`` that writes a
+A drop-in stand-in for ``pdomain_ocr_trainer_spa.worker.evaluate`` that writes a
 scripted ``result.json`` and prints a ``@@PDEVENT@@`` sequence — exercising
 the real ``LocalLongJobRunner.submit_with_process`` plumbing without CUDA or
 DocTR.

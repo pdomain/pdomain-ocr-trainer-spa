@@ -47,7 +47,7 @@ Two forms coexist:
 | New (post-ROADMAP) | `pd-ga-clogaelach-recognition-2026-05-05` | minted by SPA; required for new HF publishes |
 
 Parser/formatter lives in `frontend/src/lib/modelName.ts` and
-`src/pd_ocr_trainer_spa/domain/models.py` — the two implementations
+`src/pdomain_ocr_trainer_spa/domain/models.py` — the two implementations
 must round-trip the same set of strings.
 
 ```python

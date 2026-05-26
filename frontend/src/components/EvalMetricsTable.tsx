@@ -1,9 +1,9 @@
 // EvalMetricsTable — renders overall metrics + glyph-feature slices (spec 07 §6.2).
 //
 // Slices are sorted by |delta_cer| descending; low-support rows are greyed.
-// SPA-LOCAL: spec 07 §4 names a pd-ui component, but pd-ui does not export an
+// SPA-LOCAL: spec 07 §4 names a pdomain-ui component, but pdomain-ui does not export an
 // EvalMetricsTable yet — this carries the spec-13 testid contract and is
-// drop-in-replaceable once pd-ui ships one.
+// drop-in-replaceable once pdomain-ui ships one.
 
 import type { EvalMetrics, EvalSlice } from "../api/eval";
 

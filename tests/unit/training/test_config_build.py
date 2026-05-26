@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from pd_ocr_trainer_spa.core.enums import TaskEnum
-from pd_ocr_trainer_spa.training.config_build import (
+from pdomain_ocr_trainer_spa.core.enums import TaskEnum
+from pdomain_ocr_trainer_spa.training.config_build import (
     build_detection_config,
     build_recognition_config,
 )

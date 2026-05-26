@@ -15,14 +15,14 @@ from unittest.mock import patch
 if TYPE_CHECKING:
     from fastapi.testclient import TestClient
 
-    from pd_ocr_trainer_spa.settings import Settings
+    from pdomain_ocr_trainer_spa.settings import Settings
 
 
 def _make_client_with_token(settings: Settings, tmp_path: Path) -> TestClient:
     """Build a TestClient with a valid (on-disk) HF token file."""
     from fastapi.testclient import TestClient
 
-    from pd_ocr_trainer_spa.bootstrap import build_app
+    from pdomain_ocr_trainer_spa.bootstrap import build_app
 
     token_path = tmp_path / "hf-token"
     token_path.write_text("hf_test_token", encoding="utf-8")
@@ -36,7 +36,7 @@ def test_sources_preview_route_exists(settings: Settings, tmp_path: Path) -> Non
 
     # Patch the actual HF network call so we don't need real credentials.
     with patch(
-        "pd_ocr_trainer_spa.adapters.dataset_sources.huggingface.HuggingFaceDatasetSource.preview",
+        "pdomain_ocr_trainer_spa.adapters.dataset_sources.huggingface.HuggingFaceDatasetSource.preview",
         return_value=[],
     ):
         resp = client.get(
@@ -52,7 +52,7 @@ def test_sources_preview_missing_token_returns_error(settings: Settings) -> None
     """GET /api/sources/huggingface/preview with no token returns 400 hf.auth_missing."""
     from fastapi.testclient import TestClient
 
-    from pd_ocr_trainer_spa.bootstrap import build_app
+    from pdomain_ocr_trainer_spa.bootstrap import build_app
 
     settings.hf_token_path = settings.app_data_root / "nonexistent-token"
     client = TestClient(build_app(settings))
@@ -70,7 +70,7 @@ def test_sources_preview_no_token_path_returns_error(settings: Settings) -> None
     """GET /api/sources/huggingface/preview with hf_token_path=None returns 400."""
     from fastapi.testclient import TestClient
 
-    from pd_ocr_trainer_spa.bootstrap import build_app
+    from pdomain_ocr_trainer_spa.bootstrap import build_app
 
     settings.hf_token_path = None
     client = TestClient(build_app(settings))
@@ -89,7 +89,7 @@ def test_sources_preview_route_not_shadowed_by_spa(settings: Settings, tmp_path:
     client = _make_client_with_token(settings, tmp_path)
 
     with patch(
-        "pd_ocr_trainer_spa.adapters.dataset_sources.huggingface.HuggingFaceDatasetSource.preview",
+        "pdomain_ocr_trainer_spa.adapters.dataset_sources.huggingface.HuggingFaceDatasetSource.preview",
         return_value=[],
     ):
         resp = client.get(

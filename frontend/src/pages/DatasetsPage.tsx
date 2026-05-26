@@ -1,11 +1,11 @@
 // DatasetsPage — the 3-column dataset kanban for one (profile, task) pair
-// (spec 05). Composes the pd-ui KanbanBoard (vendored shim until pd-ui ships
+// (spec 05). Composes the pdomain-ui KanbanBoard (vendored shim until pdomain-ui ships
 // it — see components/kanban/KanbanBoard.tsx) and owns the staged overlay,
 // multi-select state, and the keyboard-only flow (spec 12 §3.1 / §9).
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Button, Card } from "@concavetrillion/pd-ui/primitives";
+import { Button, Card } from "@pdomain/pdomain-ui/primitives";
 import { KanbanBoard } from "../components/kanban/KanbanBoard";
 import type {
   KanbanColumnDef,

@@ -1,12 +1,12 @@
 // RunListPage — the run inventory table (spec 06 §8, route /runs).
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Badge, Button, Card } from "@concavetrillion/pd-ui/primitives";
-import type { BadgeVariant } from "@concavetrillion/pd-ui/primitives";
+import { Badge, Button, Card } from "@pdomain/pdomain-ui/primitives";
+import type { BadgeVariant } from "@pdomain/pdomain-ui/primitives";
 import { fetchRuns } from "../api/runs";
 import type { Run, RunStatus } from "../api/runs";
 
-// pd-ui Badge exposes only default | primary | danger — map run statuses
+// pdomain-ui Badge exposes only default | primary | danger — map run statuses
 // onto that palette. The status text itself stays the precise signal
 // (spec 12 §6 — never colour alone).
 const STATUS_VARIANT: Record<RunStatus, BadgeVariant> = {

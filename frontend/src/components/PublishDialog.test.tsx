@@ -15,7 +15,7 @@ function jsonResponse(status: number, body: unknown): Response {
   } as Response;
 }
 
-// Canonical SPDX identifiers as defined by pd_book_tools.licenses.
+// Canonical SPDX identifiers as defined by pdomain_book_tools.licenses.
 // Plain "GPL-3.0" is a deprecated SPDX id and must NOT appear.
 const CANONICAL_IDS = [
   "Apache-2.0",

@@ -18,7 +18,7 @@ from typing import TYPE_CHECKING
 import pytest
 
 if TYPE_CHECKING:
-    from pd_ocr_trainer_spa.settings import Settings
+    from pdomain_ocr_trainer_spa.settings import Settings
 
 _STUB_EVAL_WORKER = Path(__file__).parent.parent / "fixtures" / "stub_eval_worker.py"
 
@@ -43,11 +43,11 @@ async def _submit_and_wait(
 
 def test_eval_round_trip_writes_result_json(settings: Settings) -> None:
     """An eval run via a real subprocess writes result.json the API can read."""
-    from pd_ocr_ops.gpu.local_jobs import LocalLongJobRunner
+    from pdomain_ocr_ops.gpu.local_jobs import LocalLongJobRunner
 
-    from pd_ocr_trainer_spa.core.enums import TaskEnum, TypefaceEnum
-    from pd_ocr_trainer_spa.domain import eval as eval_dom
-    from pd_ocr_trainer_spa.domain.profiles import create_profile
+    from pdomain_ocr_trainer_spa.core.enums import TaskEnum, TypefaceEnum
+    from pdomain_ocr_trainer_spa.domain import eval as eval_dom
+    from pdomain_ocr_trainer_spa.domain.profiles import create_profile
 
     create_profile(
         settings, name="clogaelach", language="ga", typeface=TypefaceEnum.clogaelach

@@ -11,7 +11,7 @@ by an explicit "Apply" action.
 > [`02-backend.md`](02-backend.md) §6.3,
 > [`12-hotkeys-a11y.md`](12-hotkeys-a11y.md) §Kanban.
 >
-> **Re-spec note (2026-05-21).** Rewritten onto the `pd-ui`
+> **Re-spec note (2026-05-21).** Rewritten onto the `pdomain-ui`
 > `KanbanBoard` component (D-T4) and the staged-then-applied
 > dataflow (D-T23). The kanban is no longer SPA-local, and there is
 > no per-drag `move` endpoint or server-side staging buffer — drags
@@ -201,13 +201,13 @@ computed server-side and carried on the chip (§2).
 
 ---
 
-## 7. The `pd-ui` `KanbanBoard` component
+## 7. The `pdomain-ui` `KanbanBoard` component
 
-The kanban is the `pd-ui` `KanbanBoard` / `KanbanColumn` / `PageChip`
-component family (D-T4) — not SPA-local. The SPA composes it; pd-ui
+The kanban is the `pdomain-ui` `KanbanBoard` / `KanbanColumn` / `PageChip`
+component family (D-T4) — not SPA-local. The SPA composes it; pdomain-ui
 owns drag/drop, multi-select, and a11y.
 
-- DnD: `@dnd-kit` inside pd-ui — `PointerSensor` for mouse,
+- DnD: `@dnd-kit` inside pdomain-ui — `PointerSensor` for mouse,
   `KeyboardSensor` for a11y. A custom collision detector snaps to
   the nearest column.
 - A whole project row drags as a unit; individual chips drag
@@ -221,7 +221,7 @@ owns drag/drop, multi-select, and a11y.
 - Dragging any selected chip drags the whole selection.
 
 The SPA supplies the `KanbanView` data, the staged-overlay state,
-and an `onStage(moves)` callback; `pd-ui` renders and reports moves.
+and an `onStage(moves)` callback; `pdomain-ui` renders and reports moves.
 Selection state is internal to the `KanbanBoard`. Keyboard a11y:
 [`12-hotkeys-a11y.md`](12-hotkeys-a11y.md).
 
@@ -229,14 +229,14 @@ Selection state is internal to the `KanbanBoard`. Keyboard a11y:
 
 ## 8. Toolbar and footer
 
-Header row (SPA-composed, around the `pd-ui` board):
+Header row (SPA-composed, around the `pdomain-ui` board):
 
 - `[Rescan]` → `POST .../scan`. Discards the staged overlay after
   confirming if there are pending moves.
-- `[ ] Include detection` / `[ ] Include recognition` — `pd-ui`
+- `[ ] Include detection` / `[ ] Include recognition` — `pdomain-ui`
   checkboxes; each change fires `POST .../include-toggles`.
 - Filter input: substring filter on `project_id`.
-- Style-tag dropdown (`pd-ui Select`): filters chips by `style_tags`;
+- Style-tag dropdown (`pdomain-ui Select`): filters chips by `style_tags`;
   default "all".
 - "Showing N of M pages" counter.
 
@@ -278,7 +278,7 @@ chip is a **crop**, not a page:
   a compact positive-feature summary like `ct,long_s` (glyph).
 - `key` uses `crop_name` as the item segment.
 
-The `pd-ui` `KanbanBoard` has a "thumbnail strip" view mode for
+The `pdomain-ui` `KanbanBoard` has a "thumbnail strip" view mode for
 crop-heavy datasets that previews each chip's image, lazy-loaded via
 `GET /api/profiles/{p}/datasets/{task}/crop-image?key=...`.
 
@@ -311,6 +311,6 @@ crop-heavy datasets that previews each chip's image, lazy-loaded via
 - Legacy column defs: `pd-ocr-trainer/src/pd_ocr_trainer/dataset_ui.py:13-17`.
 - Multi-select rules: `dataset_ui.py:61-97`.
 - Existing-pages render + multi-select drag: `dataset_ui.py:230-262`.
-- `ExportManager` save / move semantics: `pd-ocr-training/pd_ocr_training/datasets.py:242-609`
+- `ExportManager` save / move semantics: `pdomain-ocr-training/pdomain_ocr_training/datasets.py:242-609`
   (`save_assignments`, `move_existing_project`, `move_existing_page`).
-- `KanbanBoard` component contract: `pd-ui` docs (D-T4).
+- `KanbanBoard` component contract: `pdomain-ui` docs (D-T4).

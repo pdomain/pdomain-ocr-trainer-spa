@@ -3,7 +3,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Button, Card } from "@concavetrillion/pd-ui/primitives";
+import { Button, Card } from "@pdomain/pdomain-ui/primitives";
 import { fetchEvalResult } from "../api/eval";
 import type { EvalResult } from "../api/eval";
 import { EvalMetricsTable } from "../components/EvalMetricsTable";

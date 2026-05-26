@@ -67,9 +67,9 @@ setup: ## Sync Python deps + install pre-commit hooks
 
 install: setup ## Alias for setup
 
-uninstall: ## Remove the installed pd-ocr-trainer-spa uv tool
-	@uv tool uninstall pd-ocr-trainer-spa || true
-	@echo "✅ pd-ocr-trainer-spa uninstalled."
+uninstall: ## Remove the installed pdomain-ocr-trainer-spa uv tool
+	@uv tool uninstall pdomain-ocr-trainer-spa || true
+	@echo "✅ pdomain-ocr-trainer-spa uninstalled."
 
 remove-venv: ## Remove the virtual environment
 	rm -rf .venv
@@ -101,7 +101,7 @@ format-check: ## Check Python formatting with ruff (non-mutating)
 	uv run ruff check --select I
 
 typecheck: ## Run basedpyright at recommended mode
-	uv run basedpyright src/pd_ocr_trainer_spa --level error
+	uv run basedpyright src/pdomain_ocr_trainer_spa --level error
 
 pre-commit-check: ## Run pre-commit on all files
 	uv run pre-commit run --all-files
@@ -122,7 +122,7 @@ frontend-typecheck: frontend-install ## Run tsc --noEmit type check on frontend
 frontend-test: frontend-install ## Run frontend vitest suite
 	cd frontend && node_modules/.bin/vitest run
 
-frontend-build: frontend-install ## Build the React/Vite SPA to src/pd_ocr_trainer_spa/static/
+frontend-build: frontend-install ## Build the React/Vite SPA to src/pdomain_ocr_trainer_spa/static/
 	cd frontend && $(call _pnpm,run build)
 
 frontend-lint: frontend-install ## Run ESLint on the SPA
@@ -148,7 +148,7 @@ e2e: frontend-build ## Run Playwright browser e2e tests (requires chromium)
 e2e-browser: e2e ## Alias for e2e
 
 openapi-export: ## Export OpenAPI JSON + generate TypeScript types
-	uv run python -m pd_ocr_trainer_spa.scripts.export_openapi
+	uv run python -m pdomain_ocr_trainer_spa.scripts.export_openapi
 
 dev: ## Start backend + frontend dev servers concurrently
 	@echo "🚀 Starting backend on :8081 and frontend on :5174"
@@ -158,18 +158,18 @@ dev: ## Start backend + frontend dev servers concurrently
 	wait
 
 dev-backend: ## Start uvicorn backend (--reload)
-	uv run uvicorn "pd_ocr_trainer_spa.bootstrap:build_app" \
+	uv run uvicorn "pdomain_ocr_trainer_spa.bootstrap:build_app" \
 		--factory --host 127.0.0.1 --port 8081 --reload
 
 dev-frontend: ## Start Vite dev server
 	cd frontend && $(call _pnpm,run dev)
 
 doctor: ## Print versions, paths, GPU info, HF token presence
-	@echo "=== pd-ocr-trainer-spa doctor ==="
+	@echo "=== pdomain-ocr-trainer-spa doctor ==="
 	@uv run python -c "import sys; print('Python:', sys.version)"
 	@node --version 2>/dev/null && echo "Node: ok" || echo "Node: not found"
-	@uv run python -c "import pd_ocr_ops; print('pd-ocr-ops:', pd_ocr_ops.__version__)" 2>/dev/null || echo "pd-ocr-ops: not available"
-	@uv run python -c "import pd_ocr_training; print('pd-ocr-training:', pd_ocr_training.__version__)" 2>/dev/null || echo "pd-ocr-training: not available"
+	@uv run python -c "import pdomain_ocr_ops; print('pdomain-ocr-ops:', pdomain_ocr_ops.__version__)" 2>/dev/null || echo "pdomain-ocr-ops: not available"
+	@uv run python -c "import pdomain_ocr_training; print('pdomain-ocr-training:', pdomain_ocr_training.__version__)" 2>/dev/null || echo "pdomain-ocr-training: not available"
 	@uv run python -c "import torch; print('CUDA:', torch.cuda.is_available(), '| MPS:', getattr(torch.backends, 'mps', None) and torch.backends.mps.is_available())" 2>/dev/null || echo "torch: not installed (expected — worker subprocess only)"
 	@HF_TOKEN=~/.huggingface/token; [ -f "$$HF_TOKEN" ] && echo "HF token: found" || echo "HF token: not found"
 
@@ -179,7 +179,7 @@ clean: ## Clean cache + build artifacts
 	find . -type d -name "*.egg-info" -exec rm -rf {} + 2>/dev/null || true
 	find . -type d -name ".ruff_cache" -exec rm -rf {} + 2>/dev/null || true
 	rm -rf dist/ frontend/dist/ 2>/dev/null || true
-	find src/pd_ocr_trainer_spa/static/ -not -name '.gitkeep' -delete 2>/dev/null || true
+	find src/pdomain_ocr_trainer_spa/static/ -not -name '.gitkeep' -delete 2>/dev/null || true
 
 ci: setup lint typecheck test frontend-install frontend-typecheck frontend-test frontend-format-check frontend-lint frontend-knip ## CI pipeline (without frontend-build/e2e/wheel)
 
@@ -202,7 +202,7 @@ local-upgrade-deps: ## Upgrade deps then restore editable siblings (local-mode o
 local-run: ## Run the server against local-dev workspace (local-mode only)
 	@./scripts/local-run.sh
 
-update-pd-deps: ## Bump all pd-* sibling deps (py: pd-book-tools, pd-ocr-ops, pd-ocr-training; npm: pd-ui) to registry latest
+update-pd-deps: ## Bump all pd-* sibling deps (py: pdomain-book-tools, pdomain-ocr-ops, pdomain-ocr-training; npm: pdomain-ui) to registry latest
 	@./scripts/update-pd-deps.sh
 
 # ---------------------------------------------------------------------------

@@ -11,13 +11,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from pd_ocr_trainer_spa.core.models import EvalMetrics, ModelSidecar
+from pdomain_ocr_trainer_spa.core.models import EvalMetrics, ModelSidecar
 
 if TYPE_CHECKING:
     from fastapi.testclient import TestClient
 
-    from pd_ocr_trainer_spa.settings import Settings
-    from pd_ocr_trainer_spa.training.fake_runner import FakeLongJobRunner
+    from pdomain_ocr_trainer_spa.settings import Settings
+    from pdomain_ocr_trainer_spa.training.fake_runner import FakeLongJobRunner
 
 
 def _seed_model(settings: Settings) -> str:
@@ -81,7 +81,7 @@ def test_eval_round_trip(
     trained_profile: str,
 ) -> None:
     """Acceptance (spec 07 §8): eval submission → result.json → API renders metrics."""
-    from pd_ocr_trainer_spa.worker import evaluate as eval_worker
+    from pdomain_ocr_trainer_spa.worker import evaluate as eval_worker
 
     model = _seed_model(settings)
     run_id = client.post(

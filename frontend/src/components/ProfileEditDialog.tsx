@@ -1,10 +1,10 @@
 // ProfileEditDialog — create/edit a profile (spec 04 §5).
-// pd-ui exports only the bare Radix Dialog root with no styled sub-parts,
+// pdomain-ui exports only the bare Radix Dialog root with no styled sub-parts,
 // so the modal chrome here is a lightweight controlled overlay using the
-// pd-ui Button / Input / FieldRow primitives for the form fields.
+// pdomain-ui Button / Input / FieldRow primitives for the form fields.
 
 import { useEffect, useState } from "react";
-import { Button, FieldRow, Input } from "@concavetrillion/pd-ui/primitives";
+import { Button, FieldRow, Input } from "@pdomain/pdomain-ui/primitives";
 import {
   TYPEFACE_VALUES,
   type CreateProfilePayload,

@@ -7,6 +7,6 @@ allowBuilds:
 # These were published recently and are known-good; regenerate the lockfile
 # after adding entries here (`pnpm clean --lockfile && pnpm install`).
 minimumReleaseAgeExclude:
-  - "@concavetrillion/pd-ui@0.2.1"
+  - "@pdomain/pdomain-ui@0.2.1"
   - "@tanstack/react-virtual@3.13.26"
   - "@tanstack/virtual-core@3.16.0"

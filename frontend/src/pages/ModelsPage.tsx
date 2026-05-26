@@ -1,7 +1,7 @@
 // ModelsPage — the trained-model registry table (spec 08 §6, route /models).
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Badge, Button, Card } from "@concavetrillion/pd-ui/primitives";
+import { Badge, Button, Card } from "@pdomain/pdomain-ui/primitives";
 import { fetchModels, deleteModel } from "../api/models";
 import type { ModelListItem } from "../api/models";
 

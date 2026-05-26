@@ -1,5 +1,5 @@
 {
-  "name": "pd-ocr-trainer-spa-frontend",
+  "name": "pdomain-ocr-trainer-spa-frontend",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -17,7 +17,7 @@
     "knip": "knip"
   },
   "dependencies": {
-    "@concavetrillion/pd-ui": "^0.2.1",
+    "@pdomain/pdomain-ui": "file:/workspaces/ocr-container/pd-ui/.claude/worktrees/rename-pdomain",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-alert-dialog": "^1.1.0",
     "@radix-ui/react-dialog": "^1.1.0",
