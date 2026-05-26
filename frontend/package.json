@@ -17,7 +17,7 @@
     "knip": "knip"
   },
   "dependencies": {
-    "@pdomain/pdomain-ui": "file:/workspaces/ocr-container/pd-ui/.claude/worktrees/rename-pdomain",
+    "@pdomain/pdomain-ui": "file:../../pd-ui",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-alert-dialog": "^1.1.0",
     "@radix-ui/react-dialog": "^1.1.0",
