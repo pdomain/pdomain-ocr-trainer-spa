@@ -4,10 +4,9 @@ allowBuilds:
   esbuild: true
 
 # Packages excluded from the minimum release age check.
-# These were published recently and are known-good; regenerate the lockfile
-# after adding entries here (`pnpm clean --lockfile && pnpm install`).
+# @pdomain/* packages are published from an internal registry; they are
+# always known-good and need no supply-chain age delay.
 minimumReleaseAgeExclude:
-  - "@pdomain/pdomain-ui@0.2.1"
+  - "@pdomain/pdomain-ui"
   - "@tanstack/react-virtual@3.13.26"
   - "@tanstack/virtual-core@3.16.0"
-  - '@pdomain/pdomain-ui@0.2.2'
