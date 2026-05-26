@@ -138,7 +138,7 @@ frontend-knip: frontend-install ## Run knip dead-export detector
 	cd frontend && $(call _pnpm,run knip)
 
 build: ## Build wheel + sdist (requires frontend-build first)
-	uv run python -m build
+	uv build
 
 e2e: frontend-build ## Run Playwright browser e2e tests (requires chromium)
 	@echo "🌐 Running Playwright e2e tests..."
