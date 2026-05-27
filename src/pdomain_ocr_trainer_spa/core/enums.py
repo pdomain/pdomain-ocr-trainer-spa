@@ -23,7 +23,7 @@ class SplitEnum(str, Enum):
 
 
 class JobState(str, Enum):
-    """Mirrors the pdomain-ocr-ops ``JobStatus.state`` literal exactly (spec 01 §4)."""
+    """Mirrors the pdomain-ops ``JobStatus.state`` literal exactly (spec 01 §4)."""
 
     queued = "queued"
     running = "running"

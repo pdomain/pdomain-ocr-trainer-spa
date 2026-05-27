@@ -1,7 +1,7 @@
 """FakeLongJobRunner — the CI-safe LongJobRunner seam (spec 14-testing §2.1).
 
 Instead of spawning a worker subprocess, it emits a scripted sequence of
-pdomain-ocr-ops JobEvents and advances JobStatus.state through the lifecycle.
+pdomain-ops JobEvents and advances JobStatus.state through the lifecycle.
 No subprocess, no GPU, no torch.
 """
 
@@ -11,8 +11,8 @@ import uuid
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
-from pdomain_ocr_ops.gpu.local_jobs import UnknownJobError
-from pdomain_ocr_ops.gpu.types import JobEvent, JobStatus
+from pdomain_ops.gpu.local_jobs import UnknownJobError
+from pdomain_ops.gpu.types import JobEvent, JobStatus
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
@@ -81,7 +81,7 @@ class FakeLongJobRunner:
     def all_job_ids(self) -> list[str]:
         """Introspection seam — every registered job_id (for active-count).
 
-        The pdomain-ocr-ops ``LongJobRunner`` Protocol has no enumeration method;
+        The pdomain-ops ``LongJobRunner`` Protocol has no enumeration method;
         ``api/jobs.py`` duck-types this when present. ``LocalLongJobRunner``
         gaining an equivalent is a documented M2 follow-up.
         """

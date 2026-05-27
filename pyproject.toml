@@ -14,7 +14,7 @@ license = { text = "Unlicense" }
 requires-python = ">=3.13"
 dependencies = [
     "pdomain-book-tools>=0.14.1",
-    "pdomain-ocr-ops>=0.2.2",
+    "pdomain-ops>=0.3.0",
     # pdomain-ocr-training base install is torch-free: the FastAPI web process
     # imports only the typed config models + ITrainingRunner Protocol.
     # The training worker needs the heavy stack — see the `train` extra.
@@ -62,7 +62,7 @@ explicit = true
 
 [tool.uv.sources]
 pdomain-book-tools = { index = "pdomain-index-pip" }
-pdomain-ocr-ops = { index = "pdomain-index-pip" }
+pdomain-ops = { index = "pdomain-index-pip" }
 pdomain-ocr-training = { index = "pdomain-index-pip" }
 
 [tool.hatch.version]

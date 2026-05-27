@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from pdomain_ocr_ops.gpu.protocols import LongJobRunner
+from pdomain_ops.gpu.protocols import LongJobRunner
 
 from pdomain_ocr_trainer_spa.adapters.auth import IAuth
 from pdomain_ocr_trainer_spa.adapters.dataset_sources import IDatasetSource

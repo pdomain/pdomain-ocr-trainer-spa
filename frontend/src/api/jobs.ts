@@ -11,7 +11,7 @@ export type JobState =
   | "failed"
   | "cancelled";
 
-/** SPA projection of the pdomain-ocr-ops `JobStatus` (GET /api/jobs/{id}). */
+/** SPA projection of the pdomain-ops `JobStatus` (GET /api/jobs/{id}). */
 export interface Job {
   id: string;
   run_id: string | null;

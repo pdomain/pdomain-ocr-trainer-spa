@@ -14,7 +14,7 @@ from typing import TYPE_CHECKING, Any
 from fastapi import Request  # noqa: TC002 — runtime import: FastAPI resolves get_app_state's annotation
 
 if TYPE_CHECKING:
-    from pdomain_ocr_ops.gpu.protocols import LongJobRunner
+    from pdomain_ops.gpu.protocols import LongJobRunner
 
     from pdomain_ocr_trainer_spa.adapters.auth import IAuth
     from pdomain_ocr_trainer_spa.adapters.dataset_sources import IDatasetSource

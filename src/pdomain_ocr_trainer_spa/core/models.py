@@ -184,7 +184,7 @@ class Run(BaseModel):
     """A training/eval/publish run (spec 01-data-models §3, spec 06).
 
     ``id`` is the ULID and the directory name under ``runs/``. ``args`` is the
-    resolved task-specific args dict; ``job_id`` links to the pdomain-ocr-ops
+    resolved task-specific args dict; ``job_id`` links to the pdomain-ops
     ``LongJobRunner`` job that owns the worker subprocess.
     """
 
@@ -206,7 +206,7 @@ class Run(BaseModel):
 
 
 class Job(BaseModel):
-    """SPA projection of the pdomain-ocr-ops ``JobStatus`` (spec 01 §4 / 10 §3).
+    """SPA projection of the pdomain-ops ``JobStatus`` (spec 01 §4 / 10 §3).
 
     The SPA does not own a job runner; ``api/jobs.py`` projects
     ``LongJobRunner.status(job_id)`` onto this model for the frontend and

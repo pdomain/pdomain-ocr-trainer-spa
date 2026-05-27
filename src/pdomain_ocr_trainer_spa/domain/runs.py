@@ -7,7 +7,7 @@ per progress / metric event for chart replay).
 
 This module is torch-free: it builds typed config models via
 ``training/config_build.py`` only for validation and never imports DocTR.
-Run *execution* happens in the worker subprocess supervised by the pdomain-ocr-ops
+Run *execution* happens in the worker subprocess supervised by the pdomain-ops
 ``LongJobRunner`` (D-T1, D-T20).
 """
 

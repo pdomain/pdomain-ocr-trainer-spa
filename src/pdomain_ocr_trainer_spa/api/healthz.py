@@ -1,4 +1,4 @@
-"""Health check shim — /healthz is owned by pdomain-ocr-ops mount_routes.
+"""Health check shim — /healthz is owned by pdomain-ops mount_routes.
 
 This module is a placeholder for any SPA-specific readiness probe
 that may be added in a future milestone.

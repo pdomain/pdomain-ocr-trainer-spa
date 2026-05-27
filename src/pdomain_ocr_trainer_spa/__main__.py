@@ -34,9 +34,9 @@ def _find_available_port_fallback(preferred: int, *, max_attempts: int = 50) -> 
 
 
 def _find_available_port(preferred: int) -> int:
-    """Return an available port, using pdomain-ocr-ops helper when present."""
+    """Return an available port, using pdomain-ops helper when present."""
     try:
-        from pdomain_ocr_ops.suite import (
+        from pdomain_ops.suite import (
             find_available_port,  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
         )
 
@@ -53,7 +53,7 @@ def _pick_port(preferred: int) -> int:
 def _register_self_if_available(*, actual_port: int) -> None:
     """Call register_self with the actual bound port; silently skip if unavailable."""
     try:
-        from pdomain_ocr_ops.suite import register_self
+        from pdomain_ops.suite import register_self
 
         register_self(
             _caller_package="pdomain_ocr_trainer_spa",

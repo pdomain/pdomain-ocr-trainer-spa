@@ -85,13 +85,13 @@ def build_app(settings: Settings) -> FastAPI:
 
     app.add_exception_handler(AppError, app_error_handler)
 
-    # Mount pdomain-ocr-ops suite plumbing: /healthz, /api/suite/*, /api/icons/*
-    # Best-effort — the SPA must still start if pdomain-ocr-ops is unavailable.
+    # Mount pdomain-ops suite plumbing: /healthz, /api/suite/*, /api/icons/*
+    # Best-effort — the SPA must still start if pdomain-ops is unavailable.
     try:
-        from pdomain_ocr_ops.suite.routes import mount_routes
+        from pdomain_ops.suite.routes import mount_routes
 
         mount_routes(app)
-    except Exception:  # noqa: BLE001, S110  # optional dep: SPA must boot without pdomain-ocr-ops
+    except Exception:  # noqa: BLE001, S110  # optional dep: SPA must boot without pdomain-ops
         pass
 
     app.include_router(env_js.router)

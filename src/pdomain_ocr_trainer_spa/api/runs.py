@@ -9,7 +9,7 @@ Routes:
 * ``DELETE /api/runs/{run_id}``        — delete a terminal run
 * ``GET    /api/runs/{run_id}/progress`` — progress.jsonl replay (chart)
 
-The worker subprocess is owned by the pdomain-ocr-ops ``LongJobRunner``; this
+The worker subprocess is owned by the pdomain-ops ``LongJobRunner``; this
 router never imports torch.
 """
 
@@ -19,7 +19,7 @@ import contextlib
 from typing import TYPE_CHECKING, Protocol, cast
 
 from fastapi import APIRouter, Depends
-from pdomain_ocr_ops.gpu.local_jobs import UnknownJobError
+from pdomain_ops.gpu.local_jobs import UnknownJobError
 from pydantic import BaseModel
 
 from pdomain_ocr_trainer_spa.core.app_state import get_app_state

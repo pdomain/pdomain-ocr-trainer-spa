@@ -48,7 +48,7 @@ async def _submit_and_wait(
 
 def test_stub_worker_runs_to_completion(settings: Settings) -> None:
     """A real subprocess running the stub worker drives the job to succeeded."""
-    from pdomain_ocr_ops.gpu.local_jobs import LocalLongJobRunner
+    from pdomain_ops.gpu.local_jobs import LocalLongJobRunner
 
     # Seed a profile + recognition training data so create_run validates.
     from pdomain_ocr_trainer_spa.core.enums import TaskEnum, TypefaceEnum

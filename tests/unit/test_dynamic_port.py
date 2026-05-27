@@ -101,17 +101,17 @@ class TestPickPort:
 
 
 class TestFindAvailablePortDispatch:
-    """Verify _find_available_port uses pdomain-ocr-ops when available."""
+    """Verify _find_available_port uses pdomain-ops when available."""
 
     def test_uses_real_helper_when_present(self) -> None:
-        """When find_available_port exists in pdomain_ocr_ops.suite, it is used."""
+        """When find_available_port exists in pdomain_ops.suite, it is used."""
         mock_fap = MagicMock(return_value=8090)
 
         with patch.dict(
             "sys.modules",
             {
-                "pdomain_ocr_ops": MagicMock(),
-                "pdomain_ocr_ops.suite": MagicMock(find_available_port=mock_fap),
+                "pdomain_ops": MagicMock(),
+                "pdomain_ops.suite": MagicMock(find_available_port=mock_fap),
             },
         ):
             # Force reimport to pick up mocked module
@@ -154,7 +154,7 @@ class TestRegisterSelfIfAvailable:
         mock_suite = MagicMock()
         mock_suite.register_self = fake_register_self
 
-        with patch.dict("sys.modules", {"pdomain_ocr_ops.suite": mock_suite}):
+        with patch.dict("sys.modules", {"pdomain_ops.suite": mock_suite}):
             # Reload to pick up patched module
             import importlib
 
