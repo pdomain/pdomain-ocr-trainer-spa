@@ -34,7 +34,7 @@ endef
         frontend-typecheck frontend-test frontend-build frontend-lint \
         frontend-format frontend-format-check frontend-knip \
         build clean ci ci-full upgrade-deps \
-        openapi-export dev dev-backend dev-frontend doctor mise-trust-worktrees mise-setup \
+        openapi-export dev dev-backend dev-frontend run doctor mise-trust-worktrees mise-setup \
         release-patch release-minor release-major _do-release \
         local-setup local-dev local-check local-upgrade-deps local-run \
         update-pd-deps
@@ -151,18 +151,20 @@ openapi-export: ## Export OpenAPI JSON + generate TypeScript types
 	uv run python -m pdomain_ocr_trainer_spa.scripts.export_openapi
 
 dev: ## Start backend + frontend dev servers concurrently
-	@echo "🚀 Starting backend on :8081 and frontend on :5174"
+	@echo "Starting backend (dynamic port) and frontend on :5174"
 	@trap 'kill 0' EXIT; \
 	$(MAKE) --no-print-directory dev-backend & \
 	$(MAKE) --no-print-directory dev-frontend & \
 	wait
 
-dev-backend: ## Start uvicorn backend (--reload)
-	uv run uvicorn "pdomain_ocr_trainer_spa.bootstrap:build_app" \
-		--factory --host 127.0.0.1 --port 8081 --reload
+dev-backend: ## Start backend with dynamic port selection (--reload)
+	uv run python -m pdomain_ocr_trainer_spa --reload
 
 dev-frontend: ## Start Vite dev server
 	cd frontend && $(call _pnpm,run dev)
+
+run: ## Start the server (dynamic port; for local-run.sh)
+	uv run python -m pdomain_ocr_trainer_spa
 
 doctor: ## Print versions, paths, GPU info, HF token presence
 	@echo "=== pdomain-ocr-trainer-spa doctor ==="
