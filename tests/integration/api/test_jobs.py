@@ -11,7 +11,7 @@ import json
 from typing import TYPE_CHECKING
 
 import pytest
-from pdomain_ocr_ops.gpu.types import JobEvent
+from pdomain_ops.gpu.types import JobEvent
 
 if TYPE_CHECKING:
 

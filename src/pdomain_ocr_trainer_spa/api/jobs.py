@@ -1,6 +1,6 @@
 r"""api/jobs.py — the SPA Job projection + SSE event stream (spec 10).
 
-``pdomain-ocr-ops`` ``mount_routes`` exposes no job routes, so the SPA defines
+``pdomain-ops`` ``mount_routes`` exposes no job routes, so the SPA defines
 ``/api/jobs/*`` itself, wrapping the ``LongJobRunner``:
 
 * ``GET  /api/jobs/{job_id}``         — project ``JobStatus`` onto ``Job``
@@ -8,7 +8,7 @@ r"""api/jobs.py — the SPA Job projection + SSE event stream (spec 10).
 * ``POST /api/jobs/{job_id}/cancel``  — cancel; returns the terminal ``Job``
 * ``GET  /api/jobs/active-count``     — non-terminal job count for the badge
 
-The SPA owns no job runner; it only consumes the ``pdomain-ocr-ops`` contract.
+The SPA owns no job runner; it only consumes the ``pdomain-ops`` contract.
 """
 
 from __future__ import annotations
@@ -17,7 +17,7 @@ from typing import TYPE_CHECKING, cast
 
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import StreamingResponse
-from pdomain_ocr_ops.gpu.local_jobs import UnknownJobError
+from pdomain_ops.gpu.local_jobs import UnknownJobError
 
 from pdomain_ocr_trainer_spa.core.app_state import get_app_state
 from pdomain_ocr_trainer_spa.core.enums import JobState
@@ -27,7 +27,7 @@ from pdomain_ocr_trainer_spa.core.models import Job
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
 
-    from pdomain_ocr_ops.gpu.types import JobEvent, JobStatus
+    from pdomain_ops.gpu.types import JobEvent, JobStatus
 
     from pdomain_ocr_trainer_spa.core.app_state import AppState
 
@@ -61,7 +61,7 @@ def _resolve_run_id(state: AppState, job_id: str) -> str | None:
 
 
 def _project(status: JobStatus, run_id: str | None) -> Job:
-    """Project a pdomain-ocr-ops ``JobStatus`` onto the SPA ``Job`` model."""
+    """Project a pdomain-ops ``JobStatus`` onto the SPA ``Job`` model."""
     return Job(
         id=status.job_id,
         run_id=run_id,
@@ -167,7 +167,7 @@ async def _event_stream(
     runner = state.job_runner
     run_id = _resolve_run_id(state, job_id)
     yield f"retry: {_SSE_RETRY_MS}\n\n"
-    # pdomain-ocr-ops Protocol-shape quirk: stream_events is declared `async def
+    # pdomain-ops Protocol-shape quirk: stream_events is declared `async def
     # -> AsyncIterator` but every impl is an async generator (directly
     # iterable). See docs/process/lint-deviations.md.
     async for event in runner.stream_events(job_id):  # pyright: ignore[reportGeneralTypeIssues]

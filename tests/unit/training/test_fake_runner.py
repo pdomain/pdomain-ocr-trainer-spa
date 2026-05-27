@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
-from pdomain_ocr_ops.gpu.protocols import LongJobRunner
-from pdomain_ocr_ops.gpu.types import JobEvent
+from pdomain_ops.gpu.protocols import LongJobRunner
+from pdomain_ops.gpu.types import JobEvent
 
 from pdomain_ocr_trainer_spa.training.fake_runner import FakeLongJobRunner
 

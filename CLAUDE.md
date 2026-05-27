@@ -6,7 +6,7 @@ Agent guidance for the `pdomain-ocr-trainer-spa` repo.
 
 | target | does |
 |---|---|
-| `make local-setup` | clone any missing sibling pd-* repos (pdomain-book-tools, pdomain-ocr-ops, pdomain-ocr-training, pdomain-ui) |
+| `make local-setup` | clone any missing sibling pd-* repos (pdomain-book-tools, pdomain-ops, pdomain-ocr-training, pdomain-ui) |
 | `make local-dev` | switch to local-dev mode (3 Python siblings editable + pdomain-ui linked + marker) |
 | `make local-check` | print local-dev mode + per-sibling resolution |
 | `make local-upgrade-deps` | upgrade deps then restore editables (local-mode only) |

@@ -170,7 +170,7 @@ doctor: ## Print versions, paths, GPU info, HF token presence
 	@echo "=== pdomain-ocr-trainer-spa doctor ==="
 	@uv run python -c "import sys; print('Python:', sys.version)"
 	@node --version 2>/dev/null && echo "Node: ok" || echo "Node: not found"
-	@uv run python -c "import pdomain_ocr_ops; print('pdomain-ocr-ops:', pdomain_ocr_ops.__version__)" 2>/dev/null || echo "pdomain-ocr-ops: not available"
+	@uv run python -c "import pdomain_ops; print('pdomain-ops:', pdomain_ops.__version__)" 2>/dev/null || echo "pdomain-ops: not available"
 	@uv run python -c "import pdomain_ocr_training; print('pdomain-ocr-training:', pdomain_ocr_training.__version__)" 2>/dev/null || echo "pdomain-ocr-training: not available"
 	@uv run python -c "import torch; print('CUDA:', torch.cuda.is_available(), '| MPS:', getattr(torch.backends, 'mps', None) and torch.backends.mps.is_available())" 2>/dev/null || echo "torch: not installed (expected — worker subprocess only)"
 	@HF_TOKEN=~/.huggingface/token; [ -f "$$HF_TOKEN" ] && echo "HF token: found" || echo "HF token: not found"
@@ -204,7 +204,7 @@ local-upgrade-deps: ## Upgrade deps then restore editable siblings (local-mode o
 local-run: ## Run the server against local-dev workspace (local-mode only)
 	@./scripts/local-run.sh
 
-update-pd-deps: ## Bump all pd-* sibling deps (py: pdomain-book-tools, pdomain-ocr-ops, pdomain-ocr-training; npm: pdomain-ui) to registry latest
+update-pd-deps: ## Bump all pd-* sibling deps (py: pdomain-book-tools, pdomain-ops, pdomain-ocr-training; npm: pdomain-ui) to registry latest
 	@./scripts/update-pd-deps.sh
 
 # ---------------------------------------------------------------------------

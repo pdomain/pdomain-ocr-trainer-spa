@@ -16,7 +16,7 @@ from pdomain_ocr_trainer_spa.core.models import (
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from pdomain_ocr_ops.gpu.types import JobEvent
+    from pdomain_ops.gpu.types import JobEvent
 
 
 class FakeModelRegistry:

@@ -12,7 +12,7 @@
 set -euo pipefail
 
 # ─── Repo-specific config (edit per-repo during M3–M9 rollout) ───────────────
-PY_SIBLINGS=(pdomain-book-tools pdomain-ocr-ops pdomain-ocr-training)
+PY_SIBLINGS=(pdomain-book-tools pdomain-ops pdomain-ocr-training)
 NPM_SIBLINGS=(pdomain-ui)   # without @pdomain/ prefix
 PD_INDEX_PIP="https://pdomain.github.io/pdomain-index-pip"
 PD_INDEX_NPM="https://pdomain.github.io/pdomain-index-npm"

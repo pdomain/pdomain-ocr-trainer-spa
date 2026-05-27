@@ -14,7 +14,7 @@ from pdomain_ocr_trainer_spa.adapters.storage.filesystem import FilesystemStorag
 from pdomain_ocr_trainer_spa.adapters.storage.s3 import S3Storage
 
 if TYPE_CHECKING:
-    from pdomain_ocr_ops.gpu.protocols import LongJobRunner
+    from pdomain_ops.gpu.protocols import LongJobRunner
 
     from pdomain_ocr_trainer_spa.adapters.auth import IAuth
     from pdomain_ocr_trainer_spa.adapters.dataset_sources import IDatasetSource
@@ -58,11 +58,11 @@ def build_model_registry(settings: Settings) -> IModelRegistry:
 
 
 def build_job_runner(settings: Settings) -> LongJobRunner:
-    """Return the pdomain-ocr-ops LongJobRunner selected by ``settings.job_runner_kind``.
+    """Return the pdomain-ops LongJobRunner selected by ``settings.job_runner_kind``.
 
-    The pdomain-ocr-ops LongJobRunner Protocol declares ``stream_events`` as an
+    The pdomain-ops LongJobRunner Protocol declares ``stream_events`` as an
     async method returning an AsyncIterator; every concrete impl (including
-    pdomain-ocr-ops' own LocalLongJobRunner) implements it as an async generator,
+    pdomain-ops' own LocalLongJobRunner) implements it as an async generator,
     which basedpyright sees as a structural mismatch. The ignores below track
     that upstream Protocol-shape quirk — see docs/process/lint-deviations.md.
     """
@@ -70,7 +70,7 @@ def build_job_runner(settings: Settings) -> LongJobRunner:
         from pdomain_ocr_trainer_spa.training.fake_runner import FakeLongJobRunner
 
         return FakeLongJobRunner()  # pyright: ignore[reportReturnType]
-    from pdomain_ocr_ops.gpu.local_jobs import LocalLongJobRunner
+    from pdomain_ops.gpu.local_jobs import LocalLongJobRunner
 
     return LocalLongJobRunner(  # pyright: ignore[reportReturnType]
         db_path=settings.jobs_db_path,

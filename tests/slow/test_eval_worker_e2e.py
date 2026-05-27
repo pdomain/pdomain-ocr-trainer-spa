@@ -43,7 +43,7 @@ async def _submit_and_wait(
 
 def test_eval_round_trip_writes_result_json(settings: Settings) -> None:
     """An eval run via a real subprocess writes result.json the API can read."""
-    from pdomain_ocr_ops.gpu.local_jobs import LocalLongJobRunner
+    from pdomain_ops.gpu.local_jobs import LocalLongJobRunner
 
     from pdomain_ocr_trainer_spa.core.enums import TaskEnum, TypefaceEnum
     from pdomain_ocr_trainer_spa.domain import eval as eval_dom

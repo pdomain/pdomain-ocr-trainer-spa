@@ -1,4 +1,4 @@
-"""Parse the worker's @@PDEVENT@@ stdout protocol into pdomain-ocr-ops JobEvents.
+"""Parse the worker's @@PDEVENT@@ stdout protocol into pdomain-ops JobEvents.
 
 The worker writes one line per pdomain-ocr-training TrainingEvent:
 
@@ -32,7 +32,7 @@ def is_event_line(line: str) -> bool:
 
 
 def parse_event_line(line: str, *, job_id: str, seq: int) -> dict[str, object]:
-    """Parse one @@PDEVENT@@ line into a pdomain-ocr-ops JobEvent-shaped dict.
+    """Parse one @@PDEVENT@@ line into a pdomain-ops JobEvent-shaped dict.
 
     Raises ValueError when the line is not a well-formed event line.
     """
