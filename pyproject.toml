@@ -62,7 +62,7 @@ explicit = true
 
 [tool.uv.sources]
 pdomain-book-tools = { index = "pdomain-index-pip" }
-pdomain-ops = { index = "pdomain-index-pip" }
+pdomain-ops = { path = "/workspaces/ocr-container/pdomain-ops", editable = true }
 pdomain-ocr-training = { index = "pdomain-index-pip" }
 
 [tool.hatch.version]
