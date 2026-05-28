@@ -37,6 +37,7 @@ endef
         openapi-export dev dev-backend dev-frontend run doctor mise-trust-worktrees mise-setup \
         release-patch release-minor release-major _do-release \
         local-setup local-dev local-check local-upgrade-deps local-run \
+        local-setup-py local-frontend-install local-frontend-build \
         update-pd-deps
 
 help: ## Show this help message
@@ -203,6 +204,15 @@ local-upgrade-deps: ## Upgrade deps then restore editable siblings (local-mode o
 
 local-run: ## Run the server against local-dev workspace (local-mode only)
 	@./scripts/local-run.sh
+
+local-setup-py: ## Re-apply editable Python siblings (idempotent)
+	@./scripts/local-setup-py.sh
+
+local-frontend-install: ## frontend-install + restore pnpm link overlays for npm siblings
+	@./scripts/local-frontend-install.sh
+
+local-frontend-build: local-frontend-install ## Vite build using local-linked siblings
+	cd frontend && $(call _pnpm,run build)
 
 update-pd-deps: ## Bump all pd-* sibling deps (py: pdomain-book-tools, pdomain-ops, pdomain-ocr-training; npm: pdomain-ui) to registry latest
 	@./scripts/update-pd-deps.sh

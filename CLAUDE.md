@@ -11,6 +11,9 @@ Agent guidance for the `pdomain-ocr-trainer-spa` repo.
 | `make local-check` | print local-dev mode + per-sibling resolution |
 | `make local-upgrade-deps` | upgrade deps then restore editables (local-mode only) |
 | `make local-run` | run the SPA against local-dev workspace (local-mode only) |
+| `make local-setup-py` | re-apply editable Python siblings (idempotent; called by local-run) |
+| `make local-frontend-install` | pnpm install + restore pnpm link overlay for pdomain-ui |
+| `make local-frontend-build` | Vite build via local-linked siblings (called by local-run) |
 | `make update-pd-deps` | bump pd-* sibling deps to registry latest; leaves diff for review |
 
 See [workspace `docs/process/local-dev.md`](../docs/process/local-dev.md) for the canonical local-dev pattern (spec #362).
