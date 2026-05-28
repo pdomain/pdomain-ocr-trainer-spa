@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
-# scripts/local-run.sh — run repo's CLI/server against the local-dev workspace.
+# scripts/local-run.sh — run the SPA against the local-dev workspace.
 #
-# Requires local-dev mode. Delegates to repo-specific `make run` after the guard.
+# Deliberately does NOT delegate to `make run` — that path runs
+# `frontend-build` → `frontend-install`, the registry path, which would
+# discard the local-link overlay for @pdomain/pdomain-ui.
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 GIT_COMMON_DIR="$(git -C "$REPO_ROOT" rev-parse --path-format=absolute --git-common-dir)"
 CANONICAL_REPO_ROOT="$(dirname "$GIT_COMMON_DIR")"
-# Marker lives in the canonical repo's .venv (shared across worktrees).
 MARKER="$CANONICAL_REPO_ROOT/.venv/.pd-local-mode"
 
 if [[ ! -f "$MARKER" ]]; then
@@ -15,7 +16,8 @@ if [[ ! -f "$MARKER" ]]; then
   exit 1
 fi
 
-# Repo-specific run target
-# UV_NO_SYNC=1: keep editable pd-* siblings; a plain `make run` re-syncs and
-# reverts them to registry versions, breaking unreleased editable APIs at runtime.
-exec env UV_NO_SYNC=1 make -C "$REPO_ROOT" run
+make -C "$REPO_ROOT" local-setup-py
+make -C "$REPO_ROOT" local-frontend-build
+
+# --no-sync REQUIRED: plain `uv run` re-syncs and reverts the editable pd-* siblings.
+exec uv run --no-sync --project "$CANONICAL_REPO_ROOT" python -m pdomain_ocr_trainer_spa ${ARGS:-}
