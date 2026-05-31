@@ -36,7 +36,7 @@ given implementation task.
 - **Citations.** Whenever a spec asserts behaviour drawn from the
   legacy trainer, the labeler-spa, or pgdp-prep, the citation appears
   as `path:line`
-  (e.g. `pd-ocr-trainer/src/pd_ocr_trainer/ui.py:247`).
+  (e.g. `pdomain-ocr-training/src/pdomain_ocr_training/ui.py:247`).
 - **Endpoints.** Always prefixed `/api/...`. Job endpoints use
   `/api/jobs/{job_id}/events` SSE, mirroring the labeler-spa.
 - **Type names.** Wire models share a name with the domain Pydantic

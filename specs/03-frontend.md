@@ -6,7 +6,7 @@ FastAPI wheel in production, served via the Vite dev-server with an
 
 This spec covers the **shell**: routing, state stores, generated API
 client, app chrome, and the page tree — and maps every legacy
-`pd-ocr-trainer` NiceGUI element to a component. Per-feature specs
+`pdomain-ocr-training` NiceGUI element to a component. Per-feature specs
 deepen each piece.
 
 > Required reading: [`00-overview.md`](00-overview.md),
@@ -248,7 +248,7 @@ The app is wrapped in the pdomain-ui `AppShell`:
 ```
 ┌────────────────────────────────────────────────────────────────────┐
 │ AppShell · header  (TopNav + Breadcrumb)                           │
-│  pd-ocr-trainer  [profile: clogaelach ▼]   [⊞ launcher]  v0.x      │
+│  pdomain-ocr-training  [profile: clogaelach ▼]   [⊞ launcher]  v0.x      │
 ├──────────┬─────────────────────────────────────────────────────────┤
 │ rail     │ main: <Outlet />                                        │
 │ Profiles │                                                         │
@@ -384,6 +384,6 @@ Minimum contract:
   `pdomain-ocr-simple-gui` frontends.
 - pdomain-ui component surface: workspace cross-cut design
   (`ocr-container/docs/specs/2026-05-16-cross-cut-design.md` §4, §6).
-- Legacy trainer UI surface: `pd-ocr-trainer/src/pd_ocr_trainer/ui.py`
+- Legacy trainer UI surface: `pdomain-ocr-training/src/pdomain_ocr_training/ui.py`
   + `dataset_ui.py` (profile card, detection card, recognition card,
   output card, dataset section).

@@ -17,7 +17,7 @@ ADR added to [`specs/17-decisions.md`](specs/17-decisions.md).
 ### Q3. Source of training entry points: import or extract?
 
 > **✅ Superseded — resolved by the retirement re-spec (2026-05-21).**
-> Training code is neither imported from the legacy `pd-ocr-trainer`
+> Training code is neither imported from the legacy `pdomain-ocr-training`
 > nor extracted into a `-core` package: it now lives in the
 > `pdomain-ocr-training` library behind the `ITrainingRunner` Protocol
 > (D-T1). The SPA worker imports `pdomain_ocr_training.LocalTrainingRunner`;
@@ -25,20 +25,20 @@ ADR added to [`specs/17-decisions.md`](specs/17-decisions.md).
 > of options (A)/(B)/(C) below apply. **Resolution:** D-T1.
 
 **Context.** The SPA invokes
-`python -m pd_ocr_trainer.train_<task>` from a subprocess
+`python -m pdomain_ocr_training.train_<task>` from a subprocess
 (D-T1). Two ways to get those scripts:
 
 **Options.**
 
-- **(A) Import from existing `pd-ocr-trainer`.** Add it as a Python
+- **(A) Import from existing `pdomain-ocr-training`.** Add it as a Python
   dependency via uv. The SPA's wheel installs it transitively; the
-  `pd-ocr-trainer-ui` script can find `pd_ocr_trainer.train_*` on
+  `pdomain-ocr-trainer-ui` script can find `pdomain_ocr_training.train_*` on
   the PYTHONPATH.
-- **(B) Extract a slim `pd-ocr-trainer-core` package** that holds
+- **(B) Extract a slim `pdomain-ocr-training-core` package** that holds
   only `dataset_store.py`, `train_detect.py`, `train_recog.py`,
   `train_typeface.py` (when it lands), `train_glyph.py`,
-  `utils.py`. The legacy `pd-ocr-trainer` (UI) and the new
-  `pdomain-ocr-trainer-spa` both depend on it. `pd-ocr-trainer-core`
+  `utils.py`. The legacy `pdomain-ocr-training` (UI) and the new
+  `pdomain-ocr-trainer-spa` both depend on it. `pdomain-ocr-training-core`
   ships with no UI dependencies.
 - **(C) Vendor copies inside `pdomain-ocr-trainer-spa`.** Worst — fork.
 
@@ -261,7 +261,7 @@ must parse those into `JobEvent`s.
 - **(A)** `pdomain-ocr-ops` adds a documented subprocess-stdout →
   `JobEvent` parser keyed on the `@@PDEVENT@@` prefix, wired into
   `_supervise`. The canonical contract lives in `pdomain-ocr-ops`; every
-  `pd-*` SPA reusing `submit_with_process` gets progress for free.
+  `pdomain` SPA reusing `submit_with_process` gets progress for free.
 - **(B)** `pdomain-ocr-ops` exposes a public `emit_event(job_id, ...)` API
   and the worker calls back over HTTP/IPC. More moving parts; needs a
   reachable endpoint.
@@ -414,7 +414,7 @@ mentions a CI webhook for regressions. Spec lives where?
 
 - **(A)** `pdomain-ocr-trainer-spa/scripts/regression_alert.py` + a
   README. Single-script, single-repo.
-- **(B)** New `pd-ml-ci/` repo for cross-repo CI helpers.
+- **(B)** New `pdomain-ml-ci/` repo for cross-repo CI helpers.
 
 **Recommendation.** **(A)** until a second consumer appears.
 

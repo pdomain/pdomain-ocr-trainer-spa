@@ -49,7 +49,7 @@ export function AppHeader({ onOpenHelp }: AppHeaderProps): JSX.Element {
           borderBottom: "1px solid var(--border, #ddd)",
         }}
       >
-        <strong>pd-ocr-trainer</strong>
+        <strong>pdomain-ocr-trainer-spa</strong>
         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
           <span data-testid="header-app-version" title="App version">
             v{env.version}

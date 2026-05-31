@@ -38,7 +38,7 @@ endef
         release-patch release-minor release-major _do-release ci-slow \
         local-setup local-dev local-check local-upgrade-deps local-run \
         local-setup-py local-frontend-install local-frontend-build \
-        update-pd-deps
+        update-pdomain-deps
 
 help: ## Show this help message
 	@echo "Available commands:"
@@ -192,7 +192,7 @@ ci-slow: ci-full ## Full pre-flight for releases
 
 # ─── local-dev workflow (spec #362) ─────────────────────────────────────────
 
-local-setup: ## Clone any missing sibling pd-* repos into the workspace
+local-setup: ## Clone any missing sibling pdomain repos into the workspace
 	@./scripts/local-setup.sh
 
 local-dev: ## Switch to local-dev mode (siblings editable + marker)
@@ -216,8 +216,8 @@ local-frontend-install: ## frontend-install + restore pnpm link overlays for npm
 local-frontend-build: local-frontend-install ## Vite build using local-linked siblings
 	cd frontend && $(call _pnpm,run build)
 
-update-pd-deps: ## Bump all pd-* sibling deps (py: pdomain-book-tools, pdomain-ops, pdomain-ocr-training; npm: pdomain-ui) to registry latest
-	@./scripts/update-pd-deps.sh
+update-pdomain-deps: ## Bump all pdomain sibling deps (py: pdomain-book-tools, pdomain-ops, pdomain-ocr-training; npm: pdomain-ui) to registry latest
+	@./scripts/update-pdomain-deps.sh
 
 # ---------------------------------------------------------------------------
 # Releases

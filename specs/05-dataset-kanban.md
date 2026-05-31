@@ -308,7 +308,7 @@ crop-heavy datasets that previews each chip's image, lazy-loaded via
 
 ## 12. Citations
 
-- Legacy column defs: `pd-ocr-trainer/src/pd_ocr_trainer/dataset_ui.py:13-17`.
+- Legacy column defs: `pdomain-ocr-training/src/pdomain_ocr_training/dataset_ui.py:13-17`.
 - Multi-select rules: `dataset_ui.py:61-97`.
 - Existing-pages render + multi-select drag: `dataset_ui.py:230-262`.
 - `ExportManager` save / move semantics: `pdomain-ocr-training/pdomain_ocr_training/datasets.py:242-609`

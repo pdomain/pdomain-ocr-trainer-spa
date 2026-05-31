@@ -23,7 +23,7 @@ The legacy trainer writes model artefacts under:
 
 `<shared-models-dir>` defaults to the OS-aware data dir
 (`get_os_data_parent() / "pd-ml-models"`,
-`pd-ocr-trainer/src/pd_ocr_trainer/dataset_store.py:46`); the SPA
+`pdomain-ocr-training/src/pdomain_ocr_training/dataset_store.py:46`); the SPA
 reads the same `Settings.shared_models_dir`.
 
 The SPA does **not** invent a new directory layout. `IModelRegistry.filesystem`
@@ -94,7 +94,7 @@ every successful train run:
 }
 ```
 
-Verbatim from `pd-ocr-trainer/docs/ROADMAP.md` §Model metadata
+Verbatim from `pdomain-ocr-training/docs/ROADMAP.md` §Model metadata
 sidecar with `args` and `eval` additions for the SPA. Schema is
 **append-only** by convention; new fields land as optional, never
 breaking older readers ([Q6](../OPEN_QUESTIONS.md): explicit
@@ -212,7 +212,7 @@ HF when the user opens the publish dialog.
 
 ## 10. Citations
 
-- Shared-models dir constant: `pd-ocr-trainer/src/pd_ocr_trainer/dataset_store.py:46`.
+- Shared-models dir constant: `pdomain-ocr-training/src/pdomain_ocr_training/dataset_store.py:46`.
 - Model output dir helper: `dataset_store.py:73-74`.
-- Legacy model-name prefixing: `pd-ocr-trainer/src/pd_ocr_trainer/ui.py:247-259`.
-- Sidecar shape: `pd-ocr-trainer/docs/ROADMAP.md` §Model metadata sidecar.
+- Legacy model-name prefixing: `pdomain-ocr-training/src/pdomain_ocr_training/ui.py:247-259`.
+- Sidecar shape: `pdomain-ocr-training/docs/ROADMAP.md` §Model metadata sidecar.

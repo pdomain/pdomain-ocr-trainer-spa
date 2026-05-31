@@ -21,7 +21,7 @@ detection + recognition + (optional) typeface + (optional) glyph
 training data, all aligned, plus a target prefix for trained models.
 The legacy code calls profiles "groups" in the UI and "profiles" in
 the API; we standardize on **profile** everywhere
-(`pd-ocr-trainer/src/pd_ocr_trainer/dataset_store.py:24`).
+(`pdomain-ocr-training/src/pdomain_ocr_training/dataset_store.py:24`).
 
 ```python
 class Profile(BaseModel):
@@ -48,7 +48,7 @@ class ProfileCounts(BaseModel):
 
 ### 1.1 TypefaceEnum
 
-Mirrors `pd-ocr-trainer/docs/ROADMAP.md` §"Typeface enum". Closed.
+Mirrors `pdomain-ocr-training/docs/ROADMAP.md` §"Typeface enum". Closed.
 
 ```python
 class TypefaceEnum(str, Enum):
@@ -147,7 +147,7 @@ class SplitEnum(str, Enum):
   Each line: `{"file_name": "...png", "ligatures": [...], "long_s": bool, "swash": bool}`.
 
 The SPA is a thin wrapper over these shapes — it does not introduce
-a new container format. See `pd-ocr-trainer/docs/DATASETS.md`.
+a new container format. See `pdomain-ocr-training/docs/DATASETS.md`.
 
 ### 2.2 Source pages (Unassigned)
 
@@ -265,7 +265,7 @@ class ModelPaths(BaseModel):
     config: str | None = None
 
 class ModelSidecar(BaseModel):
-    """Verbatim port of pd-ocr-trainer/docs/ROADMAP.md §Model metadata sidecar."""
+    """Verbatim port of pdomain-ocr-training/docs/ROADMAP.md §Model metadata sidecar."""
     name: str
     task: str                     # "detection" | "recognition" | "typeface-classification" | "glyph-classification"
     language: str
@@ -291,7 +291,7 @@ class ModelPublication(BaseModel):
 ### 5.1 Naming convention
 
 Names are emitted by `_prefixed_model_name()` (legacy
-`pd-ocr-trainer/src/pd_ocr_trainer/ui.py:247`). The SPA standardizes
+`pdomain-ocr-training/src/pdomain_ocr_training/ui.py:247`). The SPA standardizes
 on the **new** convention from the trainer ROADMAP §Cross-repo
 dependencies:
 
@@ -372,10 +372,10 @@ interface UserPrefs {
 
 ## 9. Citations
 
-- Profile / dataset roots: `pd-ocr-trainer/src/pd_ocr_trainer/dataset_store.py:18-54`.
+- Profile / dataset roots: `pdomain-ocr-training/src/pdomain_ocr_training/dataset_store.py:18-54`.
 - Profile normalization: `dataset_store.py:62-66`.
 - Existing-by-project grouping: `dataset_store.py:148-165`.
-- Model-name prefix: `pd-ocr-trainer/src/pd_ocr_trainer/ui.py:247`.
-- Sidecar shape: `pd-ocr-trainer/docs/ROADMAP.md` §Model metadata sidecar.
-- Typeface enum: `pd-ocr-trainer/docs/ROADMAP.md` §Typeface enum.
-- HF dataset shapes: `pd-ocr-trainer/docs/DATASETS.md` §Dataset shapes.
+- Model-name prefix: `pdomain-ocr-training/src/pdomain_ocr_training/ui.py:247`.
+- Sidecar shape: `pdomain-ocr-training/docs/ROADMAP.md` §Model metadata sidecar.
+- Typeface enum: `pdomain-ocr-training/docs/ROADMAP.md` §Typeface enum.
+- HF dataset shapes: `pdomain-ocr-training/docs/DATASETS.md` §Dataset shapes.

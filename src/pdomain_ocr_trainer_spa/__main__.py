@@ -1,7 +1,7 @@
 """Entry point for pdomain-ocr-trainer-spa.
 
 Usage:
-    pd-ocr-trainer-ui [--host HOST] [--port PORT] [--no-browser] [--log-level LEVEL]
+    pdomain-ocr-trainer-ui [--host HOST] [--port PORT] [--no-browser] [--log-level LEVEL]
 
 Port selection priority (highest to lowest):
     1. --port CLI flag

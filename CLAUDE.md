@@ -6,7 +6,7 @@ Agent guidance for the `pdomain-ocr-trainer-spa` repo.
 
 | target | does |
 |---|---|
-| `make local-setup` | clone any missing sibling pd-* repos (pdomain-book-tools, pdomain-ops, pdomain-ocr-training, pdomain-ui) |
+| `make local-setup` | clone any missing sibling pdomain repos (pdomain-book-tools, pdomain-ops, pdomain-ocr-training, pdomain-ui) |
 | `make local-dev` | switch to local-dev mode (3 Python siblings editable + pdomain-ui linked + marker) |
 | `make local-check` | print local-dev mode + per-sibling resolution |
 | `make local-upgrade-deps` | upgrade deps then restore editables (local-mode only) |
@@ -14,7 +14,7 @@ Agent guidance for the `pdomain-ocr-trainer-spa` repo.
 | `make local-setup-py` | re-apply editable Python siblings (idempotent; called by local-run) |
 | `make local-frontend-install` | pnpm install + restore pnpm link overlay for pdomain-ui |
 | `make local-frontend-build` | Vite build via local-linked siblings (called by local-run) |
-| `make update-pd-deps` | bump pd-* sibling deps to registry latest; leaves diff for review |
+| `make update-pdomain-deps` | bump pdomain sibling deps to registry latest; leaves diff for review |
 
 See [workspace `docs/process/local-dev.md`](../docs/process/local-dev.md) for the canonical local-dev pattern (spec #362).
 

@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "pdomain-ocr-trainer-spa"
 dynamic = ["version"]
-description = "FastAPI + React SPA for OCR model training — replaces pd-ocr-trainer NiceGUI UI"
+description = "FastAPI + React SPA for OCR model training — replaces pdomain-ocr-training NiceGUI UI"
 authors = [
     { name = "CT", email = "concavetrillion@gmail.com" }
 ]
@@ -32,7 +32,7 @@ dependencies = [
 train = ["pdomain-ocr-training[train]"]
 
 [project.scripts]
-pd-ocr-trainer-ui = "pdomain_ocr_trainer_spa.__main__:main"
+pdomain-ocr-trainer-ui = "pdomain_ocr_trainer_spa.__main__:main"
 
 [project.urls]
 Homepage = "https://github.com/pdomain/pdomain-ocr-trainer-spa"

@@ -6,7 +6,7 @@ how the SPA renders results, and how glyph-feature slicing
 
 > Required reading: [`01-data-models.md`](01-data-models.md) §3,
 > [`06-training-runs.md`](06-training-runs.md) (eval shares the run
-> machinery), `pd-ocr-trainer/docs/specs/glyph-annotation-eval-slicing.md`
+> machinery), `pdomain-ocr-training/docs/specs/glyph-annotation-eval-slicing.md`
 > (the underlying spec; this doc adapts it to the SPA surface).
 
 ---
@@ -131,7 +131,7 @@ Recognition eval only. Activated by
 `EvalRequest.slice_glyph_features: true`.
 
 Slicing rules (verbatim from
-`pd-ocr-trainer/docs/specs/glyph-annotation-eval-slicing.md`):
+`pdomain-ocr-training/docs/specs/glyph-annotation-eval-slicing.md`):
 
 - For each binary feature `f` in
   `{ligature:<kind>, long_s, swash}`:
@@ -247,7 +247,7 @@ Spec for the webhook lives outside this repo
 
 ## 9. Citations
 
-- Eval-slicing motivation + math: `pd-ocr-trainer/docs/specs/glyph-annotation-eval-slicing.md`.
+- Eval-slicing motivation + math: `pdomain-ocr-training/docs/specs/glyph-annotation-eval-slicing.md`.
 - Glyph data model: `pdomain-book-tools` `GlyphAnnotations` (cross-repo).
 - Detection eval shape: existing `train_detect.py` post-train eval
   pass.

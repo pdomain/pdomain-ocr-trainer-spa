@@ -7,7 +7,7 @@ repo: pdomain/pdomain-ocr-trainer-spa
 
 # pdomain-ocr-trainer-spa Milestone Roadmap
 
-This plan tracks the 15 implementation milestones (M0–M14) for `pdomain-ocr-trainer-spa`, the FastAPI + React/Vite/TypeScript replacement for the legacy NiceGUI `pd-ocr-trainer`. Milestones M0–M3 are infrastructure (no domain UI); M4–M9 are vertical slices (one page + its backend routes); M10–M14 are post-core-parity ROADMAP milestones gated on upstream readiness. Each milestone is bounded to approximately one coding session with concrete acceptance tests. See `specs/16-milestones.md` for the milestone spec and `specs/02`–`specs/19` for the authoritative per-area design (the post-2026-05-21 re-spec onto the pdomain-ui / pdomain-ocr-ops / pdomain-ocr-training stack supersedes any stale impl detail in `16-milestones.md`).
+This plan tracks the 15 implementation milestones (M0–M14) for `pdomain-ocr-trainer-spa`, the FastAPI + React/Vite/TypeScript replacement for the legacy NiceGUI `pdomain-ocr-training`. Milestones M0–M3 are infrastructure (no domain UI); M4–M9 are vertical slices (one page + its backend routes); M10–M14 are post-core-parity ROADMAP milestones gated on upstream readiness. Each milestone is bounded to approximately one coding session with concrete acceptance tests. See `specs/16-milestones.md` for the milestone spec and `specs/02`–`specs/19` for the authoritative per-area design (the post-2026-05-21 re-spec onto the pdomain-ui / pdomain-ocr-ops / pdomain-ocr-training stack supersedes any stale impl detail in `16-milestones.md`).
 
 ---
 
@@ -16,7 +16,7 @@ model: sonnet  effort: M  area: infra
 
 Context: M0 bootstraps the entire `pdomain-ocr-trainer-spa` repo: pyproject.toml, uv.lock, Makefile, mise.toml, pre-commit, Dockerfile, GitHub Actions workflows (ci/release/nightly), the FastAPI backend skeleton (healthz, env.js, static mount), and a minimal React/Vite/TS frontend serving a static "Hello" SPA. No domain logic is introduced. M0 was already shipped via retirement-plan issue #282 (Scaffold pdomain-ocr-trainer-spa repo); its GH issue will be created then immediately closed on sync.
 Approach: Bootstrap the full repo scaffold modelled on a shipped peer SPA, wiring `pdomain-ui`, `pdomain-ocr-ops`, and `pdomain-ocr-training` as dependencies; add SPA-serving contract tests.
-Verification: `make ci` green; `pd-ocr-trainer-ui --no-browser --port 8081 --host 127.0.0.1` serves 200 at `/healthz` and `/`
+Verification: `make ci` green; `pdomain-ocr-trainer-ui --no-browser --port 8081 --host 127.0.0.1` serves 200 at `/healthz` and `/`
 Acceptance:
 - [ ] `make ci` green (backend lint/typecheck/test + frontend install/test)
 - [ ] `tests/test_routes_root.py` passes with monkeypatch (no real frontend build required)
@@ -143,7 +143,7 @@ Approach: Write `tests/e2e/test_driver_contract.py` covering all driver-contract
 Verification: `tests/e2e/test_driver_contract.py` green; manual coexistence check passes
 Acceptance:
 - [ ] Conformance test green
-- [ ] Manual: side-by-side legacy + new `pd-ocr-trainer-ui` against the same `ml-training/` do not collide (different ports, different env-var prefixes)
+- [ ] Manual: side-by-side legacy + new `pdomain-ocr-trainer-ui` against the same `ml-training/` do not collide (different ports, different env-var prefixes)
 
 ---
 

@@ -25,7 +25,7 @@ ROADMAP-driven (HF, classifier tasks, glyph).
 ## M0 — Repo scaffold  ✅ shipped (retirement plan #282)
 
 **Outcome.** A repo that lints, type-checks, boots
-`pd-ocr-trainer-ui` and serves a static "Hello" SPA. No domain
+`pdomain-ocr-trainer-ui` and serves a static "Hello" SPA. No domain
 logic.
 
 **Files to create.**
@@ -79,7 +79,7 @@ styling comes from `pdomain-ui` (D-T19), not Tailwind/shadcn.
 - `tests/test_routes_root.py` passes with monkeypatch — no real
   frontend build required (the workspace SPA-serving contract).
 - `pdomain-ui`, `pdomain-ocr-ops`, `pdomain-ocr-training` listed as dependencies.
-- `pd-ocr-trainer-ui --no-browser --port 8081 --host 127.0.0.1`
+- `pdomain-ocr-trainer-ui --no-browser --port 8081 --host 127.0.0.1`
   responds 200 at `/healthz` and serves index.html at `/`.
 - GitHub repo created and configured (`allow_squash_merge=false`).
 
@@ -318,8 +318,8 @@ a "switching from legacy trainer" section.
 
 **Acceptance.**
 - Conformance test green.
-- Manual: a side-by-side run of legacy `pd-ocr-trainer-ui` and new
-  `pd-ocr-trainer-ui` against the same `ml-training/` does not
+- Manual: a side-by-side run of legacy `pdomain-ocr-trainer-ui` and new
+  `pdomain-ocr-trainer-ui` against the same `ml-training/` does not
   step on each other (different ports, different env-var prefixes).
 
 **Pre-conditions.** M8.

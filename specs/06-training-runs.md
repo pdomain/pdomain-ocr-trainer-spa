@@ -13,7 +13,7 @@ this surface; per-task differences are §5.
 > `pdomain-ocr-training` + `pdomain-ocr-ops` stack (D-T1, D-T20). A training
 > run now drives `pdomain-ocr-training`'s `ITrainingRunner` inside a
 > worker subprocess supervised by the `pdomain-ocr-ops` `LongJobRunner`.
-> The original raw-`pd-ocr-trainer` subprocess and the per-task
+> The original raw-`pdomain-ocr-training` subprocess and the per-task
 > stdout regex parser are superseded — progress now arrives as
 > structured `TrainingEvent`s, not parsed log lines.
 
@@ -262,7 +262,7 @@ file hits the cap. ([Q13](../OPEN_QUESTIONS.md))
 - Multi-head sigmoid; one head per feature in `feature_heads`.
 - Per-feature precision / recall surface as separate `metric` events.
 - Eval gate: per-feature precision ≥ 0.99 for "auto-fill", recall
-  ≥ 0.9 for "suggest" — mirrors `pd-ocr-trainer/docs/ROADMAP.md` (g2).
+  ≥ 0.9 for "suggest" — mirrors `pdomain-ocr-training/docs/ROADMAP.md` (g2).
 
 ---
 
@@ -394,4 +394,4 @@ A `TrainingEvent` of `kind="error"` carries `<ExcType>: <msg>` in
   `pdomain-ocr-ops/pdomain_ocr_ops/gpu/local_jobs.py:104-179`.
 - Crash-recovery model: `pdomain-ocr-labeler-spa/specs/10-jobs-and-sse.md`.
 - Trainer ROADMAP for typeface (a.5) and glyph (g1)/(g2):
-  `pd-ocr-trainer/docs/ROADMAP.md`.
+  `pdomain-ocr-training/docs/ROADMAP.md`.

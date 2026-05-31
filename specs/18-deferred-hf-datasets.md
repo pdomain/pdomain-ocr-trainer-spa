@@ -2,7 +2,7 @@
 
 > **Status: ⏸ Deferred — post-core-parity (Phase 3).**
 > Nothing in this spec is part of the core-parity milestone set
-> (M0–M9). It is carried forward from the legacy `pd-ocr-trainer`
+> (M0–M9). It is carried forward from the legacy `pdomain-ocr-training`
 > roadmap (`docs/plans/roadmap.md`) so the design survives that
 > repo's archival, and is **blocked on core-parity completion** —
 > the SPA must reach functional parity with the legacy NiceGUI
@@ -136,7 +136,7 @@ M10/M11, none block core parity.
 
 ## 5. Citations
 
-- Legacy roadmap (HF-datasets, milestones a–d): `pd-ocr-trainer/docs/plans/roadmap.md:84-155`.
+- Legacy roadmap (HF-datasets, milestones a–d): `pdomain-ocr-training/docs/plans/roadmap.md:84-155`.
 - Headline decisions: `roadmap.md:10-19`.
 - Model metadata sidecar: `roadmap.md:315-334`.
 - Per-row licensing note: `roadmap.md:312-313`.

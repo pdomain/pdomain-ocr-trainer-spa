@@ -10,7 +10,7 @@ any of these require a new entry, not a silent edit to a per-area spec.
 > **Re-spec note.** D-T1, D-T3, D-T9, D-T10 were revised — and D-T19–D-T22
 > added — when the SPA was re-spec'd onto the `pdomain-ui` + `pdomain-ocr-ops` +
 > `pdomain-ocr-training` stack (cross-cut retirement design, 2026-05-21). The
-> original D-T1 (training as raw subprocess calls into `pd-ocr-trainer`)
+> original D-T1 (training as raw subprocess calls into `pdomain-ocr-training`)
 > and the rejected shadcn/ui+Tailwind frontend choice are superseded.
 
 ---
@@ -44,7 +44,7 @@ directly. Simpler wiring, but gives up CUDA isolation and hard
 cancellation and loads `torch` into the web process — all three of the
 reasons above.
 
-**Rejected (original D-T1).** Raw `python -m pd_ocr_trainer.train_<task>`
+**Rejected (original D-T1).** Raw `python -m pdomain_ocr_training.train_<task>`
 subprocess calls into the legacy repo. The legacy repo is being retired;
 training code now lives behind `ITrainingRunner` in `pdomain-ocr-training`.
 
@@ -267,7 +267,7 @@ starts, normal commit hygiene applies.)
 ## D-T18. Workspace .gitignore tracks the new repo
 
 **Decided.** `pdomain-ocr-trainer-spa/` is in the workspace `.gitignore`
-alongside the other `pd-*` repos so the workspace's own git stays clean.
+alongside the other `pdomain` repos so the workspace's own git stays clean.
 
 **Why.** Mirrors labeler-spa precedent.
 
@@ -305,7 +305,7 @@ registry, per-job status, and an SSE event stream. The SPA does not
 hand-roll a `core/job_runner.py`.
 
 **Why.** `pdomain-ocr-ops` is the workspace-standard ops library; its
-`LongJobRunner` is the canonical long-job seam every `pd-*` SPA backend
+`LongJobRunner` is the canonical long-job seam every `pdomain` SPA backend
 uses. Reusing it removes duplicated job-lifecycle code and a class of
 restart/SSE bugs.
 

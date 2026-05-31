@@ -1471,7 +1471,7 @@ wheels = [
 
 [[package]]
 name = "pdomain-book-tools"
-version = "0.14.2"
+version = "0.15.3"
 source = { registry = "https://pdomain.github.io/pdomain-index-pip/simple/" }
 dependencies = [
     { name = "huggingface-hub" },
@@ -1495,9 +1495,9 @@ dependencies = [
     { name = "torchvision" },
     { name = "transformers" },
 ]
-sdist = { url = "https://github.com/pdomain/pdomain-book-tools/releases/download/v0.14.2/pdomain_book_tools-0.14.2.tar.gz" }
+sdist = { url = "https://github.com/pdomain/pdomain-book-tools/releases/download/v0.15.3/pdomain_book_tools-0.15.3.tar.gz", hash = "sha256:7197ac5ebb82397bca78298a70ee7713d104b1c467ffe4ee4fa183acacc9b5b6" }
 wheels = [
-    { url = "https://github.com/pdomain/pdomain-book-tools/releases/download/v0.14.2/pdomain_book_tools-0.14.2-py3-none-any.whl" },
+    { url = "https://github.com/pdomain/pdomain-book-tools/releases/download/v0.15.3/pdomain_book_tools-0.15.3-py3-none-any.whl", hash = "sha256:f93eeb5732d061e9d7ccb4787232db820b2eeb0de78146ceb363ffc8052adba0" },
 ]
 
 [[package]]
@@ -1575,9 +1575,9 @@ dependencies = [
     { name = "tomli" },
     { name = "tomli-w" },
 ]
-sdist = { url = "https://github.com/pdomain/pdomain-ocr-training/releases/download/v0.2.3/pdomain_ocr_training-0.2.3.tar.gz" }
+sdist = { url = "https://github.com/pdomain/pdomain-ocr-training/releases/download/v0.2.3/pdomain_ocr_training-0.2.3.tar.gz", hash = "sha256:4a827b3096370549eba072081e69c5c655b1340bf7ba4efbeb796a4ba6efad9b" }
 wheels = [
-    { url = "https://github.com/pdomain/pdomain-ocr-training/releases/download/v0.2.3/pdomain_ocr_training-0.2.3-py3-none-any.whl" },
+    { url = "https://github.com/pdomain/pdomain-ocr-training/releases/download/v0.2.3/pdomain_ocr_training-0.2.3-py3-none-any.whl", hash = "sha256:80f7a2afcacd234af3e85abafed02a5ad8f0a1b37cecbc3d9279d3dbcda58eea" },
 ]
 
 [package.optional-dependencies]
@@ -1610,7 +1610,7 @@ requires-dist = [
     { name = "filelock", specifier = ">=3.13" },
     { name = "httpx", specifier = ">=0.27" },
     { name = "modal", marker = "extra == 'modal'", specifier = ">=0.66" },
-    { name = "pdomain-book-tools", specifier = ">=0.14.1", index = "https://pdomain.github.io/pdomain-index-pip/simple/" },
+    { name = "pdomain-book-tools", specifier = ">=0.15.1", index = "https://pdomain.github.io/pdomain-index-pip/simple/" },
     { name = "platformdirs", specifier = ">=4.2" },
     { name = "pydantic", specifier = ">=2.5" },
     { name = "tomli", specifier = ">=2.0" },

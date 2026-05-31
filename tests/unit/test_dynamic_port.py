@@ -18,7 +18,6 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -56,7 +55,7 @@ class TestBootstrapSpaArgs:
 
     def test_default_preferred_port(self) -> None:
         """With no --port flag, preferred=DEFAULT_PORT (8081)."""
-        bootstrap_mock, _ = _run_main(["pd-ocr-trainer-ui", "--no-browser"])
+        bootstrap_mock, _ = _run_main(["pdomain-ocr-trainer-ui", "--no-browser"])
 
         bootstrap_mock.assert_called_once()
         _, kwargs = bootstrap_mock.call_args
@@ -64,35 +63,35 @@ class TestBootstrapSpaArgs:
 
     def test_cli_port_sets_preferred(self) -> None:
         """--port 9200 passes preferred=9200 to bootstrap_spa."""
-        bootstrap_mock, _ = _run_main(["pd-ocr-trainer-ui", "--port", "9200", "--no-browser"])
+        bootstrap_mock, _ = _run_main(["pdomain-ocr-trainer-ui", "--port", "9200", "--no-browser"])
 
         _, kwargs = bootstrap_mock.call_args
         assert kwargs["preferred"] == 9200
 
     def test_caller_package(self) -> None:
         """caller_package is always 'pdomain_ocr_trainer_spa'."""
-        bootstrap_mock, _ = _run_main(["pd-ocr-trainer-ui", "--no-browser"])
+        bootstrap_mock, _ = _run_main(["pdomain-ocr-trainer-ui", "--no-browser"])
 
         _, kwargs = bootstrap_mock.call_args
         assert kwargs["caller_package"] == "pdomain_ocr_trainer_spa"
 
     def test_port_env_forwarded(self) -> None:
         """port_env='PD_OCR_TRAINER_SPA_PORT' is forwarded to bootstrap_spa."""
-        bootstrap_mock, _ = _run_main(["pd-ocr-trainer-ui", "--no-browser"])
+        bootstrap_mock, _ = _run_main(["pdomain-ocr-trainer-ui", "--no-browser"])
 
         _, kwargs = bootstrap_mock.call_args
         assert kwargs["port_env"] == "PD_OCR_TRAINER_SPA_PORT"
 
     def test_host_forwarded(self) -> None:
         """--host is forwarded to bootstrap_spa."""
-        bootstrap_mock, _ = _run_main(["pd-ocr-trainer-ui", "--host", "0.0.0.0", "--no-browser"])  # noqa: S104
+        bootstrap_mock, _ = _run_main(["pdomain-ocr-trainer-ui", "--host", "0.0.0.0", "--no-browser"])
 
         _, kwargs = bootstrap_mock.call_args
-        assert kwargs["host"] == "0.0.0.0"  # noqa: S104
+        assert kwargs["host"] == "0.0.0.0"
 
     def test_default_host(self) -> None:
         """Default host is 127.0.0.1."""
-        bootstrap_mock, _ = _run_main(["pd-ocr-trainer-ui", "--no-browser"])
+        bootstrap_mock, _ = _run_main(["pdomain-ocr-trainer-ui", "--no-browser"])
 
         _, kwargs = bootstrap_mock.call_args
         assert kwargs["host"] == "127.0.0.1"
@@ -108,7 +107,7 @@ class TestPortPropagation:
     def test_bound_port_passed_to_uvicorn(self) -> None:
         """uvicorn.run receives the port returned by bootstrap_spa."""
         bound = 9055
-        _, uvicorn_mock = _run_main(["pd-ocr-trainer-ui", "--no-browser"], bound_port=bound)
+        _, uvicorn_mock = _run_main(["pdomain-ocr-trainer-ui", "--no-browser"], bound_port=bound)
 
         _, kwargs = uvicorn_mock.call_args
         assert kwargs["port"] == bound
@@ -123,7 +122,7 @@ class TestPortPropagation:
         with (
             patch("pdomain_ocr_trainer_spa.__main__.bootstrap_spa", return_value=bound),
             patch.object(uvicorn, "run"),
-            patch("sys.argv", ["pd-ocr-trainer-ui", "--no-browser"]),
+            patch("sys.argv", ["pdomain-ocr-trainer-ui", "--no-browser"]),
             patch("pdomain_ocr_trainer_spa.bootstrap.build_app", return_value=MagicMock()),
             patch("pdomain_ocr_trainer_spa.settings.Settings", settings_cls),
         ):
@@ -147,7 +146,7 @@ class TestCliFlagBehaviour:
         monkeypatch.setenv("PD_OCR_TRAINER_SPA_PORT", "9100")
 
         bootstrap_mock, _ = _run_main(
-            ["pd-ocr-trainer-ui", "--port", "9200", "--no-browser"],
+            ["pdomain-ocr-trainer-ui", "--port", "9200", "--no-browser"],
         )
 
         _, kwargs = bootstrap_mock.call_args
@@ -158,7 +157,7 @@ class TestCliFlagBehaviour:
         """When only env var is set (no --port), preferred=DEFAULT_PORT; bootstrap_spa owns env resolution."""
         monkeypatch.setenv("PD_OCR_TRAINER_SPA_PORT", "9100")
 
-        bootstrap_mock, _ = _run_main(["pd-ocr-trainer-ui", "--no-browser"])
+        bootstrap_mock, _ = _run_main(["pdomain-ocr-trainer-ui", "--no-browser"])
 
         _, kwargs = bootstrap_mock.call_args
         assert kwargs["preferred"] == 8081  # DEFAULT_PORT

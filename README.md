@@ -1,7 +1,7 @@
 # pdomain-ocr-trainer-spa
 
 FastAPI + React/Vite/TS replacement for the NiceGUI-based
-[`pd-ocr-trainer`](../pd-ocr-trainer/) UI. Same training and dataset
+[`pdomain-ocr-training`](../pdomain-ocr-training/) UI. Same training and dataset
 machinery, web SPA front-end, structurally modelled on
 [`pdomain-ocr-labeler-spa`](../pdomain-ocr-labeler-spa/) and
 [`pdomain-prep-for-pgdp`](../pdomain-prep-for-pgdp/).
@@ -18,7 +18,7 @@ recognition + typeface-classifier + glyph-classifier training runs,
 evaluation slicing, model registry, and Hugging Face dataset / model
 publishing.
 
-The legacy `pd-ocr-trainer` keeps working unchanged until parity ships
+The legacy `pdomain-ocr-training` keeps working unchanged until parity ships
 here. Both consume and emit the same on-disk shapes
 (`ml-training/<profile>/{detection,recognition}/`,
 `ml-validation/<profile>/...`, `matched-ocr/`, the `dist/` model
@@ -37,4 +37,4 @@ Open questions live in [`OPEN_QUESTIONS.md`](OPEN_QUESTIONS.md).
 
 ## License
 
-Same as the other `pd-*` repos. See `LICENSE` once it lands.
+Same as the other `pdomain` repos. See `LICENSE` once it lands.

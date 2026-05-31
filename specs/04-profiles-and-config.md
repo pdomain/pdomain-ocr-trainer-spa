@@ -368,4 +368,4 @@ mutations invalidate `["profiles"]` / `["profile", name]`.
 - Custom-characters seed: `pdomain_book_tools.ocr.doctr_support.DEFAULT_CUSTOM_CHARACTERS`.
 - GPU device selection: `pdomain-ocr-ops/pdomain_ocr_ops/gpu` (`pick_device`).
 - Historical origin of the config knobs (legacy, repo being
-  retired): `pd-ocr-trainer/src/pd_ocr_trainer/ui.py:74-318`.
+  retired): `pdomain-ocr-training/src/pdomain_ocr_training/ui.py:74-318`.

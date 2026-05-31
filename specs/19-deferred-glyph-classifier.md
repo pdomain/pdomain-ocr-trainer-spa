@@ -2,7 +2,7 @@
 
 > **Status: ⏸ Deferred — post-core-parity (Phase 3).**
 > Nothing in this spec is part of the core-parity milestone set
-> (M0–M9). It is carried forward from the legacy `pd-ocr-trainer`
+> (M0–M9). It is carried forward from the legacy `pdomain-ocr-training`
 > roadmap (`docs/plans/roadmap.md` §Glyph-annotation milestones) so
 > the design survives that repo's archival, and is **blocked on
 > core-parity completion** plus upstream readiness (see §4).
@@ -118,10 +118,10 @@ The SPA waits on all of these; it does not build ahead of them.
 ## 5. Citations
 
 - Legacy roadmap, glyph milestones (g1)/(g2) + taxonomy preamble:
-  `pd-ocr-trainer/docs/plans/roadmap.md:157-210`.
+  `pdomain-ocr-training/docs/plans/roadmap.md:157-210`.
 - Referenced legacy design specs (in the repo being archived):
-  `pd-ocr-trainer/docs/specs/glyph-annotation-eval-slicing.md`,
-  `pd-ocr-trainer/docs/specs/glyph-feature-classifier.md`.
+  `pdomain-ocr-training/docs/specs/glyph-annotation-eval-slicing.md`,
+  `pdomain-ocr-training/docs/specs/glyph-feature-classifier.md`.
 - SPA adaptation: [`06-training-runs.md`](06-training-runs.md) §5.4,
   [`07-evaluation-and-metrics.md`](07-evaluation-and-metrics.md) §4,
   [`16-milestones.md`](16-milestones.md) M13–M14.

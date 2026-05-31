@@ -5,7 +5,7 @@ and the HF publish path (datasets / models pushed to repos under
 the user's HF namespace). Both wrap `huggingface_hub` and
 `datasets`; the SPA never invents new HF concepts.
 
-> Required reading: `pd-ocr-trainer/docs/DATASETS.md` (the
+> Required reading: `pdomain-ocr-training/docs/DATASETS.md` (the
 > cross-repo dataset contract — this spec adapts it to the SPA).
 
 ---
@@ -48,7 +48,7 @@ Instead:
 - Missing token → adapter raises `IDatasetSource.AuthError`; SPA
   renders a banner: "HF token not found at `<path>`. Place a token
   there or set `PD_OCR_TRAINER_SPA_HF_TOKEN_PATH`." with a link to
-  `pd-ocr-trainer/docs/DATASETS.md#authentication`.
+  `pdomain-ocr-training/docs/DATASETS.md#authentication`.
 - The token is **never** shipped over the wire to the SPA; the
   frontend has no awareness of its value.
 
@@ -78,7 +78,7 @@ class HuggingFaceDatasetSource(IDatasetSource):
         ...
 ```
 
-Mapping rules (mirrors `pd-ocr-trainer/docs/DATASETS.md` §Dataset shapes):
+Mapping rules (mirrors `pdomain-ocr-training/docs/DATASETS.md` §Dataset shapes):
 
 | HF shape | Internal task | Materialization |
 |---|---|---|
@@ -246,8 +246,8 @@ user explicitly clicks "Refresh".
 
 ## 10. Citations
 
-- Cross-repo dataset spec: `pd-ocr-trainer/docs/DATASETS.md`.
-- Trainer ROADMAP HF milestones: `pd-ocr-trainer/docs/ROADMAP.md`
+- Cross-repo dataset spec: `pdomain-ocr-training/docs/DATASETS.md`.
+- Trainer ROADMAP HF milestones: `pdomain-ocr-training/docs/ROADMAP.md`
   §(a), (b), (c), (d).
 - Existing `push_to_hf_hub` codepath: `train_detect.py` and
   `train_recog.py` (search for `push_to_hf_hub`).

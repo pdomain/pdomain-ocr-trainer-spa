@@ -25,7 +25,7 @@ pdomain-ocr-trainer-spa/
 │   └── spa_check.py                (build-time assertion: SPA bytes are inside the wheel)
 ├── .github/workflows/
 │   ├── ci.yml                      (every PR: lint, test, e2e, wheel-build)
-│   ├── release.yml                 (on tag: build wheel + sdist, attach to GH Release, push to pd-index)
+│   ├── release.yml                 (on tag: build wheel + sdist, attach to GH Release, push to pdomain-index)
 │   └── nightly.yml                 (slow tests + HF mock refresh)
 ├── .pre-commit-config.yaml
 ├── .gitignore
@@ -136,10 +136,10 @@ Two paths:
 
 ```
 uv tool install ./dist/pdomain_ocr_trainer_spa-*.whl
-pd-ocr-trainer-ui --port 8081
+pdomain-ocr-trainer-ui --port 8081
 ```
 
-### 6.2 `uv tool install` from the pd-index PEP 503 index
+### 6.2 `uv tool install` from the pdomain-index PEP 503 index
 
 Per workspace `project_release_strategy.md` memory:
 
@@ -147,14 +147,14 @@ Per workspace `project_release_strategy.md` memory:
 uv tool install --index https://pdomain.github.io/pdomain-index-pip pdomain-ocr-trainer-spa
 ```
 
-The `pd-index` repo isn't built yet — when it lands, this repo's
+The `pdomain-index` repo isn't built yet — when it lands, this repo's
 `release.yml` pushes wheels there in addition to the GitHub
 Release attachment.
 
 ### 6.3 Bash + PowerShell installers
 
 `install.sh` / `install.ps1` shell out to `uv tool install` with
-the `pd-index` URL. Mirrors the labeler-spa installers.
+the `pdomain-index` URL. Mirrors the labeler-spa installers.
 
 ---
 
@@ -164,7 +164,7 @@ the `pd-index` URL. Mirrors the labeler-spa installers.
 
 ```toml
 [project.scripts]
-pd-ocr-trainer-ui = "pdomain_ocr_trainer_spa.__main__:main"
+pdomain-ocr-trainer-ui = "pdomain_ocr_trainer_spa.__main__:main"
 ```
 
 `__main__:main`:
@@ -175,7 +175,7 @@ pd-ocr-trainer-ui = "pdomain_ocr_trainer_spa.__main__:main"
 4. Open browser at `http://{host}:{port}/` after a 1 s delay
    unless `--no-browser`.
 
-The legacy `pd-ocr-trainer` keeps its own entry point under a
+The legacy `pdomain-ocr-training` keeps its own entry point under a
 different name so both can coexist.
 
 ---
@@ -239,7 +239,7 @@ Tag-driven (`v0.x.y`). Builds wheel + sdist, runs the same gates
 as `ci.yml`, then:
 
 - Creates a GitHub Release with the wheel attached.
-- (Future) Pushes wheel to `pd-index` repo's PEP 503 tree.
+- (Future) Pushes wheel to `pdomain-index` repo's PEP 503 tree.
 
 Two-pass `npm install` lesson from
 `pdomain-ocr-labeler-spa/specs/15-deployment-dev.md` (B-28 + B-19) is
@@ -287,7 +287,7 @@ repos:
    loads, calls `/api/profiles`, shows `all` profile.
 3. `make build` → wheel under `dist/`. `python -m zipfile -l` shows
    `pdomain_ocr_trainer_spa/static/index.html` present.
-4. `uv tool install ./dist/...whl` → `pd-ocr-trainer-ui --port 8081`
+4. `uv tool install ./dist/...whl` → `pdomain-ocr-trainer-ui --port 8081`
    serves both API and SPA from one process.
 5. `make doctor` reports CUDA: yes/no, MPS: yes/no, HF token:
    yes/no, and the resolved `pdomain-ocr-training` / `pdomain-ocr-ops`

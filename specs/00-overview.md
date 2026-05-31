@@ -1,6 +1,6 @@
 # 00 — Overview
 
-`pdomain-ocr-trainer-spa` reimplements the existing `pd-ocr-trainer` (NiceGUI
+`pdomain-ocr-trainer-spa` reimplements the existing `pdomain-ocr-training` (NiceGUI
 training/dataset UI) as a **FastAPI + React/Vite/TypeScript SPA**, built on
 the workspace-standard **`pdomain-ui` + `pdomain-ocr-ops` + `pdomain-ocr-training`** stack
 and structurally modelled on the shipped `pdomain-ocr-labeler-spa`.
@@ -12,16 +12,16 @@ then jump to the per-area spec for whatever you're implementing.
 > which predated the workspace decision to standardize SPAs on `pdomain-ui` +
 > `pdomain-ocr-ops`. The old specs rejected `pdomain-ui` (shadcn/ui + Tailwind) and
 > assumed the legacy trainer kept existing (training driven by subprocess
-> calls into `pd_ocr_trainer.train_*`). Both assumptions are gone. See the
+> calls into `pdomain_ocr_training.train_*`). Both assumptions are gone. See the
 > cross-cut retirement design
-> (`ocr-container/docs/specs/2026-05-21-pd-ocr-trainer-retirement-design.md`).
+> (`ocr-container/docs/specs/2026-05-21-pdomain-ocr-training-retirement-design.md`).
 
 ---
 
 ## Goals
 
 1. **Core parity** with the current trainer. The working interactive
-   feature set of `pd-ocr-trainer/src/pd_ocr_trainer/ui.py` and
+   feature set of `pdomain-ocr-training/src/pdomain_ocr_training/ui.py` and
    `dataset_ui.py` — profile management, detection/recognition OCR
    config, dataset kanban, detection + recognition training, live
    training log, training runs — must work end-to-end against the same
@@ -32,7 +32,7 @@ then jump to the per-area spec for whatever you're implementing.
    See [`02-backend.md`](02-backend.md).
 3. **Single-wheel distribution.** End users install with
    `uv tool install pdomain-ocr-trainer-spa` and get one binary
-   (`pd-ocr-trainer-ui`) that serves both API and SPA.
+   (`pdomain-ocr-trainer-ui`) that serves both API and SPA.
    See [`15-deployment-dev.md`](15-deployment-dev.md).
 4. **Milestone-implementable by AI agents.** Each milestone in
    [`16-milestones.md`](16-milestones.md) is bounded enough that a
@@ -48,11 +48,11 @@ intent survives the legacy repo's deletion — see *Deferred scope* below.
 
 - **No replacement for the legacy trainer until core parity ships.**
   Both binaries must coexist on the same machine and on the same
-  `ml-training/` tree until `pd-ocr-trainer` is retired. Disk format
+  `ml-training/` tree until `pdomain-ocr-training` is retired. Disk format
   does not change.
 - **No new training algorithms.** Detection / recognition training
   entry points live in **`pdomain-ocr-training`** (extracted from the legacy
-  `pd_ocr_trainer.train_*` modules); the SPA only drives them through
+  `pdomain_ocr_training.train_*` modules); the SPA only drives them through
   the `ITrainingRunner` Protocol. See [`02-backend.md`](02-backend.md).
 - **No `torch` in the SPA process.** `torch`/DocTR live only in
   `pdomain-ocr-training`. The FastAPI backend imports the *Protocol* and the
@@ -66,7 +66,7 @@ intent survives the legacy repo's deletion — see *Deferred scope* below.
   ([D-T13](17-decisions.md))
 - **No new on-disk dataset format.** Detection parquet, recognition
   imagefolder, `labels.json`, `metadata.jsonl` are byte-for-byte
-  preserved per `pd-ocr-trainer/docs/DATASETS.md`.
+  preserved per `pdomain-ocr-training/docs/DATASETS.md`.
 - **No public REST contract.** The API is intentionally unstable
   across SPA versions. Internal use only — the SPA frontend is the
   only known consumer in v1.

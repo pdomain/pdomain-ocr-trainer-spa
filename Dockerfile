@@ -22,7 +22,7 @@ COPY src/ src/
 # Copy sibling Python deps (for [tool.uv.sources] path references)
 COPY --from=builder /dev/null /tmp/placeholder
 # Note: in real CI, sibling repos (pdomain-ocr-ops, pdomain-ocr-training) are installed
-# from the pd-index PEP 503 registry, not path sources.
+# from the pdomain-index PEP 503 registry, not path sources.
 # For local builds, mount sibling repos as volumes.
 
 # Install Python dependencies
@@ -51,4 +51,4 @@ RUN uv tool install *.whl
 
 EXPOSE 8081
 
-ENTRYPOINT ["pd-ocr-trainer-ui", "--host", "0.0.0.0", "--port", "8081", "--no-browser"]
+ENTRYPOINT ["pdomain-ocr-trainer-ui", "--host", "0.0.0.0", "--port", "8081", "--no-browser"]

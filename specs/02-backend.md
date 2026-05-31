@@ -597,7 +597,7 @@ re-running. Mirrors labeler-spa.
 
 ## 9. Citations
 
-- Path / profile constants: `pd-ocr-trainer/src/pd_ocr_trainer/dataset_store.py:18-54`.
+- Path / profile constants: `pdomain-ocr-training/src/pdomain_ocr_training/dataset_store.py:18-54`.
 - Profile listing: `dataset_store.py:104-122`.
 - Legacy migration: `dataset_store.py:192-200+`.
 - `ITrainingRunner` / `TrainingEvent` / config models:

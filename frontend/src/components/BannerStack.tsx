@@ -9,7 +9,7 @@ import { useCallback, useEffect, useState } from "react";
 import type { Banner } from "../api/banners";
 import { fetchBanners } from "../api/banners";
 
-const DISMISS_STORAGE_KEY = "pd-trainer-dismissed-banners";
+const DISMISS_STORAGE_KEY = "pdomain-trainer-dismissed-banners";
 const REFRESH_INTERVAL_MS = 60_000;
 
 function loadDismissed(): Set<string> {

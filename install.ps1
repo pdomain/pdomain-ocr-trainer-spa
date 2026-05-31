@@ -1,7 +1,7 @@
 # install.ps1 — install pdomain-ocr-trainer-spa via uv tool install (Windows)
 #
 # Usage:
-#   .\install.ps1              # install from pd-index PEP 503 registry (when available)
+#   .\install.ps1              # install from pdomain-index PEP 503 registry (when available)
 #   .\install.ps1 .\dist\pdomain_ocr_trainer_spa-*.whl  # install from a local wheel
 
 param(
@@ -19,7 +19,7 @@ if ($WheelPath) {
     Write-Host "Installing pdomain-ocr-trainer-spa from $WheelPath ..."
     uv tool install $WheelPath
 } else {
-    Write-Host "Installing pdomain-ocr-trainer-spa from pd-index ..."
+    Write-Host "Installing pdomain-ocr-trainer-spa from pdomain-index ..."
     uv tool install `
         --index https://pdomain.github.io/pdomain-index-pip `
         pdomain-ocr-trainer-spa
@@ -27,4 +27,4 @@ if ($WheelPath) {
 
 Write-Host ""
 Write-Host "✅ pdomain-ocr-trainer-spa installed."
-Write-Host "   Run: pd-ocr-trainer-ui --port 8081"
+Write-Host "   Run: pdomain-ocr-trainer-ui --port 8081"
