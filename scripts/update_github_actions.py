@@ -19,6 +19,7 @@ MANAGED_ACTIONS = (
     "actions/checkout",
     "astral-sh/setup-uv",
     "actions/setup-python",
+    "actions/setup-node",
     "actions/upload-artifact",
     "actions/download-artifact",
     "peter-evans/create-pull-request",
@@ -45,7 +46,7 @@ def resolve_executable(name: str) -> str:
 
 def run_gh(command: list[str]) -> subprocess.CompletedProcess[str]:
     resolved = [resolve_executable(command[0]), *command[1:]]
-    return subprocess.run(
+    return subprocess.run(  # noqa: S603
         resolved, cwd=ROOT, check=True, capture_output=True, text=True
     )
 
