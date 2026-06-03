@@ -26,9 +26,15 @@ RUN uv sync --frozen --no-dev --no-install-project
 # Copy frontend source
 COPY frontend/ frontend/
 
-# Build frontend (uses PATH node/npm from nvm)
+# Build frontend (uses PATH node/corepack from nvm)
 SHELL ["/bin/bash", "-c"]
-RUN . "$NVM_DIR/nvm.sh" && nvm use 24 && cd frontend && npm install && npm run build
+RUN . "$NVM_DIR/nvm.sh" \
+    && nvm use 24 \
+    && corepack enable \
+    && corepack prepare pnpm@11.3.0 --activate \
+    && cd frontend \
+    && pnpm i --frozen-lockfile \
+    && pnpm build
 
 # Build wheel
 RUN uv build --wheel
