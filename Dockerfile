@@ -14,13 +14,14 @@ RUN curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh |
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
 WORKDIR /app
+ENV SETUPTOOLS_SCM_PRETEND_VERSION=0.0.0
 
 # Copy Python project files
-COPY pyproject.toml uv.lock ./
+COPY pyproject.toml uv.lock README.md ./
 COPY src/ src/
 
 # Install Python dependencies from the lockfile and configured indexes.
-RUN uv sync --frozen --no-dev
+RUN uv sync --frozen --no-dev --no-install-project
 
 # Copy frontend source
 COPY frontend/ frontend/
@@ -38,10 +39,13 @@ FROM python:3.13-slim AS runtime
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
 WORKDIR /app
+ENV PATH="/app/.venv/bin:$PATH"
 
-COPY --from=builder /app/dist/*.whl .
+COPY pyproject.toml uv.lock README.md ./
+RUN uv sync --frozen --no-dev --no-install-project
 
-RUN uv tool install *.whl
+COPY --from=builder /app/dist/*.whl dist/
+RUN uv pip install --python .venv/bin/python --no-deps dist/*.whl
 
 EXPOSE 8081
 

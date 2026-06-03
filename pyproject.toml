@@ -73,7 +73,6 @@ source = "vcs"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/pdomain_ocr_trainer_spa"]
-force-include = { "src/pdomain_ocr_trainer_spa/static" = "pdomain_ocr_trainer_spa/static" }
 
 [tool.ruff]
 line-length = 110
