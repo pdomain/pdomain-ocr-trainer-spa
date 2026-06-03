@@ -15,15 +15,12 @@ ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW_DIR = ROOT / ".github/workflows"
 MANAGED_ACTIONS = (
     "actions/checkout",
-    "actions/github-script",
     "astral-sh/setup-uv",
     "actions/setup-python",
     "actions/setup-node",
     "actions/upload-artifact",
     "actions/download-artifact",
-    "jdx/mise-action",
     "peter-evans/create-pull-request",
-    "pnpm/action-setup",
 )
 USES_PATTERN = re.compile(r"(?m)^\s*uses:\s*([^\s#]+)")
 
