@@ -19,14 +19,8 @@ WORKDIR /app
 COPY pyproject.toml uv.lock ./
 COPY src/ src/
 
-# Copy sibling Python deps (for [tool.uv.sources] path references)
-COPY --from=builder /dev/null /tmp/placeholder
-# Note: in real CI, sibling repos (pdomain-ocr-ops, pdomain-ocr-training) are installed
-# from the pdomain-index PEP 503 registry, not path sources.
-# For local builds, mount sibling repos as volumes.
-
-# Install Python dependencies
-RUN uv sync --no-dev
+# Install Python dependencies from the lockfile and configured indexes.
+RUN uv sync --frozen --no-dev
 
 # Copy frontend source
 COPY frontend/ frontend/
