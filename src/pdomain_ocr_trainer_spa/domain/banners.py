@@ -110,8 +110,7 @@ def _disk_low_banner(settings: Settings) -> Banner | None:
         severity="error",
         title="Disk almost full",
         description=(
-            f"The shared-models partition has only {pct}% free. Training "
-            "runs may fail to write checkpoints."
+            f"The shared-models partition has only {pct}% free. Training runs may fail to write checkpoints."
         ),
         dismissible=False,
     )

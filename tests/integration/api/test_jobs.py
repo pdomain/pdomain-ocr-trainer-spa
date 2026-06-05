@@ -14,7 +14,6 @@ import pytest
 from pdomain_ops.gpu.types import JobEvent
 
 if TYPE_CHECKING:
-
     from pdomain_ocr_trainer_spa.training.fake_runner import FakeLongJobRunner
 
 
@@ -26,23 +25,38 @@ def fake_runner(app) -> FakeLongJobRunner:
 
 _SCRIPT = [
     JobEvent.model_construct(
-        job_id="", seq=0, at=None, kind="log",
+        job_id="",
+        seq=0,
+        at=None,
+        kind="log",
         payload={"stream": "stdout", "line": "Epoch 1/3"},
     ),
     JobEvent.model_construct(
-        job_id="", seq=0, at=None, kind="progress",
+        job_id="",
+        seq=0,
+        at=None,
+        kind="progress",
         payload={"current": 1, "total": 3, "message": "epoch 1/3"},
     ),
     JobEvent.model_construct(
-        job_id="", seq=0, at=None, kind="metric",
+        job_id="",
+        seq=0,
+        at=None,
+        kind="metric",
         payload={"name": "val_cer", "value": 0.10, "step": 1},
     ),
     JobEvent.model_construct(
-        job_id="", seq=0, at=None, kind="progress",
+        job_id="",
+        seq=0,
+        at=None,
+        kind="progress",
         payload={"current": 2, "total": 3, "message": "epoch 2/3"},
     ),
     JobEvent.model_construct(
-        job_id="", seq=0, at=None, kind="state",
+        job_id="",
+        seq=0,
+        at=None,
+        kind="state",
         payload={"state": "succeeded", "exit_code": 0},
     ),
 ]
@@ -116,7 +130,11 @@ def test_subscribe_receives_every_event_in_order(client, fake_runner) -> None:
         raw = "".join(resp.iter_text())
     frames = _parse_sse(raw)
     assert [f["event"] for f in frames] == [
-        "log", "progress", "metric", "progress", "state",
+        "log",
+        "progress",
+        "metric",
+        "progress",
+        "state",
     ]
     seqs = [f["id"] for f in frames]
     assert seqs == sorted(seqs)
@@ -190,7 +208,10 @@ def test_active_count(client, fake_runner) -> None:
     # A script with no terminal `state` event keeps the job `running`.
     fake_runner.script = [
         JobEvent.model_construct(
-            job_id="", seq=0, at=None, kind="progress",
+            job_id="",
+            seq=0,
+            at=None,
+            kind="progress",
             payload={"current": 1, "total": 3, "message": "epoch 1/3"},
         ),
     ]

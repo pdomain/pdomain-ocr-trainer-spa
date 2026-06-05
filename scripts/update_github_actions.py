@@ -45,9 +45,7 @@ def resolve_executable(name: str) -> str:
 
 def run_gh(command: list[str]) -> subprocess.CompletedProcess[str]:
     resolved = [resolve_executable(command[0]), *command[1:]]
-    return subprocess.run(
-        resolved, cwd=ROOT, check=True, capture_output=True, text=True
-    )
+    return subprocess.run(resolved, cwd=ROOT, check=True, capture_output=True, text=True)
 
 
 def gh_json(endpoint: str, *, runner: GhRunner = run_gh) -> dict[str, object]:
@@ -116,9 +114,7 @@ def verify_managed_actions(workflow_dir: Path = WORKFLOW_DIR) -> None:
         for name in sorted(workflow_action_names(path) - managed):
             unmanaged.setdefault(name, []).append(display_path)
     if unmanaged:
-        details = ", ".join(
-            f"{name} in {', '.join(paths)}" for name, paths in sorted(unmanaged.items())
-        )
+        details = ", ".join(f"{name} in {', '.join(paths)}" for name, paths in sorted(unmanaged.items()))
         raise ValueError(f"unmanaged workflow actions: {details}")
 
 

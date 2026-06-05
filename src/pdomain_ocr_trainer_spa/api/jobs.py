@@ -33,9 +33,7 @@ if TYPE_CHECKING:
 
 router = APIRouter(prefix="/api/jobs", tags=["jobs"])
 
-_TERMINAL: frozenset[JobState] = frozenset(
-    {JobState.succeeded, JobState.failed, JobState.cancelled}
-)
+_TERMINAL: frozenset[JobState] = frozenset({JobState.succeeded, JobState.failed, JobState.cancelled})
 _SSE_RETRY_MS = 5000
 
 
@@ -88,9 +86,7 @@ async def active_count(
             job_ids = [str(jid) for jid in cast("list[object]", raw_ids)]
     else:
         job_ids = [
-            jid
-            for jid in (getattr(run, "job_id", None) for run in state.runs.values())
-            if jid is not None
+            jid for jid in (getattr(run, "job_id", None) for run in state.runs.values()) if jid is not None
         ]
 
     by_kind: dict[str, int] = {}
@@ -136,11 +132,7 @@ async def cancel_job(
 
 def _sse_frame(event: JobEvent) -> str:
     """Serialize one ``JobEvent`` as an SSE frame (spec 10 §5)."""
-    return (
-        f"id: {event.seq}\n"
-        f"event: {event.kind}\n"
-        f"data: {event.model_dump_json()}\n\n"
-    )
+    return f"id: {event.seq}\nevent: {event.kind}\ndata: {event.model_dump_json()}\n\n"
 
 
 def _persist_progress(state: AppState, run_id: str | None, event: JobEvent) -> None:

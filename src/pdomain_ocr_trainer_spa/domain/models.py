@@ -98,9 +98,7 @@ def parse_model_name(name: str) -> ParsedModelName:
             task = tok
             task_idx = idx
             break
-    profile = (
-        "-".join(tokens[1:task_idx]) if task_idx > 1 else None
-    )
+    profile = "-".join(tokens[1:task_idx]) if task_idx > 1 else None
     qualifier = "-".join(tokens[task_idx + 1 :]) if task_idx >= 0 else ""
     return ParsedModelName(
         prefix=tokens[0] if tokens else "",
@@ -177,9 +175,7 @@ def _sidecar_path_in(leaf: Path) -> Path | None:
     return matches[0] if matches else None
 
 
-def _model_from_leaf(
-    settings: Settings, leaf: Path, *, profile: str, task: TaskEnum
-) -> TrainedModel | None:
+def _model_from_leaf(settings: Settings, leaf: Path, *, profile: str, task: TaskEnum) -> TrainedModel | None:
     """Build a :class:`TrainedModel` from one ``<profile>/<task>/<name>/`` dir."""
     weights = _weights_in(leaf)
     sidecar_path = _sidecar_path_in(leaf)
@@ -190,9 +186,7 @@ def _model_from_leaf(
 
     if sidecar_path is not None:
         try:
-            sidecar = ModelSidecar.model_validate_json(
-                sidecar_path.read_text(encoding="utf-8")
-            )
+            sidecar = ModelSidecar.model_validate_json(sidecar_path.read_text(encoding="utf-8"))
         except (ValueError, OSError):
             sidecar = _stub_sidecar(name, task)
     else:
@@ -218,9 +212,7 @@ def _model_from_leaf(
         typeface=typeface,
         paths=ModelPaths(
             weights=str(weights) if weights is not None else str(leaf / f"{name}.pt"),
-            sidecar=str(sidecar_path) if sidecar_path is not None else str(
-                leaf / f"{name}.metadata.json"
-            ),
+            sidecar=str(sidecar_path) if sidecar_path is not None else str(leaf / f"{name}.metadata.json"),
             config=str(config) if config.exists() else None,
         ),
         sidecar=sidecar,
@@ -267,9 +259,7 @@ def list_models(
             if task is not None and task_enum != task:
                 continue
             for leaf in sorted(task_dir.iterdir()):
-                model = _model_from_leaf(
-                    settings, leaf, profile=profile_dir.name, task=task_enum
-                )
+                model = _model_from_leaf(settings, leaf, profile=profile_dir.name, task=task_enum)
                 if model is None:
                     continue
                 if not include_legacy and parse_model_name(model.name).is_legacy:
@@ -324,11 +314,7 @@ def regenerate_sidecar(settings: Settings, name: str) -> TrainedModel:
             doctr_arch = None
 
     parsed = parse_model_name(name)
-    matching = [
-        r
-        for r in list_runs(settings)
-        if r.model_name == name and r.kind == "train"
-    ]
+    matching = [r for r in list_runs(settings) if r.model_name == name and r.kind == "train"]
     matching.sort(key=lambda r: r.started_at, reverse=True)
     args: dict[str, object] = {}
     trained_at = None
@@ -381,10 +367,7 @@ def _model_referenced_by_active_run(settings: Settings, name: str) -> bool:
     """True when a non-terminal run references this model (spec 08 §5)."""
     from pdomain_ocr_trainer_spa.domain.runs import list_runs
 
-    return any(
-        r.model_name == name and r.status in {"pending", "running"}
-        for r in list_runs(settings)
-    )
+    return any(r.model_name == name and r.status in {"pending", "running"} for r in list_runs(settings))
 
 
 def delete_model(settings: Settings, name: str) -> None:

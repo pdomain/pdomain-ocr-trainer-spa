@@ -85,7 +85,7 @@ async def publish_dataset(
     Returns 202 with run_id + job_id on success.
     """
     token = _require_hf_token(state.settings)  # raises 400 hf.auth_missing
-    dom.validate_spdx_license(body.license)      # raises 409 publish.license_missing
+    dom.validate_spdx_license(body.license)  # raises 409 publish.license_missing
 
     run_id, job_id = dom.submit_publish_dataset_job(
         settings=state.settings,

@@ -43,9 +43,7 @@ class _ProcessSubmitter(Protocol):
     SPA's job runner is always one of those two, so the cast is sound.
     """
 
-    async def submit_with_process(
-        self, kind: str, spec: dict[str, object], cmd: list[str]
-    ) -> str: ...
+    async def submit_with_process(self, kind: str, spec: dict[str, object], cmd: list[str]) -> str: ...
 
 
 class CreateRunRequest(BaseModel):
@@ -76,9 +74,7 @@ class RunListResponse(BaseModel):
 
 def _train_job_running(state: AppState) -> bool:
     """True when any tracked run is still pending/running (one-train-job rule)."""
-    return any(
-        run.status in {"pending", "running"} for run in state.runs.values()
-    )
+    return any(run.status in {"pending", "running"} for run in state.runs.values())
 
 
 @router.post("", status_code=202)

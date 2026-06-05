@@ -100,14 +100,10 @@ def _read_all(settings: Settings, profile: str) -> dict[str, dict[str, object]]:
         return {}
     if not isinstance(data, dict):
         return {}
-    return {
-        str(k): v for k, v in data.items() if isinstance(v, dict)
-    }
+    return {str(k): v for k, v in data.items() if isinstance(v, dict)}
 
 
-def _write_all(
-    settings: Settings, profile: str, data: dict[str, dict[str, object]]
-) -> None:
+def _write_all(settings: Settings, profile: str, data: dict[str, dict[str, object]]) -> None:
     """Write (or delete) a profile's ``training_defaults.json`` — empty payload removes it."""
     path = _defaults_path(settings, profile)
     if not data:
@@ -117,9 +113,7 @@ def _write_all(
     path.write_text(json.dumps(data, indent=2), encoding="utf-8")
 
 
-def get_training_defaults(
-    settings: Settings, *, profile: str, task: TaskEnum
-) -> dict[str, object]:
+def get_training_defaults(settings: Settings, *, profile: str, task: TaskEnum) -> dict[str, object]:
     """Return a profile's saved training-defaults for a task.
 
     Raises ``404 training_defaults.not_set`` when the task has never been
@@ -149,9 +143,7 @@ def set_training_defaults(
     return args
 
 
-def delete_training_defaults(
-    settings: Settings, *, profile: str, task: TaskEnum
-) -> None:
+def delete_training_defaults(settings: Settings, *, profile: str, task: TaskEnum) -> None:
     """Drop a profile's training-defaults for a task (falls back to seed thereafter)."""
     seed_defaults(task)  # validates the task is supported
     normalized = normalize_profile_name(profile)

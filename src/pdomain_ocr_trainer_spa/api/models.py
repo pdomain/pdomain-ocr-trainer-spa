@@ -85,9 +85,7 @@ async def list_models(
         task=task,
         include_legacy=include_legacy,
     )
-    return ModelListResponse(
-        models=[_to_item(state.settings, m) for m in models]
-    )
+    return ModelListResponse(models=[_to_item(state.settings, m) for m in models])
 
 
 @router.post("/scan")

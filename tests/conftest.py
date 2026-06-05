@@ -68,7 +68,5 @@ def trained_profile(settings: Settings):
     ):
         task_dir = settings.ml_training_dir / "clogaelach" / task
         task_dir.mkdir(parents=True, exist_ok=True)
-        (task_dir / "labels.json").write_text(
-            json.dumps({"item-1": value}), encoding="utf-8"
-        )
+        (task_dir / "labels.json").write_text(json.dumps({"item-1": value}), encoding="utf-8")
     return "clogaelach"

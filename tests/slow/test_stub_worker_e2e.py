@@ -55,9 +55,7 @@ def test_stub_worker_runs_to_completion(settings: Settings) -> None:
     from pdomain_ocr_trainer_spa.domain import runs as dom
     from pdomain_ocr_trainer_spa.domain.profiles import create_profile
 
-    create_profile(
-        settings, name="clogaelach", language="ga", typeface=TypefaceEnum.clogaelach
-    )
+    create_profile(settings, name="clogaelach", language="ga", typeface=TypefaceEnum.clogaelach)
     task_dir = settings.ml_training_dir / "clogaelach" / "recognition"
     task_dir.mkdir(parents=True, exist_ok=True)
     (task_dir / "labels.json").write_text(json.dumps({"c": "x"}), encoding="utf-8")
@@ -79,11 +77,7 @@ def test_stub_worker_runs_to_completion(settings: Settings) -> None:
         str(dom.run_dir(settings, run.id)),
     ]
 
-    state = asyncio.run(
-        _submit_and_wait(
-            runner, kind="train.recognition", run_id=run.id, cmd=cmd
-        )
-    )
+    state = asyncio.run(_submit_and_wait(runner, kind="train.recognition", run_id=run.id, cmd=cmd))
     assert state == "succeeded"
 
 

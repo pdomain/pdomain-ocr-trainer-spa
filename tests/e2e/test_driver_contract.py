@@ -137,14 +137,8 @@ def _static_and_dynamic(ids: list[str]) -> tuple[list[str], list[str]]:
 # frontend source scanning
 # --------------------------------------------------------------------------
 def _source_files() -> list[Path]:
-    return [
-        p
-        for p in _FRONTEND_SRC.rglob("*.tsx")
-        if not p.name.endswith(".test.tsx")
-    ] + [
-        p
-        for p in _FRONTEND_SRC.rglob("*.ts")
-        if not p.name.endswith(".test.ts")
+    return [p for p in _FRONTEND_SRC.rglob("*.tsx") if not p.name.endswith(".test.tsx")] + [
+        p for p in _FRONTEND_SRC.rglob("*.ts") if not p.name.endswith(".test.ts")
     ]
 
 
@@ -212,8 +206,7 @@ def test_router_declares_every_spec_url(spec_text: str) -> None:
     app = _APP_TSX.read_text(encoding="utf-8")
     route_paths = set(re.findall(r'<Route\s+path="([^"]*)"', app))
     # Normalise spec `{param}` placeholders to react-router `:param`.
-    declared = {re.sub(r"\{([a-z_]+)\}", lambda m: f":{_camel(m.group(1))}", u)
-                for u in route_paths}
+    declared = {re.sub(r"\{([a-z_]+)\}", lambda m: f":{_camel(m.group(1))}", u) for u in route_paths}
 
     missing: list[str] = []
     for url in urls:
@@ -259,9 +252,7 @@ def test_section_static_testids_present(
     waived = _DEFERRED_CHROME | set(_DEFERRED_TESTIDS)
 
     missing = sorted(set(static) - present - waived)
-    assert not missing, (
-        f"spec 13 §4 ({label}) static testids absent from frontend source: {missing}"
-    )
+    assert not missing, f"spec 13 §4 ({label}) static testids absent from frontend source: {missing}"
 
 
 @pytest.mark.parametrize(("label", "start", "end"), _SECTIONS, ids=[s[0] for s in _SECTIONS])
@@ -289,19 +280,14 @@ def test_section_dynamic_testids_have_template(
             continue
         # Static lead-in: text up to (and including) the dash before `{`.
         lead = spec_id.split("{", 1)[0]
-        by_template = any(
-            p == lead or p.endswith(lead) or lead.endswith(p) for p in prefixes
-        )
+        by_template = any(p == lead or p.endswith(lead) or lead.endswith(p) for p in prefixes)
         by_enum = any(lit.startswith(lead) and lit != lead for lit in literals)
         if not (by_template or by_enum):
             missing.append(
                 f"{spec_id}  (no `data-testid` template with lead {lead!r} "
                 f"and no enumerated `{lead}*` literal)"
             )
-    assert not missing, (
-        f"spec 13 §4 ({label}) dynamic testids unrealised in source:\n"
-        + "\n".join(missing)
-    )
+    assert not missing, f"spec 13 §4 ({label}) dynamic testids unrealised in source:\n" + "\n".join(missing)
 
 
 # --------------------------------------------------------------------------
@@ -346,9 +332,7 @@ def test_driver_contract_version_exposed() -> None:
     env_js = (_REPO_ROOT / "src" / "pdomain_ocr_trainer_spa" / "api" / "env_js.py").read_text(
         encoding="utf-8"
     )
-    assert "driverContractVersion" in env_js, (
-        "spec 13 §6 requires /env.js to expose driverContractVersion"
-    )
+    assert "driverContractVersion" in env_js, "spec 13 §6 requires /env.js to expose driverContractVersion"
 
 
 def test_deferred_chrome_ids_documented() -> None:

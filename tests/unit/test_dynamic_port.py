@@ -22,6 +22,7 @@ import pytest
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _run_main(
     argv: list[str],
     bound_port: int = 8081,
@@ -49,6 +50,7 @@ def _run_main(
 # ---------------------------------------------------------------------------
 # bootstrap_spa call args
 # ---------------------------------------------------------------------------
+
 
 class TestBootstrapSpaArgs:
     """Verify bootstrap_spa is called with the expected keyword arguments."""
@@ -101,6 +103,7 @@ class TestBootstrapSpaArgs:
 # Port propagation
 # ---------------------------------------------------------------------------
 
+
 class TestPortPropagation:
     """Verify the bound port from bootstrap_spa flows to uvicorn and Settings."""
 
@@ -137,6 +140,7 @@ class TestPortPropagation:
 # ---------------------------------------------------------------------------
 # CLI flag behaviour
 # ---------------------------------------------------------------------------
+
 
 class TestCliFlagBehaviour:
     """Verify CLI flag semantics passed through to bootstrap_spa."""

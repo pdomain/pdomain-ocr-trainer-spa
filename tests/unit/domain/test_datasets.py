@@ -42,9 +42,7 @@ def _seed_export(
         det = base / "detection"
         det_images = det / "images"
         det_images.mkdir(parents=True, exist_ok=True)
-        (det / "labels.json").write_text(
-            json.dumps({p: [] for p in detection_pages}), encoding="utf-8"
-        )
+        (det / "labels.json").write_text(json.dumps({p: [] for p in detection_pages}), encoding="utf-8")
         for page in detection_pages:
             (det_images / page).write_bytes(b"png")
 
@@ -99,22 +97,16 @@ def test_scenario_3_apply_copies_export_into_train(export_settings: Settings) ->
         export_settings, profile="all", task=TaskEnum.recognition, request=req
     )
     assert errors == []
-    train_labels = (
-        export_settings.ml_training_dir / "all" / "recognition" / "labels.json"
-    )
+    train_labels = export_settings.ml_training_dir / "all" / "recognition" / "labels.json"
     assert json.loads(train_labels.read_text()) == {"myproj_1_0.png": "hello"}
-    assert (
-        export_settings.ml_training_dir / "all" / "recognition" / "images" / "myproj_1_0.png"
-    ).exists()
+    assert (export_settings.ml_training_dir / "all" / "recognition" / "images" / "myproj_1_0.png").exists()
     assert [r.project_id for r in view.columns["train"].rows] == ["myproj"]
     assert view.columns["train"].rows[0].source == "on_disk"
 
 
 def test_scenario_4_move_train_to_val(export_settings: Settings) -> None:
     _seed_on_disk(export_settings, "train", "all", {"p_1_0.png": "a", "p_1_1.png": "b"})
-    req = ApplyAssignmentRequest(
-        assignments=[AssignmentEntry(key="p:p_1_0.png", target_split="val")]
-    )
+    req = ApplyAssignmentRequest(assignments=[AssignmentEntry(key="p:p_1_0.png", target_split="val")])
     view, errors = dom.apply_assignments(
         export_settings, profile="all", task=TaskEnum.recognition, request=req
     )
@@ -127,20 +119,14 @@ def test_scenario_4_move_train_to_val(export_settings: Settings) -> None:
     )
     assert train_labels == {"p_1_1.png": "b"}
     assert val_labels == {"p_1_0.png": "a"}
-    assert (
-        export_settings.ml_validation_dir / "all" / "recognition" / "images" / "p_1_0.png"
-    ).exists()
-    assert not (
-        export_settings.ml_training_dir / "all" / "recognition" / "images" / "p_1_0.png"
-    ).exists()
+    assert (export_settings.ml_validation_dir / "all" / "recognition" / "images" / "p_1_0.png").exists()
+    assert not (export_settings.ml_training_dir / "all" / "recognition" / "images" / "p_1_0.png").exists()
     _ = view
 
 
 def test_scenario_5_move_split_to_unassigned_deletes_files(export_settings: Settings) -> None:
     _seed_on_disk(export_settings, "val", "all", {"p_1_0.png": "a"})
-    req = ApplyAssignmentRequest(
-        assignments=[AssignmentEntry(key="p:p_1_0.png", target_split="unassigned")]
-    )
+    req = ApplyAssignmentRequest(assignments=[AssignmentEntry(key="p:p_1_0.png", target_split="unassigned")])
     view, errors = dom.apply_assignments(
         export_settings, profile="all", task=TaskEnum.recognition, request=req
     )
@@ -149,9 +135,7 @@ def test_scenario_5_move_split_to_unassigned_deletes_files(export_settings: Sett
         (export_settings.ml_validation_dir / "all" / "recognition" / "labels.json").read_text()
     )
     assert val_labels == {}
-    assert not (
-        export_settings.ml_validation_dir / "all" / "recognition" / "images" / "p_1_0.png"
-    ).exists()
+    assert not (export_settings.ml_validation_dir / "all" / "recognition" / "images" / "p_1_0.png").exists()
     assert not view.columns["val"].rows
 
 
@@ -178,9 +162,7 @@ def test_unchanged_export_crop_not_flagged(export_settings: Settings) -> None:
 
 
 def test_include_toggles_persist_to_kanban_state_json(export_settings: Settings) -> None:
-    dom.set_include_toggles(
-        export_settings, profile="all", include_detection=False, include_recognition=True
-    )
+    dom.set_include_toggles(export_settings, profile="all", include_detection=False, include_recognition=True)
     state = export_settings.app_data_root / "profiles" / "all" / "kanban_state.json"
     assert json.loads(state.read_text()) == {
         "version": 2,
@@ -193,9 +175,7 @@ def test_include_toggles_persist_to_kanban_state_json(export_settings: Settings)
 
 
 def test_apply_unknown_key_reports_error(export_settings: Settings) -> None:
-    req = ApplyAssignmentRequest(
-        assignments=[AssignmentEntry(key="ghost:ghost_1.png", target_split="train")]
-    )
+    req = ApplyAssignmentRequest(assignments=[AssignmentEntry(key="ghost:ghost_1.png", target_split="train")])
     view, errors = dom.apply_assignments(
         export_settings, profile="all", task=TaskEnum.recognition, request=req
     )
@@ -204,9 +184,7 @@ def test_apply_unknown_key_reports_error(export_settings: Settings) -> None:
 
 
 def test_apply_all_failed_raises_409(export_settings: Settings) -> None:
-    req = ApplyAssignmentRequest(
-        assignments=[AssignmentEntry(key="ghost:ghost_1.png", target_split="train")]
-    )
+    req = ApplyAssignmentRequest(assignments=[AssignmentEntry(key="ghost:ghost_1.png", target_split="train")])
     with pytest.raises(AppError) as excinfo:
         dom.apply_assignments(
             export_settings,
@@ -221,9 +199,7 @@ def test_apply_all_failed_raises_409(export_settings: Settings) -> None:
 
 def test_classifier_task_rejected(export_settings: Settings) -> None:
     with pytest.raises(AppError) as excinfo:
-        dom.build_kanban(
-            export_settings, profile="all", task=TaskEnum.typeface_classification
-        )
+        dom.build_kanban(export_settings, profile="all", task=TaskEnum.typeface_classification)
     assert excinfo.value.code == "dataset.task_unsupported"
     assert excinfo.value.status_code == 501
 
@@ -241,9 +217,7 @@ def _det_meta(n_boxes: int) -> dict[str, object]:
     }
 
 
-def _write_detection_labels(
-    task_dir: Path, labels: dict[str, dict[str, object]]
-) -> None:
+def _write_detection_labels(task_dir: Path, labels: dict[str, dict[str, object]]) -> None:
     """Write a detection ``labels.json`` + matching page images into ``task_dir``."""
     images = task_dir / "images"
     images.mkdir(parents=True, exist_ok=True)
@@ -252,9 +226,7 @@ def _write_detection_labels(
         (images / page_name).write_bytes(b"png")
 
 
-def _seed_detection_export(
-    settings: Settings, project_id: str, labels: dict[str, dict[str, object]]
-) -> None:
+def _seed_detection_export(settings: Settings, project_id: str, labels: dict[str, dict[str, object]]) -> None:
     """Drop a labeler DocTR detection export for ``project_id``."""
     assert settings.labeler_export_root is not None
     base = settings.labeler_export_root / project_id / "all" / "detection"
@@ -272,9 +244,7 @@ def _seed_detection_on_disk(
 def test_detection_export_appears_in_unassigned_with_bbox_count(
     export_settings: Settings,
 ) -> None:
-    _seed_detection_export(
-        export_settings, "myproj", {"myproj_1.png": _det_meta(3)}
-    )
+    _seed_detection_export(export_settings, "myproj", {"myproj_1.png": _det_meta(3)})
     view = dom.build_kanban(export_settings, profile="all", task=TaskEnum.detection)
     rows = view.columns["unassigned"].rows
     assert [r.project_id for r in rows] == ["myproj"]
@@ -299,17 +269,11 @@ def test_detection_apply_copies_export_into_train_with_valid_labels(
     req = ApplyAssignmentRequest(
         assignments=[AssignmentEntry(key="myproj:myproj_1.png", target_split="train")]
     )
-    view, errors = dom.apply_assignments(
-        export_settings, profile="all", task=TaskEnum.detection, request=req
-    )
+    view, errors = dom.apply_assignments(export_settings, profile="all", task=TaskEnum.detection, request=req)
     assert errors == []
-    train_labels = (
-        export_settings.ml_training_dir / "all" / "detection" / "labels.json"
-    )
+    train_labels = export_settings.ml_training_dir / "all" / "detection" / "labels.json"
     assert json.loads(train_labels.read_text()) == {"myproj_1.png": meta}
-    assert (
-        export_settings.ml_training_dir / "all" / "detection" / "images" / "myproj_1.png"
-    ).exists()
+    assert (export_settings.ml_training_dir / "all" / "detection" / "images" / "myproj_1.png").exists()
     assert [r.project_id for r in view.columns["train"].rows] == ["myproj"]
 
 
@@ -318,9 +282,7 @@ def test_detection_move_train_to_val_preserves_metadata(
 ) -> None:
     meta = _det_meta(4)
     _seed_detection_on_disk(export_settings, "train", "all", {"p_1.png": meta})
-    req = ApplyAssignmentRequest(
-        assignments=[AssignmentEntry(key="p:p_1.png", target_split="val")]
-    )
+    req = ApplyAssignmentRequest(assignments=[AssignmentEntry(key="p:p_1.png", target_split="val")])
     _view, errors = dom.apply_assignments(
         export_settings, profile="all", task=TaskEnum.detection, request=req
     )
@@ -329,21 +291,15 @@ def test_detection_move_train_to_val_preserves_metadata(
         (export_settings.ml_validation_dir / "all" / "detection" / "labels.json").read_text()
     )
     assert val_labels == {"p_1.png": meta}
-    assert not (
-        export_settings.ml_training_dir / "all" / "detection" / "images" / "p_1.png"
-    ).exists()
+    assert not (export_settings.ml_training_dir / "all" / "detection" / "images" / "p_1.png").exists()
 
 
 def test_detection_move_to_unassigned_deletes_files(
     export_settings: Settings,
 ) -> None:
     _seed_detection_on_disk(export_settings, "val", "all", {"p_1.png": _det_meta(1)})
-    req = ApplyAssignmentRequest(
-        assignments=[AssignmentEntry(key="p:p_1.png", target_split="unassigned")]
-    )
-    view, errors = dom.apply_assignments(
-        export_settings, profile="all", task=TaskEnum.detection, request=req
-    )
+    req = ApplyAssignmentRequest(assignments=[AssignmentEntry(key="p:p_1.png", target_split="unassigned")])
+    view, errors = dom.apply_assignments(export_settings, profile="all", task=TaskEnum.detection, request=req)
     assert errors == []
     val_labels = json.loads(
         (export_settings.ml_validation_dir / "all" / "detection" / "labels.json").read_text()

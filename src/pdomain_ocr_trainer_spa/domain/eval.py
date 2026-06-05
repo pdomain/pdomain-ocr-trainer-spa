@@ -98,9 +98,7 @@ def write_result(settings: Settings, result: EvalResult) -> Path:
     path = _result_path(settings, result.run_id)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(result.model_dump_json(indent=2), encoding="utf-8")
-    _result_md_path(settings, result.run_id).write_text(
-        render_result_markdown(result), encoding="utf-8"
-    )
+    _result_md_path(settings, result.run_id).write_text(render_result_markdown(result), encoding="utf-8")
     return path
 
 

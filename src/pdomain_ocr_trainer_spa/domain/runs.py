@@ -112,9 +112,7 @@ def derive_model_name(
             ),
             status_code=409,
         )
-    typeface = (
-        prof.typeface.value if hasattr(prof.typeface, "value") else str(prof.typeface)
-    )
+    typeface = prof.typeface.value if hasattr(prof.typeface, "value") else str(prof.typeface)
     date = datetime.now(UTC).strftime("%Y-%m-%d")
     parts = ["pd", prof.language, typeface, _TASK_SLUG[task], date]
     name = "-".join(parts)
@@ -390,13 +388,8 @@ def hydrate_runs(state: AppState) -> None:
         if run.status in {"pending", "running"} and not _job_is_live(state, run):
             run = mark_terminal(settings, run, status="failed", exit_code=-1)
             stderr = run_dir(settings, run.id) / "stderr.log"
-            with contextlib.suppress(OSError), stderr.open(
-                "a", encoding="utf-8"
-            ) as fh:
-                fh.write(
-                    "[trainer-spa] process gone before exit; "
-                    "marked failed at boot\n"
-                )
+            with contextlib.suppress(OSError), stderr.open("a", encoding="utf-8") as fh:
+                fh.write("[trainer-spa] process gone before exit; marked failed at boot\n")
         state.runs[run.id] = run
 
 

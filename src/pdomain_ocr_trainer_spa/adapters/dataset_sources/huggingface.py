@@ -59,8 +59,7 @@ class HuggingFaceDatasetSource:
         calls ``fetch_to_local`` and then reads from the materialized dir.
         """
         raise NotImplementedError(
-            "list() is for worker subprocess use; "
-            "the SPA web process uses fetch_to_local() instead."
+            "list() is for worker subprocess use; the SPA web process uses fetch_to_local() instead."
         )
 
     def fetch_to_local(
@@ -99,8 +98,7 @@ class HuggingFaceDatasetSource:
             import huggingface_hub
         except ImportError as exc:
             raise RuntimeError(
-                "huggingface_hub is not installed. "
-                "Add it to the environment or use local sources only."
+                "huggingface_hub is not installed. Add it to the environment or use local sources only."
             ) from exc
 
         cache_dir = self._settings.hf_cache_dir or Path.home() / ".cache" / "huggingface"
@@ -123,9 +121,7 @@ class HuggingFaceDatasetSource:
         self._materialize_task(snapshot_path, target, task)
         return target
 
-    def _materialize_task(
-        self, snapshot: Path, target: Path, task: str
-    ) -> None:
+    def _materialize_task(self, snapshot: Path, target: Path, task: str) -> None:
         """Copy/link files from the HF snapshot into the DocTR-compatible layout.
 
         Recognition layout: ``images/`` + ``labels.json``
@@ -155,6 +151,7 @@ class HuggingFaceDatasetSource:
                         dst.hardlink_to(img)
                     except OSError:
                         import shutil
+
                         shutil.copy2(img, dst)
 
         # Build labels.json from metadata.jsonl
@@ -181,6 +178,7 @@ class HuggingFaceDatasetSource:
         # Basic passthrough — detection parquet decoding is worker-side.
         # The SPA just ensures the snapshot directory is accessible.
         import shutil
+
         images_src = snapshot / "images"
         labels_src = snapshot / "labels.json"
         images_dst = target / "images"

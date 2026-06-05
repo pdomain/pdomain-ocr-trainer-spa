@@ -49,13 +49,9 @@ class _TrainingRunner(Protocol):
     config models are torch-free pydantic models (D-T1).
     """
 
-    def train_detection(
-        self, profile: str, config: DetectionConfig
-    ) -> Iterator[object]: ...
+    def train_detection(self, profile: str, config: DetectionConfig) -> Iterator[object]: ...
 
-    def train_recognition(
-        self, profile: str, config: RecognitionConfig
-    ) -> Iterator[object]: ...
+    def train_recognition(self, profile: str, config: RecognitionConfig) -> Iterator[object]: ...
 
 
 def emit_event(event: dict[str, object], *, stdout_log: Path | None = None) -> None:
@@ -165,9 +161,7 @@ def run_worker(run_dir: Path, *, runner: _TrainingRunner | None = None) -> int:
     return exit_code
 
 
-def write_model_sidecar(
-    manifest: dict[str, object], args: dict[str, object]
-) -> Path | None:
+def write_model_sidecar(manifest: dict[str, object], args: dict[str, object]) -> Path | None:
     """Write ``<model_name>.metadata.json`` under the run's shared-models dir.
 
     The sidecar shape matches :class:`~pdomain_ocr_trainer_spa.core.models.ModelSidecar`

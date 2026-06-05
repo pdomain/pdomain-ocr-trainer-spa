@@ -23,15 +23,11 @@ class _FakeRunner:
     def __init__(self, events: list[dict[str, object]]) -> None:
         self._events = events
 
-    def train_recognition(
-        self, profile: str, config: object
-    ) -> Iterator[dict[str, object]]:
+    def train_recognition(self, profile: str, config: object) -> Iterator[dict[str, object]]:
         del profile, config
         yield from self._events
 
-    def train_detection(
-        self, profile: str, config: object
-    ) -> Iterator[dict[str, object]]:
+    def train_detection(self, profile: str, config: object) -> Iterator[dict[str, object]]:
         del profile, config
         yield from self._events
 
@@ -75,9 +71,7 @@ def test_run_worker_emits_pdevent_lines(tmp_path: Path, capsys) -> None:
     code = worker.run_worker(run_dir, runner=runner)
     assert code == 0
 
-    out_lines = [
-        ln for ln in capsys.readouterr().out.splitlines() if ln.startswith("@@PDEVENT@@")
-    ]
+    out_lines = [ln for ln in capsys.readouterr().out.splitlines() if ln.startswith("@@PDEVENT@@")]
     assert len(out_lines) == 3
     first = json.loads(out_lines[0][len("@@PDEVENT@@") :])
     assert first["kind"] == "epoch"
@@ -87,9 +81,7 @@ def test_run_worker_mirrors_messages_to_stdout_log(tmp_path: Path) -> None:
     """Human-readable event messages are mirrored to stdout.log."""
     run_dir = tmp_path / "runs" / "run-1"
     _write_run_dir(run_dir)
-    runner = _FakeRunner(
-        [{"kind": "epoch", "message": "epoch 1/2", "progress": 0.5, "data": {}}]
-    )
+    runner = _FakeRunner([{"kind": "epoch", "message": "epoch 1/2", "progress": 0.5, "data": {}}])
     worker.run_worker(run_dir, runner=runner)
     log = (run_dir / "stdout.log").read_text(encoding="utf-8")
     assert "epoch 1/2" in log
@@ -99,9 +91,7 @@ def test_run_worker_error_event_yields_nonzero_exit(tmp_path: Path) -> None:
     """An error TrainingEvent makes the worker exit non-zero."""
     run_dir = tmp_path / "runs" / "run-1"
     _write_run_dir(run_dir)
-    runner = _FakeRunner(
-        [{"kind": "error", "message": "RuntimeError: CUDA out of memory"}]
-    )
+    runner = _FakeRunner([{"kind": "error", "message": "RuntimeError: CUDA out of memory"}])
     code = worker.run_worker(run_dir, runner=runner)
     assert code == 1
 
@@ -155,12 +145,12 @@ def test_run_worker_no_sidecar_on_error(tmp_path: Path) -> None:
     shared = tmp_path / "shared-models" / "clogaelach" / "recognition"
     name = "pd-ga-clogaelach-recognition-2026-05-21"
     (run_dir / "manifest.json").write_text(
-        json.dumps({"id": "r", "profile": "p", "task": "recognition",
-                    "model_name": name, "args": {}}),
+        json.dumps({"id": "r", "profile": "p", "task": "recognition", "model_name": name, "args": {}}),
         encoding="utf-8",
     )
     (run_dir / "args.json").write_text(
-        json.dumps({"shared_models_dir": str(shared), "name": name}), encoding="utf-8",
+        json.dumps({"shared_models_dir": str(shared), "name": name}),
+        encoding="utf-8",
     )
     (run_dir / "stdout.log").touch()
     runner = _FakeRunner([{"kind": "error", "message": "boom"}])

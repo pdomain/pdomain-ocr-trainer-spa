@@ -44,7 +44,7 @@ def test_accepts_quoted_managed_actions_and_local_workflows(tmp_path: Path) -> N
         "jobs:\n"
         "  ci:\n"
         "    steps:\n"
-        "      - uses: \"actions/checkout@abc123\"\n"
+        '      - uses: "actions/checkout@abc123"\n'
         "      - uses: './.github/workflows/regen.yml'\n",
         encoding="utf-8",
     )
@@ -55,13 +55,14 @@ def test_accepts_quoted_managed_actions_and_local_workflows(tmp_path: Path) -> N
 def test_current_workflows_use_only_managed_actions() -> None:
     update_github_actions.verify_managed_actions()
 
+
 def test_update_workflow_refs_updates_quoted_action_refs(tmp_path: Path) -> None:
     workflow = tmp_path / "ci.yml"
     workflow.write_text(
         "jobs:\n"
         "  ci:\n"
         "    steps:\n"
-        "      - uses: \"actions/checkout@oldoldoldoldoldoldoldoldoldoldoldoldoldoldoldoldold1\"\n"
+        '      - uses: "actions/checkout@oldoldoldoldoldoldoldoldoldoldoldoldoldoldoldoldold1"\n'
         "      - uses: 'astral-sh/setup-uv@oldoldoldoldoldoldoldoldoldoldoldoldoldoldoldoldold2'\n",
         encoding="utf-8",
     )
@@ -82,14 +83,15 @@ def test_update_uv_version_refs_updates_quoted_setup_uv(tmp_path: Path) -> None:
         "jobs:\n"
         "  ci:\n"
         "    steps:\n"
-        "      - uses: \"astral-sh/setup-uv@oldoldoldoldoldoldoldoldoldoldoldoldoldoldoldoldold2\"\n"
+        '      - uses: "astral-sh/setup-uv@oldoldoldoldoldoldoldoldoldoldoldoldoldoldoldoldold2"\n'
         "        with:\n"
-        "          version: \"0.1.0\"\n",
+        '          version: "0.1.0"\n',
         encoding="utf-8",
     )
 
     assert update_github_actions.update_uv_version_refs(workflow, version="0.11.16")
     assert 'version: "0.11.16"' in workflow.read_text(encoding="utf-8")
+
 
 def test_update_uv_version_refs_updates_quoted_setup_uv_with_inline_comment(tmp_path: Path) -> None:
     workflow = tmp_path / "ci.yml"
@@ -97,9 +99,9 @@ def test_update_uv_version_refs_updates_quoted_setup_uv_with_inline_comment(tmp_
         "jobs:\n"
         "  ci:\n"
         "    steps:\n"
-        "      - uses: \"astral-sh/setup-uv@oldoldoldoldoldoldoldoldoldoldoldoldoldoldoldoldold2\"  # v8.1.0\n"
+        '      - uses: "astral-sh/setup-uv@oldoldoldoldoldoldoldoldoldoldoldoldoldoldoldoldold2"  # v8.1.0\n'
         "        with:\n"
-        "          version: \"0.1.0\"\n",
+        '          version: "0.1.0"\n',
         encoding="utf-8",
     )
 

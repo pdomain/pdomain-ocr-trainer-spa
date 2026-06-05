@@ -62,21 +62,15 @@ def test_scenario1_create_run(
     assert detail.json()["status"] in {"running", "succeeded"}
 
 
-def test_create_run_no_training_data_409(
-    client: TestClient, fake_runner: FakeLongJobRunner
-) -> None:
+def test_create_run_no_training_data_409(client: TestClient, fake_runner: FakeLongJobRunner) -> None:
     """A profile without labels.json is rejected before submission."""
     from pdomain_ocr_trainer_spa.core.enums import TypefaceEnum
     from pdomain_ocr_trainer_spa.domain.profiles import create_profile
 
     state = client.app.state.app_state  # type: ignore[attr-defined]
-    create_profile(
-        state.settings, name="empty", language="ga", typeface=TypefaceEnum.roman
-    )
+    create_profile(state.settings, name="empty", language="ga", typeface=TypefaceEnum.roman)
     fake_runner.script = list(_SUCCESS_SCRIPT)
-    r = client.post(
-        "/api/runs", json={"profile": "empty", "task": "recognition", "args": {}}
-    )
+    r = client.post("/api/runs", json={"profile": "empty", "task": "recognition", "args": {}})
     assert r.status_code == 409
     assert r.json()["code"] == "run.no_training_data"
 
@@ -92,9 +86,7 @@ def test_create_run_incomplete_profile_409(
     task_dir.mkdir(parents=True, exist_ok=True)
     (task_dir / "labels.json").write_text(json.dumps({"c": "x"}), encoding="utf-8")
     fake_runner.script = list(_SUCCESS_SCRIPT)
-    r = client.post(
-        "/api/runs", json={"profile": "bare", "task": "recognition", "args": {}}
-    )
+    r = client.post("/api/runs", json={"profile": "bare", "task": "recognition", "args": {}})
     assert r.status_code == 409
     assert r.json()["code"] == "run.profile_incomplete"
 
@@ -179,9 +171,7 @@ def test_scenario5_sse_reconnect_replays_remainder(
     )
     job_id = r.json()["job_id"]
 
-    with client.stream(
-        "GET", f"/api/jobs/{job_id}/events", headers={"Last-Event-ID": "3"}
-    ) as resp:
+    with client.stream("GET", f"/api/jobs/{job_id}/events", headers={"Last-Event-ID": "3"}) as resp:
         body = "".join(resp.iter_text())
     # events with seq <= 3 are skipped; seq 4,5,6 remain
     assert "id: 0" not in body
@@ -230,14 +220,10 @@ def test_run_fails_when_job_fails(
 # --- list / concurrency / delete ------------------------------------------
 
 
-def test_list_runs(
-    client: TestClient, fake_runner: FakeLongJobRunner, trained_profile: str
-) -> None:
+def test_list_runs(client: TestClient, fake_runner: FakeLongJobRunner, trained_profile: str) -> None:
     """The run list returns created runs newest-first."""
     fake_runner.script = list(_SUCCESS_SCRIPT)
-    client.post(
-        "/api/runs", json={"profile": trained_profile, "task": "recognition", "args": {}}
-    )
+    client.post("/api/runs", json={"profile": trained_profile, "task": "recognition", "args": {}})
     r = client.get("/api/runs")
     assert r.status_code == 200
     assert len(r.json()["runs"]) == 1
@@ -248,13 +234,9 @@ def test_one_train_job_at_a_time(
 ) -> None:
     """A second submission while one run is pending/running is a 409 (D-T15)."""
     fake_runner.script = [_ev("log", {"line": "running"})]  # no terminal event
-    first = client.post(
-        "/api/runs", json={"profile": trained_profile, "task": "recognition", "args": {}}
-    )
+    first = client.post("/api/runs", json={"profile": trained_profile, "task": "recognition", "args": {}})
     assert first.status_code == 202
-    second = client.post(
-        "/api/runs", json={"profile": trained_profile, "task": "detection", "args": {}}
-    )
+    second = client.post("/api/runs", json={"profile": trained_profile, "task": "detection", "args": {}})
     assert second.status_code == 409
     assert second.json()["code"] == "run.already_running"
 
@@ -264,9 +246,7 @@ def test_delete_terminal_run(
 ) -> None:
     """A succeeded run with no artefacts can be deleted."""
     fake_runner.script = list(_SUCCESS_SCRIPT)
-    r = client.post(
-        "/api/runs", json={"profile": trained_profile, "task": "recognition", "args": {}}
-    )
+    r = client.post("/api/runs", json={"profile": trained_profile, "task": "recognition", "args": {}})
     run_id = r.json()["run_id"]
     client.get(f"/api/runs/{run_id}")  # reconcile to succeeded
     assert client.delete(f"/api/runs/{run_id}").status_code == 204
@@ -283,17 +263,13 @@ def test_get_unknown_run_404(client: TestClient) -> None:
 # --- crash recovery (D-T3) ------------------------------------------------
 
 
-def test_hydrate_marks_orphaned_running_as_failed(
-    settings: Settings, trained_profile: str
-) -> None:
+def test_hydrate_marks_orphaned_running_as_failed(settings: Settings, trained_profile: str) -> None:
     """A run left 'running' at boot with no live job is marked failed."""
     from pdomain_ocr_trainer_spa.bootstrap import build_app
     from pdomain_ocr_trainer_spa.core.enums import TaskEnum
     from pdomain_ocr_trainer_spa.domain import runs as dom
 
-    run = dom.create_run(
-        settings, profile=trained_profile, task=TaskEnum.recognition, args={}
-    )
+    run = dom.create_run(settings, profile=trained_profile, task=TaskEnum.recognition, args={})
     dom.update_run(settings, run, status="running", job_id="dead-job")
 
     app = build_app(settings)  # triggers hydrate_from_disk

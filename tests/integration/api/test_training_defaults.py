@@ -33,9 +33,7 @@ def test_get_unset_returns_404(client: TestClient) -> None:
 
 
 def test_put_then_get_round_trips_recognition(client: TestClient) -> None:
-    seed = client.get(
-        "/api/profiles/all/training-defaults/recognition/seed"
-    ).json()["args"]
+    seed = client.get("/api/profiles/all/training-defaults/recognition/seed").json()["args"]
     seed["epochs"] = 50
     put = client.put("/api/profiles/all/training-defaults/recognition", json=seed)
     assert put.status_code == 200
@@ -47,9 +45,7 @@ def test_put_then_get_round_trips_recognition(client: TestClient) -> None:
 
 
 def test_put_then_get_round_trips_detection(client: TestClient) -> None:
-    seed = client.get(
-        "/api/profiles/all/training-defaults/detection/seed"
-    ).json()["args"]
+    seed = client.get("/api/profiles/all/training-defaults/detection/seed").json()["args"]
     seed["batch_size"] = 8
     put = client.put("/api/profiles/all/training-defaults/detection", json=seed)
     assert put.status_code == 200
@@ -58,17 +54,13 @@ def test_put_then_get_round_trips_detection(client: TestClient) -> None:
 
 
 def test_delete_falls_back_to_404(client: TestClient) -> None:
-    client.put(
-        "/api/profiles/all/training-defaults/detection", json={"epochs": 7}
-    )
+    client.put("/api/profiles/all/training-defaults/detection", json={"epochs": 7})
     resp = client.delete("/api/profiles/all/training-defaults/detection")
     assert resp.status_code == 204
     assert client.get("/api/profiles/all/training-defaults/detection").status_code == 404
 
 
 def test_classifier_task_rejected_on_seed(client: TestClient) -> None:
-    resp = client.get(
-        "/api/profiles/all/training-defaults/glyph-classification/seed"
-    )
+    resp = client.get("/api/profiles/all/training-defaults/glyph-classification/seed")
     assert resp.status_code == 422
     assert resp.json()["code"] == "training_defaults.task_unsupported"

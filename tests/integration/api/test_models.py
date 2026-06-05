@@ -114,9 +114,7 @@ def test_scan_models(client: TestClient, settings: Settings) -> None:
     assert len(r.json()["models"]) == 1
 
 
-def test_trained_run_sidecar_visible_in_models(
-    client: TestClient, settings: Settings
-) -> None:
+def test_trained_run_sidecar_visible_in_models(client: TestClient, settings: Settings) -> None:
     """Acceptance (spec 08 §9.1): a worker-written sidecar appears in /models.
 
     Simulates what worker/train.py does on a successful run — writes the
@@ -132,6 +130,4 @@ def test_trained_run_sidecar_visible_in_models(
     )
     listed = client.get("/api/models").json()["models"]
     assert any(m["model"]["name"] == name for m in listed)
-    assert json.loads(
-        (shared / name / f"{name}.metadata.json").read_text()
-    )["task"] == "recognition"
+    assert json.loads((shared / name / f"{name}.metadata.json").read_text())["task"] == "recognition"

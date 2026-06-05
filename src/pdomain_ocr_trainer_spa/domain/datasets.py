@@ -154,9 +154,7 @@ def _write_labels(task_dir: Path, labels: LabelMap) -> None:
     (task_dir / "labels.json").write_text(json.dumps(labels, indent=2), encoding="utf-8")
 
 
-def _iter_export_dirs(
-    settings: Settings, profile: str, task: TaskEnum
-) -> list[tuple[str, Path]]:
+def _iter_export_dirs(settings: Settings, profile: str, task: TaskEnum) -> list[tuple[str, Path]]:
     """Return ``(project_id, task_dir)`` for every export matching ``profile``.
 
     Layout: ``<export-root>/<project_id>/<profile-subfolder>/<task>/``.
@@ -243,9 +241,7 @@ def _on_disk_chip(task: TaskEnum, item_name: str, value: object) -> KanbanPageCh
     )
 
 
-def _rows_from_labels(
-    task: TaskEnum, labels: LabelMap, source: str
-) -> list[KanbanProjectRow]:
+def _rows_from_labels(task: TaskEnum, labels: LabelMap, source: str) -> list[KanbanProjectRow]:
     """Group a ``{item_name: value}`` map into ordered project rows."""
     by_project: dict[str, list[KanbanPageChip]] = {}
     for item_name, value in sorted(labels.items()):
@@ -267,9 +263,7 @@ def _rows_from_labels(
     return rows
 
 
-def _on_disk_labels(
-    settings: Settings, split: str, profile: str, task: TaskEnum
-) -> LabelMap:
+def _on_disk_labels(settings: Settings, split: str, profile: str, task: TaskEnum) -> LabelMap:
     """All on-disk labels for a split."""
     return _read_labels(_task_dir(settings, split, profile, task))
 
@@ -296,8 +290,7 @@ def _unassigned_rows(
         if not export_labels:
             continue
         if all(
-            name in on_disk_labels
-            and _values_equal(task, on_disk_labels[name], value)
+            name in on_disk_labels and _values_equal(task, on_disk_labels[name], value)
             for name, value in export_labels.items()
         ):
             continue  # fully present + unchanged — suppressed
@@ -306,11 +299,7 @@ def _unassigned_rows(
             is_changed = item_name in on_disk_labels and not _values_equal(
                 task, on_disk_labels[item_name], value
             )
-            summary = (
-                _change_summary(task, on_disk_labels[item_name], value)
-                if is_changed
-                else None
-            )
+            summary = _change_summary(task, on_disk_labels[item_name], value) if is_changed else None
             is_recognition = task is TaskEnum.recognition
             chips.append(
                 KanbanPageChip(
@@ -339,21 +328,14 @@ def build_kanban(settings: Settings, *, profile: str, task: TaskEnum) -> KanbanV
     """Assemble the committed ``KanbanView`` for a ``(profile, task)`` pair (spec 05 §2)."""
     _require_supported(task)
     normalized = normalize_profile_name(profile)
-    on_disk = {
-        split: _on_disk_labels(settings, split, normalized, task)
-        for split in _SPLIT_DIRS
-    }
+    on_disk = {split: _on_disk_labels(settings, split, normalized, task) for split in _SPLIT_DIRS}
     include_detection, include_recognition = _read_include_toggles(settings, normalized)
     return KanbanView(
         profile=normalized,
         task=task,
         columns={
-            "unassigned": KanbanColumn(
-                rows=_unassigned_rows(settings, normalized, task, on_disk)
-            ),
-            "train": KanbanColumn(
-                rows=_rows_from_labels(task, on_disk["train"], "on_disk")
-            ),
+            "unassigned": KanbanColumn(rows=_unassigned_rows(settings, normalized, task, on_disk)),
+            "train": KanbanColumn(rows=_rows_from_labels(task, on_disk["train"], "on_disk")),
             "val": KanbanColumn(rows=_rows_from_labels(task, on_disk["val"], "on_disk")),
         },
         include_detection=include_detection,
@@ -375,9 +357,7 @@ def _committed_split_of(key: str, on_disk: dict[str, LabelMap]) -> str | None:
     return None
 
 
-def _export_value_for(
-    settings: Settings, profile: str, task: TaskEnum, key: str
-) -> object | None:
+def _export_value_for(settings: Settings, profile: str, task: TaskEnum, key: str) -> object | None:
     """Look up an export item's labels.json value by chip key."""
     project_id, _, item_name = key.partition(":")
     for export_project, task_path in _iter_export_dirs(settings, profile, task):
@@ -389,9 +369,7 @@ def _export_value_for(
     return None
 
 
-def _export_image_path(
-    settings: Settings, profile: str, task: TaskEnum, key: str
-) -> Path | None:
+def _export_image_path(settings: Settings, profile: str, task: TaskEnum, key: str) -> Path | None:
     """Locate the source image for an export chip key."""
     project_id, _, item_name = key.partition(":")
     for export_project, task_path in _iter_export_dirs(settings, profile, task):
@@ -492,10 +470,7 @@ def apply_assignments(
     """
     _require_supported(task)
     normalized = normalize_profile_name(profile)
-    on_disk = {
-        split: _on_disk_labels(settings, split, normalized, task)
-        for split in _SPLIT_DIRS
-    }
+    on_disk = {split: _on_disk_labels(settings, split, normalized, task) for split in _SPLIT_DIRS}
     errors: list[dict[str, str]] = []
     attempted = 0
     for entry in request.assignments:
@@ -503,9 +478,7 @@ def apply_assignments(
             continue
         attempted += 1
         try:
-            _apply_one(
-                settings, normalized, task, entry.key, entry.target_split, on_disk
-            )
+            _apply_one(settings, normalized, task, entry.key, entry.target_split, on_disk)
         except (AppError, OSError, ValueError) as exc:
             errors.append({"key": entry.key, "error": str(exc)})
 

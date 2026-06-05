@@ -26,17 +26,13 @@ def _seed_profile(settings: Settings, *, with_data: bool = True) -> str:
     if with_data:
         task_dir = settings.ml_training_dir / "clogaelach" / "recognition"
         task_dir.mkdir(parents=True, exist_ok=True)
-        (task_dir / "labels.json").write_text(
-            json.dumps({"crop-1": "label"}), encoding="utf-8"
-        )
+        (task_dir / "labels.json").write_text(json.dumps({"crop-1": "label"}), encoding="utf-8")
     return "clogaelach"
 
 
 def test_derive_model_name_uses_language_typeface_task_date(settings: Settings) -> None:
     _seed_profile(settings)
-    name = dom.derive_model_name(
-        settings, profile="clogaelach", task=TaskEnum.recognition
-    )
+    name = dom.derive_model_name(settings, profile="clogaelach", task=TaskEnum.recognition)
     assert name.startswith("pd-ga-clogaelach-recognition-")
 
 
@@ -49,9 +45,7 @@ def test_derive_model_name_blocks_incomplete_profile(settings: Settings) -> None
 
 def test_create_run_writes_run_dir(settings: Settings) -> None:
     _seed_profile(settings)
-    run = dom.create_run(
-        settings, profile="clogaelach", task=TaskEnum.recognition, args={"epochs": 5}
-    )
+    run = dom.create_run(settings, profile="clogaelach", task=TaskEnum.recognition, args={"epochs": 5})
     rd = dom.run_dir(settings, run.id)
     assert (rd / "manifest.json").exists()
     assert (rd / "args.json").exists()
@@ -82,12 +76,8 @@ def test_create_run_rejects_unsupported_task(settings: Settings) -> None:
 
 def test_prepare_worker_args_fills_paths(settings: Settings) -> None:
     _seed_profile(settings)
-    run = dom.create_run(
-        settings, profile="clogaelach", task=TaskEnum.recognition, args={"epochs": 3}
-    )
-    args = json.loads(
-        (dom.run_dir(settings, run.id) / "args.json").read_text(encoding="utf-8")
-    )
+    run = dom.create_run(settings, profile="clogaelach", task=TaskEnum.recognition, args={"epochs": 3})
+    args = json.loads((dom.run_dir(settings, run.id) / "args.json").read_text(encoding="utf-8"))
     assert args["epochs"] == 3
     assert args["train_path"].endswith("clogaelach/recognition")
     assert args["val_path"].endswith("clogaelach/recognition")
@@ -97,9 +87,7 @@ def test_prepare_worker_args_fills_paths(settings: Settings) -> None:
 
 def test_manifest_round_trip(settings: Settings) -> None:
     _seed_profile(settings)
-    run = dom.create_run(
-        settings, profile="clogaelach", task=TaskEnum.recognition, args={}
-    )
+    run = dom.create_run(settings, profile="clogaelach", task=TaskEnum.recognition, args={})
     reloaded = dom.read_manifest(settings, run.id)
     assert reloaded is not None
     assert reloaded.id == run.id
@@ -108,9 +96,7 @@ def test_manifest_round_trip(settings: Settings) -> None:
 
 def test_progress_append_and_read(settings: Settings) -> None:
     _seed_profile(settings)
-    run = dom.create_run(
-        settings, profile="clogaelach", task=TaskEnum.recognition, args={}
-    )
+    run = dom.create_run(settings, profile="clogaelach", task=TaskEnum.recognition, args={})
     dom.append_progress(settings, run.id, {"type": "progress", "current": 1, "total": 3})
     dom.append_progress(settings, run.id, {"type": "metric", "name": "val_cer"})
     records = dom.read_progress(settings, run.id)
@@ -121,12 +107,8 @@ def test_progress_append_and_read(settings: Settings) -> None:
 
 def test_list_runs_newest_first(settings: Settings) -> None:
     _seed_profile(settings)
-    first = dom.create_run(
-        settings, profile="clogaelach", task=TaskEnum.recognition, args={}
-    )
-    second = dom.create_run(
-        settings, profile="clogaelach", task=TaskEnum.recognition, args={}
-    )
+    first = dom.create_run(settings, profile="clogaelach", task=TaskEnum.recognition, args={})
+    second = dom.create_run(settings, profile="clogaelach", task=TaskEnum.recognition, args={})
     runs = dom.list_runs(settings)
     ids = [r.id for r in runs]
     assert ids[0] == second.id
@@ -141,9 +123,7 @@ def test_get_run_unknown_404(settings: Settings) -> None:
 
 def test_delete_run_refuses_running(settings: Settings) -> None:
     _seed_profile(settings)
-    run = dom.create_run(
-        settings, profile="clogaelach", task=TaskEnum.recognition, args={}
-    )
+    run = dom.create_run(settings, profile="clogaelach", task=TaskEnum.recognition, args={})
     with pytest.raises(AppError) as exc:
         dom.delete_run(settings, run.id)
     assert exc.value.code == "run.not_terminal"
@@ -151,9 +131,7 @@ def test_delete_run_refuses_running(settings: Settings) -> None:
 
 def test_delete_run_removes_terminal(settings: Settings) -> None:
     _seed_profile(settings)
-    run = dom.create_run(
-        settings, profile="clogaelach", task=TaskEnum.recognition, args={}
-    )
+    run = dom.create_run(settings, profile="clogaelach", task=TaskEnum.recognition, args={})
     dom.mark_terminal(settings, run, status="succeeded", exit_code=0)
     dom.delete_run(settings, run.id)
     assert not dom.run_dir(settings, run.id).exists()
@@ -167,7 +145,12 @@ def test_delete_run_removes_terminal(settings: Settings) -> None:
 def test_create_run_accepts_hf_source_in_args(settings: Settings) -> None:
     """A run created with an HF source in args.sources stores it in manifest."""
     _seed_profile(settings)
-    hf_source = {"kind": "huggingface", "repo": "ntw8532/pdomain-ocr-synth-ga-clogaelach", "revision": "main", "weight": 1.0}
+    hf_source = {
+        "kind": "huggingface",
+        "repo": "ntw8532/pdomain-ocr-synth-ga-clogaelach",
+        "revision": "main",
+        "weight": 1.0,
+    }
     run = dom.create_run(
         settings,
         profile="clogaelach",
@@ -194,9 +177,7 @@ def test_prepare_worker_args_preserves_hf_source(settings: Settings) -> None:
         task=TaskEnum.recognition,
         args={"epochs": 1, "sources": [hf_source]},
     )
-    args = json.loads(
-        (dom.run_dir(settings, run.id) / "args.json").read_text(encoding="utf-8")
-    )
+    args = json.loads((dom.run_dir(settings, run.id) / "args.json").read_text(encoding="utf-8"))
     # The HF source must be passed through to the worker for materialization.
     sources = args.get("sources", [])
     assert len(sources) == 1

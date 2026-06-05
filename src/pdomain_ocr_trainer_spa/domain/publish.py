@@ -60,8 +60,7 @@ def submit_publish_dataset_job(
     from pdomain_ocr_trainer_spa.core.errors import AdapterNotImplementedError
 
     raise AdapterNotImplementedError(
-        "Dataset publish worker not yet implemented. "
-        "Wire a worker script in a follow-on milestone."
+        "Dataset publish worker not yet implemented. Wire a worker script in a follow-on milestone."
     )
 
 
@@ -82,6 +81,5 @@ def submit_publish_model_job(
     from pdomain_ocr_trainer_spa.core.errors import AdapterNotImplementedError
 
     raise AdapterNotImplementedError(
-        "Model publish worker not yet implemented. "
-        "Wire a worker script in a follow-on milestone."
+        "Model publish worker not yet implemented. Wire a worker script in a follow-on milestone."
     )

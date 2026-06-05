@@ -83,10 +83,7 @@ def test_run_worker_emits_done_event(tmp_path: Path, capsys) -> None:
     _write_run_dir(run_dir)
     runner = _FakeEvalRunner(EvalMetrics(cer=0.05), 10)
     worker.run_worker(run_dir, runner=runner)
-    lines = [
-        ln for ln in capsys.readouterr().out.splitlines()
-        if ln.startswith("@@PDEVENT@@")
-    ]
+    lines = [ln for ln in capsys.readouterr().out.splitlines() if ln.startswith("@@PDEVENT@@")]
     kinds = [json.loads(ln[len("@@PDEVENT@@") :])["kind"] for ln in lines]
     assert "done" in kinds
 

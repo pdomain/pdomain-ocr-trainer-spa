@@ -69,18 +69,14 @@ def test_get_unset_raises_404(settings: Settings) -> None:
 
 def test_set_then_get_round_trips_recognition(settings: Settings) -> None:
     args = {**td.seed_defaults(TaskEnum.recognition), "epochs": 50}
-    td.set_training_defaults(
-        settings, profile="all", task=TaskEnum.recognition, args=args
-    )
+    td.set_training_defaults(settings, profile="all", task=TaskEnum.recognition, args=args)
     got = td.get_training_defaults(settings, profile="all", task=TaskEnum.recognition)
     assert got["epochs"] == 50
 
 
 def test_set_then_get_round_trips_detection(settings: Settings) -> None:
     args = {**td.seed_defaults(TaskEnum.detection), "batch_size": 8}
-    td.set_training_defaults(
-        settings, profile="all", task=TaskEnum.detection, args=args
-    )
+    td.set_training_defaults(settings, profile="all", task=TaskEnum.detection, args=args)
     got = td.get_training_defaults(settings, profile="all", task=TaskEnum.detection)
     assert got["batch_size"] == 8
 
@@ -100,27 +96,15 @@ def test_detection_and_recognition_defaults_are_independent(
         task=TaskEnum.recognition,
         args={"epochs": 9},
     )
-    assert (
-        td.get_training_defaults(settings, profile="all", task=TaskEnum.detection)[
-            "epochs"
-        ]
-        == 7
-    )
-    assert (
-        td.get_training_defaults(settings, profile="all", task=TaskEnum.recognition)[
-            "epochs"
-        ]
-        == 9
-    )
+    assert td.get_training_defaults(settings, profile="all", task=TaskEnum.detection)["epochs"] == 7
+    assert td.get_training_defaults(settings, profile="all", task=TaskEnum.recognition)["epochs"] == 9
     # Both stored in one training_defaults.json keyed by task.
     path = settings.app_data_root / "profiles" / "all" / "training_defaults.json"
     assert set(json.loads(path.read_text())) == {"detection", "recognition"}
 
 
 def test_delete_falls_back_to_unset(settings: Settings) -> None:
-    td.set_training_defaults(
-        settings, profile="all", task=TaskEnum.detection, args={"epochs": 7}
-    )
+    td.set_training_defaults(settings, profile="all", task=TaskEnum.detection, args={"epochs": 7})
     td.delete_training_defaults(settings, profile="all", task=TaskEnum.detection)
     with pytest.raises(AppError) as excinfo:
         td.get_training_defaults(settings, profile="all", task=TaskEnum.detection)
@@ -128,9 +112,7 @@ def test_delete_falls_back_to_unset(settings: Settings) -> None:
 
 
 def test_delete_last_task_removes_the_file(settings: Settings) -> None:
-    td.set_training_defaults(
-        settings, profile="all", task=TaskEnum.detection, args={"epochs": 7}
-    )
+    td.set_training_defaults(settings, profile="all", task=TaskEnum.detection, args={"epochs": 7})
     td.delete_training_defaults(settings, profile="all", task=TaskEnum.detection)
     path = settings.app_data_root / "profiles" / "all" / "training_defaults.json"
     assert not path.exists()

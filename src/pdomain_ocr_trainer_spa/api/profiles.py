@@ -157,9 +157,7 @@ async def put_training_defaults(
     state: AppState = Depends(get_app_state),
 ) -> TrainingDefaultsResponse:
     """Persist training-defaults for a ``(profile, task)`` pair (spec 04 §3.3)."""
-    stored = td.set_training_defaults(
-        state.settings, profile=name, task=task, args=args
-    )
+    stored = td.set_training_defaults(state.settings, profile=name, task=task, args=args)
     return TrainingDefaultsResponse(task=task, args=stored)
 
 

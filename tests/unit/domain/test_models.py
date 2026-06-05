@@ -69,9 +69,7 @@ def _write_model(
     if weights:
         (leaf / "model.pt").write_bytes(b"\x00")
     if sidecar:
-        (leaf / f"{name}.metadata.json").write_text(
-            ModelSidecar(name=name, task=task).model_dump_json()
-        )
+        (leaf / f"{name}.metadata.json").write_text(ModelSidecar(name=name, task=task).model_dump_json())
 
 
 def test_list_models_discovers_weights_only_dir(settings: Settings) -> None:
@@ -91,11 +89,15 @@ def test_list_models_discovers_weights_only_dir(settings: Settings) -> None:
 def test_list_models_filters(settings: Settings) -> None:
     """profile / task / include_legacy filters narrow the result set."""
     _write_model(
-        settings, profile="clogaelach", task="recognition",
+        settings,
+        profile="clogaelach",
+        task="recognition",
         name="pd-ga-clogaelach-recognition-2026-05-05",
     )
     _write_model(
-        settings, profile="clogaelach", task="detection",
+        settings,
+        profile="clogaelach",
+        task="detection",
         name="pd-clogaelach-detection-legacy",
     )
     assert len(dom.list_models(settings, task=TaskEnum.recognition)) == 1
@@ -116,7 +118,11 @@ def test_regenerate_sidecar_recreates_missing_file(settings: Settings) -> None:
     """regenerate_sidecar writes a fresh sidecar for a weights-only model."""
     name = "pd-ga-clogaelach-recognition-2026-05-05"
     _write_model(
-        settings, profile="clogaelach", task="recognition", name=name, sidecar=False,
+        settings,
+        profile="clogaelach",
+        task="recognition",
+        name=name,
+        sidecar=False,
     )
     model = dom.regenerate_sidecar(settings, name)
     assert dom.has_sidecar(model)
@@ -175,15 +181,16 @@ def test_delete_model_removes_leaf(settings: Settings) -> None:
 def test_backfill_language_from_profile(settings: Settings) -> None:
     """A legacy model with no sidecar slots back-fills lang/typeface from profile."""
     create_profile(
-        settings, name="clogaelach", language="ga", typeface=TypefaceEnum.clogaelach,
+        settings,
+        name="clogaelach",
+        language="ga",
+        typeface=TypefaceEnum.clogaelach,
     )
     name = "pd-clogaelach-recognition-legacy"
     leaf = settings.shared_models_dir / "clogaelach" / "recognition" / name
     leaf.mkdir(parents=True, exist_ok=True)
     (leaf / "model.pt").write_bytes(b"\x00")
-    (leaf / f"{name}.metadata.json").write_text(
-        json.dumps({"name": name, "task": "recognition"})
-    )
+    (leaf / f"{name}.metadata.json").write_text(json.dumps({"name": name, "task": "recognition"}))
     model = dom.get_model(settings, name)
     assert model.language == "ga"
     assert model.typeface == "clogaelach"

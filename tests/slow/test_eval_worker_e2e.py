@@ -49,9 +49,7 @@ def test_eval_round_trip_writes_result_json(settings: Settings) -> None:
     from pdomain_ocr_trainer_spa.domain import eval as eval_dom
     from pdomain_ocr_trainer_spa.domain.profiles import create_profile
 
-    create_profile(
-        settings, name="clogaelach", language="ga", typeface=TypefaceEnum.clogaelach
-    )
+    create_profile(settings, name="clogaelach", language="ga", typeface=TypefaceEnum.clogaelach)
     # Seed a model on disk so create_eval_run validates.
     name = "pd-ga-clogaelach-recognition-2026-05-05"
     leaf = settings.shared_models_dir / "clogaelach" / "recognition" / name
@@ -75,9 +73,7 @@ def test_eval_round_trip_writes_result_json(settings: Settings) -> None:
         str(settings.runs_dir / run.id),
     ]
 
-    state = asyncio.run(
-        _submit_and_wait(runner, kind="eval.recognition", run_id=run.id, cmd=cmd)
-    )
+    state = asyncio.run(_submit_and_wait(runner, kind="eval.recognition", run_id=run.id, cmd=cmd))
     assert state == "succeeded"
 
     result_path = settings.runs_dir / run.id / "result.json"

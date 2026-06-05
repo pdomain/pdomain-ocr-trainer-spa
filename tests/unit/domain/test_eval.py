@@ -19,15 +19,16 @@ if TYPE_CHECKING:
 
 def _seed_model(settings: Settings) -> str:
     create_profile(
-        settings, name="clogaelach", language="ga", typeface=TypefaceEnum.clogaelach,
+        settings,
+        name="clogaelach",
+        language="ga",
+        typeface=TypefaceEnum.clogaelach,
     )
     name = "pd-ga-clogaelach-recognition-2026-05-05"
     leaf = settings.shared_models_dir / "clogaelach" / "recognition" / name
     leaf.mkdir(parents=True, exist_ok=True)
     (leaf / "model.pt").write_bytes(b"\x00")
-    (leaf / f"{name}.metadata.json").write_text(
-        ModelSidecar(name=name, task="recognition").model_dump_json()
-    )
+    (leaf / f"{name}.metadata.json").write_text(ModelSidecar(name=name, task="recognition").model_dump_json())
     return name
 
 
@@ -35,7 +36,10 @@ def test_create_eval_run_writes_run_dir(settings: Settings) -> None:
     """create_eval_run creates a kind='eval' run with an args.json."""
     model = _seed_model(settings)
     run = eval_dom.create_eval_run(
-        settings, profile="clogaelach", task=TaskEnum.recognition, model_name=model,
+        settings,
+        profile="clogaelach",
+        task=TaskEnum.recognition,
+        model_name=model,
     )
     assert run.kind == "eval"
     assert run.args["model_name"] == model
@@ -47,7 +51,9 @@ def test_create_eval_run_unknown_model_404(settings: Settings) -> None:
     create_profile(settings, name="clogaelach")
     with pytest.raises(AppError) as exc:
         eval_dom.create_eval_run(
-            settings, profile="clogaelach", task=TaskEnum.recognition,
+            settings,
+            profile="clogaelach",
+            task=TaskEnum.recognition,
             model_name="nope",
         )
     assert exc.value.status_code == 404
@@ -57,7 +63,10 @@ def test_write_and_read_result_round_trip(settings: Settings) -> None:
     """write_result persists result.json + result.md; read_result round-trips."""
     model = _seed_model(settings)
     run = eval_dom.create_eval_run(
-        settings, profile="clogaelach", task=TaskEnum.recognition, model_name=model,
+        settings,
+        profile="clogaelach",
+        task=TaskEnum.recognition,
+        model_name=model,
     )
     result = EvalResult(
         run_id=run.id,
@@ -81,7 +90,10 @@ def test_get_result_missing_raises_404(settings: Settings) -> None:
     """get_result raises 404 before the eval worker has written a result."""
     model = _seed_model(settings)
     run = eval_dom.create_eval_run(
-        settings, profile="clogaelach", task=TaskEnum.recognition, model_name=model,
+        settings,
+        profile="clogaelach",
+        task=TaskEnum.recognition,
+        model_name=model,
     )
     with pytest.raises(AppError) as exc:
         eval_dom.get_result(settings, run.id)

@@ -36,9 +36,7 @@ class _FakeEvalRunner:
         return EvalMetrics(cer=0.034, wer=0.092), 1842
 
 
-def test_create_eval_returns_202(
-    client: TestClient, settings: Settings, trained_profile: str
-) -> None:
+def test_create_eval_returns_202(client: TestClient, settings: Settings, trained_profile: str) -> None:
     """POST /api/eval creates an eval run and returns 202 with run+job ids."""
     model = _seed_model(settings)
     r = client.post(
@@ -51,9 +49,7 @@ def test_create_eval_returns_202(
     assert body["job_id"]
 
 
-def test_create_eval_unknown_model_404(
-    client: TestClient, trained_profile: str
-) -> None:
+def test_create_eval_unknown_model_404(client: TestClient, trained_profile: str) -> None:
     """An eval against a missing model is rejected with 404."""
     r = client.post(
         "/api/eval",
@@ -90,9 +86,7 @@ def test_eval_round_trip(
     ).json()["run_id"]
 
     # Drive the eval worker in-process (the fake job runner does not spawn it).
-    code = eval_worker.run_worker(
-        settings.runs_dir / run_id, runner=_FakeEvalRunner()
-    )
+    code = eval_worker.run_worker(settings.runs_dir / run_id, runner=_FakeEvalRunner())
     assert code == 0
     assert (settings.runs_dir / run_id / "result.json").exists()
 

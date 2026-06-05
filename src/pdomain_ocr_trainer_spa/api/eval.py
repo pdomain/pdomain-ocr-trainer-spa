@@ -37,9 +37,7 @@ router = APIRouter(prefix="/api/eval", tags=["eval"])
 class _ProcessSubmitter(Protocol):
     """The ``submit_with_process`` seam (see ``api/runs.py`` for the rationale)."""
 
-    async def submit_with_process(
-        self, kind: str, spec: dict[str, object], cmd: list[str]
-    ) -> str: ...
+    async def submit_with_process(self, kind: str, spec: dict[str, object], cmd: list[str]) -> str: ...
 
 
 class EvalRequest(BaseModel):
