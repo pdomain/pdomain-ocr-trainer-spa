@@ -138,7 +138,13 @@ frontend-format-check: frontend-install ## Check SPA formatting with Prettier (n
 frontend-knip: frontend-install ## Run knip dead-export detector
 	cd frontend && $(call _pnpm,run knip)
 
-build: frontend-build ## Build wheel (with frontend bundled; sdist skipped)
+build: frontend-build ## Build release artifacts (sdist + wheel, both from source)
+	# Build sdist and wheel as SEPARATE explicit commands (NOT bare `uv build`).
+	# Bare `uv build` builds the wheel from the sdist in a non-git temp dir;
+	# if the global [tool.hatch.build] artifacts config is absent, the gitignored
+	# static/ SPA dir is silently dropped from the wheel. Building both explicitly
+	# from the source tree eliminates this failure mode (matches pdomain-ocr-simple-gui).
+	uv build --sdist
 	uv build --wheel
 
 e2e: frontend-build ## Run Playwright browser e2e tests (requires chromium)

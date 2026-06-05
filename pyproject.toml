@@ -71,8 +71,23 @@ pdomain-ocr-training = { index = "pdomain-index-pip" }
 [tool.hatch.version]
 source = "vcs"
 
+[tool.hatch.build]
+# Include the gitignored Vite build output in BOTH the sdist and the wheel.
+# src/pdomain_ocr_trainer_spa/static/ is gitignored (generated artefact), so
+# hatchling's default VCS-based file selection silently omits it. Setting
+# `artifacts` globally (not just in the wheel target) ensures:
+#   1. The sdist contains src/pdomain_ocr_trainer_spa/static/ (the built SPA).
+#   2. The wheel built from that sdist also includes the static files.
+# Without this, `uv build` (default: sdist then wheel-from-sdist) produces a
+# wheel with 0 static files even when `artifacts` is set only in the wheel
+# target, because hatchling builds the wheel in a non-git temp dir from the
+# sdist and applies the per-target artifact spec against that dir.
+artifacts = ["src/pdomain_ocr_trainer_spa/static/**/*"]
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/pdomain_ocr_trainer_spa"]
+# The global `artifacts` above also covers this target; no additional per-wheel
+# artifacts entry needed (duplication would be harmless but confusing).
 
 [tool.ruff]
 line-length = 110
@@ -131,7 +146,7 @@ ignore = [
 convention = "google"
 
 [tool.ruff.lint.per-file-ignores]
-"tests/*" = ["E741", "N806", "N811", "S101", "S104", "S105", "S106", "S301", "S311", "S603", "T201", "ANN", "D", "PLR2004", "PT011", "PT018", "S108", "PLR0133", "PLW2901", "PLW1510", "PERF401", "PERF402", "TRY", "BLE001", "TC"]
+"tests/*" = ["E741", "N806", "N811", "S101", "S104", "S105", "S106", "S301", "S311", "S603", "S607", "T201", "ANN", "D", "PLR2004", "PT011", "PT018", "S108", "PLR0133", "PLW2901", "PLW1510", "PERF401", "PERF402", "TRY", "BLE001", "TC"]
 "scripts/*.py" = ["T201", "D", "ANN", "S603", "S607", "PLW1510"]
 "**/__init__.py" = ["D104", "F401", "TC"]
 "**/_*.py" = ["D"]
