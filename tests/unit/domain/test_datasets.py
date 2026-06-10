@@ -409,3 +409,88 @@ def test_freshness_record_updated_after_build(
     # Second scan — record was persisted, no longer fresh
     view2 = dom.build_kanban(export_settings, profile="all", task=TaskEnum.recognition)
     assert not any(r.is_fresh for r in view2.columns["unassigned"].rows)
+
+
+# ---------------------------------------------------------------------------
+# Bug-fix: non-UTC offset produces false freshness
+# ---------------------------------------------------------------------------
+
+
+def test_normalize_exported_at_converts_to_utc() -> None:
+    """_normalize_exported_at must produce a UTC-normalised ISO string.
+
+    _normalize_exported_at accepts proj_data — either a dict {"exported_at": ...}
+    or an object with an .exported_at attribute. Two proj_data objects carrying
+    the SAME instant in different offsets must normalise to equal UTC strings.
+    """
+    from datetime import UTC, datetime, timedelta, timezone
+
+    from pdomain_ocr_trainer_spa.domain.datasets import _normalize_exported_at
+
+    # 2026-06-10T11:00:00+05:30 == 2026-06-10T05:30:00+00:00
+    ist = timezone(timedelta(hours=5, minutes=30))
+    dt_ist = datetime(2026, 6, 10, 11, 0, 0, tzinfo=ist)
+    dt_utc = datetime(2026, 6, 10, 5, 30, 0, tzinfo=UTC)
+
+    # Test via dict representation (fallback branch)
+    result_dict_ist = _normalize_exported_at({"exported_at": dt_ist})
+    result_dict_utc = _normalize_exported_at({"exported_at": dt_utc})
+    assert result_dict_ist == result_dict_utc, (
+        f"Dict-carried same instant with different offsets must normalise equally; "
+        f"got {result_dict_ist!r} vs {result_dict_utc!r}"
+    )
+    assert "+00:00" in result_dict_ist, f"Expected UTC offset in result, got {result_dict_ist!r}"
+
+    # Test via string representation (ISO 8601 with non-UTC offset, from fallback JSON)
+    str_ist = dt_ist.isoformat()  # "2026-06-10T11:00:00+05:30"
+    str_utc = dt_utc.isoformat()  # "2026-06-10T05:30:00+00:00"
+    result_str_ist = _normalize_exported_at({"exported_at": str_ist})
+    result_str_utc = _normalize_exported_at({"exported_at": str_utc})
+    assert result_str_ist == result_str_utc, (
+        f"String-carried same instant with different offsets must normalise equally; "
+        f"got {result_str_ist!r} vs {result_str_utc!r}"
+    )
+
+
+def test_non_utc_offset_not_false_fresh(export_settings: Settings) -> None:
+    """A manifest exported_at with +05:30 equal to the stored UTC is NOT fresh.
+
+    This is the primary regression test: a non-UTC offset for the SAME instant
+    as the persisted UTC string used to compare lexicographically greater
+    ("+05" > "+00") and falsely flag the project as fresh.
+    """
+    from datetime import UTC, datetime, timedelta, timezone
+
+    from pdomain_ocr_trainer_spa.domain.datasets import _normalize_exported_at
+    from pdomain_ocr_trainer_spa.domain.labeler_export import ExportFreshnessRecord
+
+    _seed_export(export_settings, "myproj", {"myproj_0001.png": "test"})
+    assert export_settings.labeler_export_root is not None
+
+    # The instant: 2026-06-10T11:00:00+05:30 == 2026-06-10T05:30:00Z
+    ist = timezone(timedelta(hours=5, minutes=30))
+    instant_ist = datetime(2026, 6, 10, 11, 0, 0, tzinfo=ist)
+    instant_utc = datetime(2026, 6, 10, 5, 30, 0, tzinfo=UTC)
+
+    # Persist the freshness record using the UTC representation.
+    # _normalize_exported_at takes proj_data (a dict or object with .exported_at),
+    # not a bare datetime — wrap in a dict so it resolves correctly.
+    stored_utc_str = _normalize_exported_at({"exported_at": instant_utc})
+    rec = ExportFreshnessRecord(project_seen_at={"myproj": stored_utc_str})
+    freshness_path = export_settings.app_data_root / "profiles" / "all" / "freshness_state.json"
+    freshness_path.parent.mkdir(parents=True, exist_ok=True)
+    rec.save(freshness_path)
+
+    # The manifest carries the same instant in +05:30 — should NOT be fresh
+    _write_manifest(
+        export_settings.labeler_export_root,
+        instant_ist.isoformat(),  # "+05:30" string in manifest
+        "myproj",
+    )
+
+    view = dom.build_kanban(export_settings, profile="all", task=TaskEnum.recognition)
+    unassigned = view.columns["unassigned"].rows
+    assert not any(r.is_fresh for r in unassigned), (
+        "A manifest timestamp with +05:30 equal to the stored UTC must NOT be is_fresh; "
+        f"got: {[r.project_id for r in unassigned if r.is_fresh]}"
+    )

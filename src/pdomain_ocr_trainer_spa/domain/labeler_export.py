@@ -8,11 +8,14 @@ See docs/conventions/lint-deviations.md for the approved guarded-import pattern.
 from __future__ import annotations
 
 import json
+import logging
 from enum import Enum
 from pathlib import Path  # noqa: TC003 — used at runtime in method signatures
 from typing import Any
 
 from pydantic import BaseModel
+
+_logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Optional pdomain-ops import — Track B gate
@@ -43,10 +46,23 @@ try:
     )
 
     def read_export_manifest(export_root: Path) -> DoctrExportManifest | None:
-        """Read the manifest.json from an export root; None if absent or unreadable."""
+        """Read the manifest.json from an export root; None if absent or unreadable.
+
+        Absorbs (OSError, ValueError) so a corrupt manifest.json never propagates
+        to callers: the real pdomain_ops.schemas.doctr_export.read_manifest raises
+        ValueError("corrupt manifest ...") on any parse failure, and we treat that
+        as absent rather than crashing GET /api/kanban or GET /api/banners.
+        """
         if not export_root.exists():
             return None
-        return _read_manifest_impl(export_root)  # pyright: ignore[reportReturnType]
+        try:
+            return _read_manifest_impl(export_root)  # pyright: ignore[reportReturnType]
+        except (OSError, ValueError):
+            _logger.warning(
+                "Corrupt or unreadable manifest at %s; treating as absent",
+                export_root / "manifest.json",
+            )
+            return None
 
 except ImportError:
 

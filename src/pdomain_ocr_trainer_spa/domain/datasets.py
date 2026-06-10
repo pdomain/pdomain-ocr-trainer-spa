@@ -216,8 +216,14 @@ def _normalize_exported_at(proj_data: object) -> str:
     """Extract and normalize exported_at from a project manifest entry.
 
     Handles both the real DoctrExportProject (pydantic datetime) and the
-    fallback dict / raw-JSON representation. Returns an ISO 8601 string
-    with UTC offset for reliable string comparison.
+    fallback dict / raw-JSON representation. Always returns an ISO 8601 string
+    with UTC offset (+00:00) so that string comparison is meaningful across
+    timestamps that carry different UTC offsets.
+
+    Naive datetimes are treated as UTC (no offset information available).
+
+    Both sides of every freshness comparison must be normalised through this
+    function so the comparison is offset-agnostic.
     """
     from datetime import UTC, datetime
 
@@ -225,16 +231,23 @@ def _normalize_exported_at(proj_data: object) -> str:
         raw = proj_data.get("exported_at", "")
     else:
         raw = getattr(proj_data, "exported_at", "")
-    # If it's already a datetime, convert via isoformat
+    # If it's already a datetime object, convert to UTC then serialise
     if isinstance(raw, datetime):
         if raw.tzinfo is None:
             raw = raw.replace(tzinfo=UTC)
-        return raw.isoformat()
-    # Normalize the string: replace trailing "Z" with "+00:00"
+        return raw.astimezone(UTC).isoformat()
+    # String path: parse → astimezone(UTC) → isoformat so all offsets are normalised
     s = str(raw)
     if s.endswith("Z"):
         s = s[:-1] + "+00:00"
-    return s
+    try:
+        parsed = datetime.fromisoformat(s)
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=UTC)
+        return parsed.astimezone(UTC).isoformat()
+    except ValueError:
+        # Unparseable string: return as-is (best effort; comparison may be unreliable)
+        return s
 
 
 def _load_fresh_project_ids(settings: Settings, profile: str) -> frozenset[str]:
