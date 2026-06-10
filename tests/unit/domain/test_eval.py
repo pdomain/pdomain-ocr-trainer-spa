@@ -98,3 +98,60 @@ def test_get_result_missing_raises_404(settings: Settings) -> None:
     with pytest.raises(AppError) as exc:
         eval_dom.get_result(settings, run.id)
     assert exc.value.status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# M12: typeface-classification eval
+# ---------------------------------------------------------------------------
+
+
+def _seed_typeface_model(settings: Settings) -> str:
+    """Seed a typeface-classification model sidecar."""
+    create_profile(
+        settings,
+        name="roman-test",
+        language="en",
+        typeface=TypefaceEnum.roman,
+    )
+    name = "pd-en-roman-typeface-classification-2026-06-10"
+    leaf = settings.shared_models_dir / "roman-test" / "typeface-classification" / name
+    leaf.mkdir(parents=True, exist_ok=True)
+    (leaf / "model.pt").write_bytes(b"\x00")
+    (leaf / f"{name}.metadata.json").write_text(
+        ModelSidecar(name=name, task="typeface-classification").model_dump_json()
+    )
+    return name
+
+
+def test_create_eval_run_typeface_creates_run_dir(settings: Settings) -> None:
+    """create_eval_run accepts typeface-classification when model exists."""
+    model = _seed_typeface_model(settings)
+    run = eval_dom.create_eval_run(
+        settings,
+        profile="roman-test",
+        task=TaskEnum.typeface_classification,
+        model_name=model,
+    )
+    assert run.kind == "eval"
+    assert run.task == TaskEnum.typeface_classification
+    assert run.args["model_name"] == model
+    assert (settings.runs_dir / run.id / "args.json").exists()
+
+
+def test_eval_typeface_api_returns_202(settings: Settings, client: object) -> None:
+    """POST /api/eval with typeface-classification task returns 202."""
+    from fastapi.testclient import TestClient
+
+    assert isinstance(client, TestClient)
+    model = _seed_typeface_model(settings)
+    resp = client.post(
+        "/api/eval",
+        json={
+            "profile": "roman-test",
+            "task": "typeface-classification",
+            "model_name": model,
+        },
+    )
+    assert resp.status_code == 202
+    data = resp.json()
+    assert "run_id" in data
