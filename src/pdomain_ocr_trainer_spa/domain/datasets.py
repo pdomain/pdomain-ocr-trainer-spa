@@ -38,7 +38,11 @@ if TYPE_CHECKING:
 
 _SPLIT_DIRS = ("train", "val")
 _COLUMNS = ("unassigned", "train", "val")
-_SUPPORTED_TASKS = (TaskEnum.recognition, TaskEnum.detection)
+_SUPPORTED_TASKS = (
+    TaskEnum.recognition,
+    TaskEnum.detection,
+    TaskEnum.typeface_classification,  # M12
+)
 
 # labels.json values are heterogeneous by task: a string (recognition) or an
 # opaque DocTR metadata object (detection). The domain layer treats them as
@@ -97,22 +101,23 @@ def _bbox_count(meta: object) -> int:
 def _chip_label(task: TaskEnum, value: object) -> str:
     """Render the chip's ``label_text`` for a labels.json value.
 
-    Recognition → the literal label string. Detection → an ``"N bboxes"``
-    summary so the chip stays informative without exposing raw geometry.
+    Recognition → the literal label string.
+    typeface_classification → the typeface string value.
+    Detection → an ``"N bboxes"`` summary.
     """
-    if task is TaskEnum.recognition:
+    if task in (TaskEnum.recognition, TaskEnum.typeface_classification):
         return str(value)
     count = _bbox_count(value)
     return f"{count} bbox" if count == 1 else f"{count} bboxes"
 
 
 def _values_equal(task: TaskEnum, left: object, right: object) -> bool:
-    """Compare two labels.json values for the "changed" highlight (spec 05 §6).
+    """Compare two label values for the "changed" highlight (spec 05 §6).
 
-    Recognition compares the label text; detection compares the bbox set
-    structurally (the whole metadata object).
+    Recognition / typeface_classification compare the string values;
+    detection compares the bbox set structurally.
     """
-    if task is TaskEnum.recognition:
+    if task in (TaskEnum.recognition, TaskEnum.typeface_classification):
         return str(left) == str(right)
     return left == right
 
@@ -151,6 +156,40 @@ def _read_labels(task_dir: Path) -> LabelMap:
     except (ValueError, OSError):
         return {}
     return {str(k): v for k, v in data.items()} if isinstance(data, dict) else {}
+
+
+def _read_metadata_jsonl(task_dir: Path) -> LabelMap:
+    """Read a ``metadata.jsonl`` file (image-classification/v1 layout).
+
+    Each line is a JSON object with ``file_name`` and ``typeface`` keys.
+    Used by the typeface-classification kanban (M12).  Missing file → ``{}``.
+    """
+    path = task_dir / "metadata.jsonl"
+    if not path.exists():
+        return {}
+    result: LabelMap = {}
+    try:
+        for raw_line in path.read_text(encoding="utf-8").splitlines():
+            line = raw_line.strip()
+            if not line:
+                continue
+            row = json.loads(line)
+            if isinstance(row, dict) and "file_name" in row:
+                result[str(row["file_name"])] = str(row.get("typeface", ""))
+    except (ValueError, OSError):
+        return {}
+    return result
+
+
+def _read_task_labels(task_dir: Path, task: TaskEnum) -> LabelMap:
+    """Read labels for any supported task layout.
+
+    Classification tasks (typeface, glyph) use ``metadata.jsonl``;
+    all other tasks use ``labels.json``.
+    """
+    if task in (TaskEnum.typeface_classification, TaskEnum.glyph_classification):
+        return _read_metadata_jsonl(task_dir)
+    return _read_labels(task_dir)
 
 
 def _write_labels(task_dir: Path, labels: LabelMap) -> None:
@@ -336,13 +375,17 @@ def set_include_toggles(
 
 
 def _on_disk_chip(task: TaskEnum, item_name: str, value: object) -> KanbanPageChip:
-    """Build a chip for an on-disk item (a crop for recognition, a page for detection)."""
+    """Build a chip for an on-disk item.
+
+    Recognition and typeface_classification chips are crops; detection chips
+    are pages.
+    """
     project = _project_of(item_name)
-    is_recognition = task is TaskEnum.recognition
+    is_crop = task in (TaskEnum.recognition, TaskEnum.typeface_classification)
     return KanbanPageChip(
         key=f"{project}:{item_name}",
         page_name=item_name,
-        crop_name=item_name if is_recognition else None,
+        crop_name=item_name if is_crop else None,
         label_text=_chip_label(task, value),
         is_changed=False,
     )
@@ -372,7 +415,7 @@ def _rows_from_labels(task: TaskEnum, labels: LabelMap, source: str) -> list[Kan
 
 def _on_disk_labels(settings: Settings, split: str, profile: str, task: TaskEnum) -> LabelMap:
     """All on-disk labels for a split."""
-    return _read_labels(_task_dir(settings, split, profile, task))
+    return _read_task_labels(_task_dir(settings, split, profile, task), task)
 
 
 def _unassigned_rows(
@@ -410,12 +453,12 @@ def _unassigned_rows(
                 task, on_disk_labels[item_name], value
             )
             summary = _change_summary(task, on_disk_labels[item_name], value) if is_changed else None
-            is_recognition = task is TaskEnum.recognition
+            is_crop = task in (TaskEnum.recognition, TaskEnum.typeface_classification)
             chips.append(
                 KanbanPageChip(
                     key=f"{project_id}:{item_name}",
                     page_name=item_name,
-                    crop_name=item_name if is_recognition else None,
+                    crop_name=item_name if is_crop else None,
                     label_text=_chip_label(task, value),
                     is_changed=is_changed,
                     change_summary=summary,

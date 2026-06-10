@@ -197,9 +197,10 @@ def test_apply_all_failed_raises_409(export_settings: Settings) -> None:
     assert excinfo.value.status_code == 409
 
 
-def test_classifier_task_rejected(export_settings: Settings) -> None:
+def test_glyph_classifier_task_still_rejected(export_settings: Settings) -> None:
+    """glyph_classification remains unsupported (not M12 scope)."""
     with pytest.raises(AppError) as excinfo:
-        dom.build_kanban(export_settings, profile="all", task=TaskEnum.typeface_classification)
+        dom.build_kanban(export_settings, profile="all", task=TaskEnum.glyph_classification)
     assert excinfo.value.code == "dataset.task_unsupported"
     assert excinfo.value.status_code == 501
 
@@ -494,3 +495,54 @@ def test_non_utc_offset_not_false_fresh(export_settings: Settings) -> None:
         "A manifest timestamp with +05:30 equal to the stored UTC must NOT be is_fresh; "
         f"got: {[r.project_id for r in unassigned if r.is_fresh]}"
     )
+
+
+# ---------------------------------------------------------------------------
+# M12: typeface-classification kanban tests
+# ---------------------------------------------------------------------------
+
+
+def _write_metadata_jsonl(task_dir: Path, rows: list[dict[str, str]]) -> None:
+    """Write a metadata.jsonl file for typeface classifier dataset."""
+    import json as _json
+
+    task_dir.mkdir(parents=True, exist_ok=True)
+    (task_dir / "images").mkdir(exist_ok=True)
+    with (task_dir / "metadata.jsonl").open("w", encoding="utf-8") as fh:
+        for row in rows:
+            fh.write(_json.dumps(row) + "\n")
+    for row in rows:
+        (task_dir / "images" / row["file_name"]).write_bytes(b"png")
+
+
+def test_typeface_kanban_no_longer_raises_501(settings: Settings) -> None:
+    """typeface-classification must not raise AppError 501 any more."""
+    view = dom.build_kanban(settings, profile="all", task=TaskEnum.typeface_classification)
+    assert view.task == TaskEnum.typeface_classification
+    assert set(view.columns) == {"unassigned", "train", "val"}
+
+
+def test_typeface_kanban_builds_from_metadata_jsonl(settings: Settings) -> None:
+    """Typeface kanban assembles from metadata.jsonl crop rows."""
+    task_dir = settings.ml_training_dir / "all" / "typeface-classification"
+    _write_metadata_jsonl(
+        task_dir,
+        [
+            {"file_name": "crop_0000.png", "typeface": "roman"},
+            {"file_name": "crop_0001.png", "typeface": "italic"},
+        ],
+    )
+    view = dom.build_kanban(settings, profile="all", task=TaskEnum.typeface_classification)
+    train_rows = view.columns["train"].rows
+    assert len(train_rows) == 1
+    assert train_rows[0].project_id == "crop"
+    chips = train_rows[0].pages
+    assert len(chips) == 2
+    chip_labels = {c.label_text for c in chips}
+    assert chip_labels == {"roman", "italic"}
+
+
+def test_typeface_kanban_empty_when_no_metadata_jsonl(settings: Settings) -> None:
+    """Typeface kanban has empty columns when no metadata.jsonl exists."""
+    view = dom.build_kanban(settings, profile="all", task=TaskEnum.typeface_classification)
+    assert all(not col.rows for col in view.columns.values())
