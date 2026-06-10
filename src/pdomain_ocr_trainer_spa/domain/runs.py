@@ -35,7 +35,13 @@ if TYPE_CHECKING:
 # Cap on progress.jsonl size — older lines are GC'd oldest-first (spec 06 §4).
 _PROGRESS_CAP = 50_000
 
-_SUPPORTED_TASKS = frozenset({TaskEnum.detection, TaskEnum.recognition})
+_SUPPORTED_TASKS = frozenset(
+    {
+        TaskEnum.detection,
+        TaskEnum.recognition,
+        TaskEnum.typeface_classification,  # M12
+    }
+)
 
 
 # ---------------------------------------------------------------------------
@@ -141,15 +147,31 @@ def _validate_task_supported(task: TaskEnum) -> None:
 
 
 def _validate_training_data(settings: Settings, profile: str, task: TaskEnum) -> None:
-    """Ensure the profile+task has a non-empty ``labels.json`` (spec 06 §2)."""
-    labels = settings.ml_training_dir / profile / task.value / "labels.json"
-    entries: object = None
-    if labels.exists():
-        try:
-            entries = json.loads(labels.read_text(encoding="utf-8"))
-        except (ValueError, OSError):
-            entries = None
-    if not isinstance(entries, dict) or not entries:
+    """Ensure the profile+task has training data (spec 06 §2).
+
+    For ``typeface_classification`` the dataset uses ``metadata.jsonl``
+    (image-classification/v1 layout); all other tasks use ``labels.json``.
+    """
+    task_dir = settings.ml_training_dir / profile / task.value
+    has_data = False
+    if task is TaskEnum.typeface_classification:
+        meta = task_dir / "metadata.jsonl"
+        if meta.exists():
+            try:
+                content = meta.read_text(encoding="utf-8").strip()
+                has_data = bool(content)
+            except OSError:
+                has_data = False
+    else:
+        labels = task_dir / "labels.json"
+        entries: object = None
+        if labels.exists():
+            try:
+                entries = json.loads(labels.read_text(encoding="utf-8"))
+            except (ValueError, OSError):
+                entries = None
+        has_data = isinstance(entries, dict) and bool(entries)
+    if not has_data:
         raise AppError(
             code="run.no_training_data",
             message=(

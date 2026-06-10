@@ -182,3 +182,56 @@ def test_prepare_worker_args_preserves_hf_source(settings: Settings) -> None:
     sources = args.get("sources", [])
     assert len(sources) == 1
     assert sources[0]["repo"] == "ntw8532/test-ds"
+
+
+# ---------------------------------------------------------------------------
+# M12: typeface-classification run creation
+# ---------------------------------------------------------------------------
+
+
+def _seed_typeface_profile(settings: Settings) -> str:
+    """Seed a profile + typeface-classification training data."""
+    create_profile(settings, name="clogaelach", language="ga", typeface=TypefaceEnum.clogaelach)
+    task_dir = settings.ml_training_dir / "clogaelach" / "typeface-classification"
+    task_dir.mkdir(parents=True)
+    (task_dir / "metadata.jsonl").write_text(
+        '{"file_name": "crop_0001.png", "typeface": "roman"}\n', encoding="utf-8"
+    )
+    return "clogaelach"
+
+
+def test_create_run_typeface_classification_accepted(settings: Settings) -> None:
+    """create_run accepts typeface-classification when training data exists."""
+    _seed_typeface_profile(settings)
+    run = dom.create_run(
+        settings,
+        profile="clogaelach",
+        task=TaskEnum.typeface_classification,
+        args={},
+    )
+    assert run.task == TaskEnum.typeface_classification
+    assert run.status == "pending"
+    assert run.model_name.startswith("pd-ga-clogaelach-typeface-classification-")
+
+
+def test_create_run_typeface_rejects_empty_metadata(settings: Settings) -> None:
+    """create_run rejects typeface-classification when metadata.jsonl is absent."""
+    create_profile(settings, name="clogaelach", language="ga", typeface=TypefaceEnum.clogaelach)
+    # No metadata.jsonl
+    with pytest.raises(AppError) as exc:
+        dom.create_run(
+            settings,
+            profile="clogaelach",
+            task=TaskEnum.typeface_classification,
+            args={},
+        )
+    assert exc.value.code == "run.no_training_data"
+
+
+def test_prepare_worker_args_typeface_fills_paths(settings: Settings) -> None:
+    """prepare_worker_args sets typeface-classification train/val paths."""
+    _seed_typeface_profile(settings)
+    run = dom.create_run(settings, profile="clogaelach", task=TaskEnum.typeface_classification, args={})
+    args = json.loads((dom.run_dir(settings, run.id) / "args.json").read_text(encoding="utf-8"))
+    assert args["train_path"].endswith("clogaelach/typeface-classification")
+    assert args["val_path"].endswith("clogaelach/typeface-classification")
