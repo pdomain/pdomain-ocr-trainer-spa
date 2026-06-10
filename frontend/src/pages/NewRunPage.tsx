@@ -13,11 +13,7 @@ import type { Profile, TrainingArgs } from "../api/profiles";
 import { createRun } from "../api/runs";
 import { ApiError } from "../api/profiles";
 
-const TASKS = [
-  "detection",
-  "recognition",
-  "typeface-classification",
-] as const;
+const TASKS = ["detection", "recognition", "typeface-classification"] as const;
 
 export function NewRunPage(): JSX.Element {
   const navigate = useNavigate();

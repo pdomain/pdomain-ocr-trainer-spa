@@ -117,8 +117,17 @@ def test_apply_total_failure_returns_409(kanban_client: TestClient) -> None:
     assert resp.json()["code"] == "dataset.apply_failed"
 
 
-def test_classifier_task_returns_501(kanban_client: TestClient) -> None:
+def test_typeface_classification_returns_200(kanban_client: TestClient) -> None:
+    """typeface-classification is now supported (M12); returns 200 with empty kanban."""
     resp = kanban_client.get("/api/profiles/all/datasets/typeface-classification/kanban")
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["task"] == "typeface-classification"
+
+
+def test_glyph_classification_returns_501(kanban_client: TestClient) -> None:
+    """glyph-classification remains unsupported; returns 501."""
+    resp = kanban_client.get("/api/profiles/all/datasets/glyph-classification/kanban")
     assert resp.status_code == 501
     assert resp.json()["code"] == "dataset.task_unsupported"
 
