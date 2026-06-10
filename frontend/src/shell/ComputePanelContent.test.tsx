@@ -36,10 +36,15 @@ beforeEach(() => {
 });
 
 describe("ComputePanelContent", () => {
-  it("renders without crashing (no device info)", () => {
+  it("renders ComputeTargetPanel with null info when device info is unavailable", () => {
+    // When useDeviceInfo returns info=null and loading=false (device not yet
+    // detected), the component must still render ComputeTargetPanel — it
+    // passes null info through, showing the panel's empty state rather than
+    // an error or loading indicator.
     render(createElement(ComputePanelContent));
-    // No error or loading shown when info is null and no error
     expect(screen.getByTestId("compute-target-panel")).toBeTruthy();
+    // No loading message is shown when loading=false
+    expect(screen.queryByText(/checking compute/i)).toBeNull();
   });
 
   it("renders loading message when loading and no info", () => {

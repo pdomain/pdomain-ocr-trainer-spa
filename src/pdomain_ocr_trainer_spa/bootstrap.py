@@ -47,6 +47,10 @@ if TYPE_CHECKING:
 # The compiled SPA lives here (populated by make frontend-build)
 _STATIC_DIR = Path(__file__).parent / "static"
 
+# Module-level task set — keeps fire-and-forget tasks alive until they complete
+# (prevents "Task was destroyed but it is pending!" under CPython's GC).
+_background_tasks: set[asyncio.Task[None]] = set()
+
 
 def _static_dir() -> Path:
     """Return the static directory path (module-level so tests can patch)."""
@@ -74,7 +78,7 @@ async def _warmup_device_info() -> None:
             list_devices,  # type: ignore[import-untyped,import-not-found]
         )
 
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         await loop.run_in_executor(ThreadPoolExecutor(max_workers=1), list_devices)
     except Exception:  # noqa: BLE001, S110  # optional warmup — never crash startup
         pass
@@ -83,8 +87,11 @@ async def _warmup_device_info() -> None:
 @asynccontextmanager
 async def _lifespan(_app: FastAPI) -> AsyncIterator[None]:
     """FastAPI lifespan: warm up device probe on startup."""
-    _task = asyncio.create_task(_warmup_device_info())  # fire-and-forget
-    del _task
+    # Keep a strong reference to the task so it isn't garbage-collected before
+    # it completes ("Task was destroyed but it is pending!" guard).
+    task = asyncio.create_task(_warmup_device_info())
+    _background_tasks.add(task)
+    task.add_done_callback(_background_tasks.discard)
     yield
 
 
