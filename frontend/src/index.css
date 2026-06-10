@@ -1,0 +1,9 @@
+@import "@pdomain/pdomain-ui/theme/tokens.css";
+@import "@pdomain/pdomain-ui/theme/primitives.css";
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
