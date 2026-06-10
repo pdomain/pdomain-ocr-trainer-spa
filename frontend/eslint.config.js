@@ -55,12 +55,11 @@ export default tseslint.config(
     files: ["src/**/*.tsx"],
     rules: {
       ...jsxA11y.flatConfigs.recommended.rules,
-      // These fire on existing patterns; downgrade until the codebase is
-      // brought into compliance deliberately.
-      "jsx-a11y/click-events-have-key-events": "warn",
-      "jsx-a11y/no-noninteractive-element-interactions": "warn",
-      "jsx-a11y/no-noninteractive-tabindex": "warn",
-      "jsx-a11y/no-redundant-roles": "warn",
+      // All violations fixed; promote to error.
+      "jsx-a11y/click-events-have-key-events": "error",
+      "jsx-a11y/no-noninteractive-element-interactions": "error",
+      "jsx-a11y/no-noninteractive-tabindex": "error",
+      "jsx-a11y/no-redundant-roles": "error",
     },
   },
   {

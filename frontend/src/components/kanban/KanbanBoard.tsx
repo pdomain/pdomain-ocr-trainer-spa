@@ -174,7 +174,6 @@ export function KanbanBoard<
           <section
             key={column.id}
             data-testid={`kanban-column-${column.id}`}
-            role="region"
             aria-label={column.label}
             aria-keyshortcuts="j k h l"
             data-grab-target={isGrabTarget ? "true" : undefined}
@@ -188,7 +187,6 @@ export function KanbanBoard<
           >
             {renderColumnHeader({ column, itemCount: columnItems.length })}
             <ul
-              role="list"
               data-testid={`kanban-column-${column.id}-list`}
               style={{ listStyle: "none", margin: 0, padding: 0 }}
             >
@@ -197,28 +195,32 @@ export function KanbanBoard<
                 const isPending = pendingIds?.has(item.id) ?? false;
                 const isGrabbed = grab?.itemIds.includes(item.id) ?? false;
                 return (
-                  <li
-                    key={item.id}
-                    role="listitem"
-                    tabIndex={0}
-                    data-grabbed={isGrabbed ? "true" : undefined}
-                    data-testid={chipTestId?.(item)}
-                    data-pending={isPending ? "true" : undefined}
-                    data-selected={isSelected ? "true" : undefined}
-                    onKeyDown={(e) => handleChipKeyDown(e, item)}
-                    onClick={(e) =>
-                      onSelect?.({ itemId: item.id, extend: e.shiftKey })
-                    }
-                    style={{
-                      outline: isSelected
-                        ? "2px solid var(--accent, #3b82f6)"
-                        : isGrabbed
-                          ? "2px dashed var(--accent, #3b82f6)"
-                          : undefined,
-                      cursor: "pointer",
-                    }}
-                  >
-                    {renderChip({ item, isSelected, isPending })}
+                  <li key={item.id}>
+                    <button
+                      type="button"
+                      tabIndex={0}
+                      data-grabbed={isGrabbed ? "true" : undefined}
+                      data-testid={chipTestId?.(item)}
+                      data-pending={isPending ? "true" : undefined}
+                      data-selected={isSelected ? "true" : undefined}
+                      onKeyDown={(e) => handleChipKeyDown(e, item)}
+                      onClick={(e) =>
+                        onSelect?.({ itemId: item.id, extend: e.shiftKey })
+                      }
+                      style={{
+                        all: "unset",
+                        display: "block",
+                        width: "100%",
+                        cursor: "pointer",
+                        outline: isSelected
+                          ? "2px solid var(--accent, #3b82f6)"
+                          : isGrabbed
+                            ? "2px dashed var(--accent, #3b82f6)"
+                            : undefined,
+                      }}
+                    >
+                      {renderChip({ item, isSelected, isPending })}
+                    </button>
                   </li>
                 );
               })}

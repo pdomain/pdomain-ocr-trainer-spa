@@ -48,7 +48,9 @@ export function HotkeyHelpDialog({
     <div
       data-testid="hotkey-help-overlay"
       role="presentation"
-      onClick={onClose}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
       style={{
         position: "fixed",
         inset: 0,
@@ -66,7 +68,6 @@ export function HotkeyHelpDialog({
         aria-modal="true"
         aria-label="Keyboard shortcuts"
         tabIndex={-1}
-        onClick={(e) => e.stopPropagation()}
       >
         <header>
           <h2 data-testid="hotkey-help-title">Keyboard shortcuts</h2>
