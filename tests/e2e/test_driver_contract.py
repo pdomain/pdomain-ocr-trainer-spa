@@ -363,3 +363,39 @@ def test_deferred_urls_are_real_spec_urls() -> None:
     """Every waived URL is a genuine spec 13 §2 entry."""
     unknown = _DEFERRED_URLS - set(_urls_from_spec(_read_spec()))
     assert not unknown, f"_DEFERRED_URLS names not in spec 13 §2: {unknown}"
+
+
+# --------------------------------------------------------------------------
+# AppShell-level testids (added by pdomain-ui AppShell migration)
+# --------------------------------------------------------------------------
+# These testids are emitted by the pdomain-ui AppShell library component;
+# they do not appear as literal strings in trainer-spa source. They are
+# verified at runtime by tests/e2e/test_shell_migration.py (Milestone G).
+# This test documents the expected ids so the full contract is visible.
+_APPSHELL_TESTIDS = {
+    "app-shell",
+    "app-shell-header",
+    "app-shell-rail",
+    "app-shell-main",
+}
+
+
+def test_appshell_testids_documented() -> None:
+    """AppShell testids are documented here; browser verification is in
+    test_shell_migration.py.
+
+    This test is a registry guard: if AppShell renames its testids, the
+    browser tests fail and this set should be updated to match.
+    """
+    # Verify the set is non-empty (guards against an accidental empty set).
+    assert _APPSHELL_TESTIDS, "AppShell testid registry is empty"
+    # Verify none of these conflict with spec-13 §4 static testids.
+    text = _read_spec()
+    all_spec_ids: set[str] = set()
+    for _, start, end in _SECTIONS:
+        all_spec_ids.update(_testids_from_section(_spec_section(text, start, end)))
+    conflicts = _APPSHELL_TESTIDS & all_spec_ids
+    assert not conflicts, (
+        f"AppShell testids conflict with spec 13 §4 testids: {conflicts}. "
+        "Rename the trainer-spa testid to avoid the collision."
+    )
