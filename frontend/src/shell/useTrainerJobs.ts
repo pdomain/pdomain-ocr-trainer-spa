@@ -5,13 +5,21 @@ import type {
   Job,
 } from "@pdomain/pdomain-ui/shell";
 
-/** Raw job shape from GET /api/jobs */
+/**
+ * Raw job shape from GET /api/jobs.
+ *
+ * Field names MUST match the backend Job model in api/jobs.py (serialized by
+ * _project() via core/models.py Job.progress).  See the producer-consumer
+ * contract test in useTrainerJobs.test.ts, which uses payload copied from
+ * tests/integration/api/test_jobs.py::test_list_jobs_returns_job_shape.
+ */
 interface RawTrainerJob {
   id: string;
+  run_id: string | null;
   kind: string; // "train" | "eval" | "publish-dataset" | "publish-model"
   state: string; // "queued" | "running" | "succeeded" | "failed" | "cancelled"
-  label?: string; // model name / dataset name
-  pct?: number; // 0–100
+  progress: number; // 0.0–1.0 (NOT "pct" — backend field name is "progress")
+  error: string | null;
 }
 
 type JobStatus =
@@ -60,16 +68,16 @@ export function useTrainerJobs(): TrainerJobsResult {
   );
   const pill: ActiveJob[] = inFlight.map((j) => ({
     id: j.id,
-    title: j.label ?? j.id,
+    title: j.run_id ?? j.id,
     phase: j.state,
-    pct: j.pct ?? 0,
-    project: j.label ?? j.id,
+    pct: j.progress,
+    project: j.run_id ?? j.id,
   }));
   const dock: Job[] = all.map((j) => ({
     id: j.id,
-    project: j.label ?? j.id,
+    project: j.run_id ?? j.id,
     phase: j.state,
-    pct: j.pct ?? 0,
+    pct: j.progress,
     status: toJobStatus(j.state),
     cancelable: false,
   }));

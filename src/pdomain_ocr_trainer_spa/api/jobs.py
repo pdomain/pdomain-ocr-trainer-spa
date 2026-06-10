@@ -3,6 +3,7 @@ r"""api/jobs.py — the SPA Job projection + SSE event stream (spec 10).
 ``pdomain-ops`` ``mount_routes`` exposes no job routes, so the SPA defines
 ``/api/jobs/*`` itself, wrapping the ``LongJobRunner``:
 
+* ``GET  /api/jobs``                  — list all known jobs (badge + dock)
 * ``GET  /api/jobs/{job_id}``         — project ``JobStatus`` onto ``Job``
 * ``GET  /api/jobs/{job_id}/events``  — stream ``JobEvent``\ s as SSE
 * ``POST /api/jobs/{job_id}/cancel``  — cancel; returns the terminal ``Job``
@@ -70,6 +71,38 @@ def _project(status: JobStatus, run_id: str | None) -> Job:
         started_at=status.started_at,
         finished_at=status.finished_at,
     )
+
+
+@router.get("")
+async def list_jobs(
+    state: AppState = Depends(get_app_state),
+) -> list[Job]:
+    """Return all known jobs with the same per-job shape as ``GET /api/jobs/{id}``.
+
+    Used by the frontend jobs dock (``useTrainerJobs`` hook).  Empty list when
+    the runner has no jobs.  The ``progress`` field is the canonical name — the
+    frontend must NOT use ``pct``.
+    """
+    runner = state.job_runner
+    job_ids: list[str] = []
+    introspect = getattr(runner, "all_job_ids", None)
+    if callable(introspect):
+        raw_ids: object = introspect()
+        if isinstance(raw_ids, list):
+            job_ids = [str(jid) for jid in cast("list[object]", raw_ids)]
+    else:
+        job_ids = [
+            jid for jid in (getattr(run, "job_id", None) for run in state.runs.values()) if jid is not None
+        ]
+
+    jobs: list[Job] = []
+    for jid in job_ids:
+        try:
+            status = await runner.status(jid)
+        except UnknownJobError:
+            continue
+        jobs.append(_project(status, _resolve_run_id(state, jid)))
+    return jobs
 
 
 @router.get("/active-count")

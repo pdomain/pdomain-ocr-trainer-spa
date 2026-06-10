@@ -95,6 +95,52 @@ def _submit(fake_runner: FakeLongJobRunner) -> str:
     return asyncio.run(fake_runner.submit("train.recognition", {}))
 
 
+# --- GET /api/jobs (list) ---------------------------------------------------
+
+
+def test_list_jobs_empty(client) -> None:
+    """GET /api/jobs returns 200 with an empty list when no jobs exist."""
+    r = client.get("/api/jobs")
+    assert r.status_code == 200
+    assert r.json() == []
+
+
+def test_list_jobs_returns_job_shape(client, fake_runner) -> None:
+    """GET /api/jobs returns all known jobs with the per-job shape.
+
+    IMPORTANT: the ``progress`` field name here is the canonical backend name.
+    The frontend useTrainerJobs hook must map this field — NOT ``pct``.
+    See frontend/src/shell/useTrainerJobs.test.ts for the producer-consumer
+    contract test that cross-references this fixture shape.
+    """
+    job_id = _submit(fake_runner)
+    r = client.get("/api/jobs")
+    assert r.status_code == 200
+    body = r.json()
+    assert isinstance(body, list)
+    assert len(body) >= 1
+    job = next(j for j in body if j["id"] == job_id)
+    # Verify all required fields are present with correct names.
+    assert job["id"] == job_id
+    assert job["kind"] == "train.recognition"
+    assert job["state"] in {"running", "succeeded"}
+    assert job["run_id"] is None
+    assert "progress" in job  # NOT "pct" — the frontend must use this name
+    assert 0.0 <= job["progress"] <= 1.0
+    # Fields that must NOT appear under wrong names.
+    assert "pct" not in job
+
+
+def test_list_jobs_shape_matches_get_job(client, fake_runner) -> None:
+    """GET /api/jobs list items have the same shape as GET /api/jobs/{id}."""
+    job_id = _submit(fake_runner)
+    single = client.get(f"/api/jobs/{job_id}").json()
+    listed = {j["id"]: j for j in client.get("/api/jobs").json()}
+    assert job_id in listed
+    # Both responses must expose the same field set.
+    assert set(single.keys()) == set(listed[job_id].keys())
+
+
 # --- GET /api/jobs/{id} -----------------------------------------------------
 
 
