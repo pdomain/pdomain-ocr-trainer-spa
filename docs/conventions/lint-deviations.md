@@ -22,3 +22,33 @@ affected files, and the justification.
   definitions as F811 in this pattern (they are in separate branches). The
   `# type: ignore[no-redef]` annotation on the fallback `DoctrExportManifest`
   class is for mypy / basedpyright only.
+
+---
+
+## Frontend ESLint deviations (Track F)
+
+### `@typescript-eslint/no-dynamic-delete`
+
+- **Files:** `frontend/src/stores/datasetsStore.ts:108`
+- **Justification:** Deliberate cache-key invalidation. `pageKey` is always a
+  string key from the store's own `staged: Record<string, KanbanColumnId>`
+  record type. The rule is promoted to `error`; this single site is suppressed
+  with an inline `// eslint-disable-next-line` comment.
+
+### `@typescript-eslint/no-deprecated` — `ActiveJob` false positive
+
+- **Files:** `frontend/src/shell/TrainerHeader.tsx:7`,
+  `frontend/src/shell/useTrainerJobs.ts:3,6`
+- **Justification:** `ActiveJob` is not itself deprecated. Its JSDoc block
+  comment in the pdomain-ui type declarations is shared with the deprecated
+  `JobsPill` props block, causing the rule to flag the type as deprecated.
+  This is a false positive from upstream `@pdomain/pdomain-ui` declaration
+  formatting. Suppressed with inline comments at each usage site until
+  pdomain-ui corrects the JSDoc layout.
+
+### `@typescript-eslint/array-type` — kept `off`
+
+- **Files:** `frontend/eslint.config.js`
+- **Justification:** Existing code mixes `T[]` and `Array<T>`. Enabling this
+  rule as `error` requires a style decision that is deferred — not in scope
+  for Track F.

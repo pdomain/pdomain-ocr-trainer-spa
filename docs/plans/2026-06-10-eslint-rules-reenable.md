@@ -38,6 +38,12 @@ strict + stylistic configs, `eslint-plugin-jsx-a11y`, React 18.
 
 ## Violation inventory (measured 2026-06-10, pre-migration)
 
+> Re-measured 2026-06-10 post-merges (pdomain-ui AppShell + labeler-import +
+> M12). Current tree: **63 warnings (0 errors)**. Deltas from pre-migration:
+> Group 1: 16→22 (+ActiveJob shell files, +JSX); Group 2: 5→9 (+a11y);
+> Group 3: 0→1; Group 6: 4→5; Group 7: 1→3; Group 10: 0→5 (new void);
+> Group 11: 0→5 (new misused-spread); Group 13: 1→2; Group 14: 0→1.
+
 Run to reproduce:
 
 ```bash
@@ -45,7 +51,7 @@ cd /workspaces/ocr-container/pdomain-ocr-trainer-spa
 make frontend-lint 2>&1
 ```
 
-Total: **60 warnings (0 errors)** across the following rule groups:
+Total: **63 warnings (0 errors)** across the following rule groups:
 
 ### Group 1: `@typescript-eslint/no-deprecated` — JSX namespace
 
