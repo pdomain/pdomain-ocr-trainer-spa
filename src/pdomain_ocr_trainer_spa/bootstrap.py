@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
+from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -26,6 +29,7 @@ from pdomain_ocr_trainer_spa.api import (
     profiles,
     runs,
     sources,
+    ui_prefs,
 )
 from pdomain_ocr_trainer_spa.api import eval as eval_api
 from pdomain_ocr_trainer_spa.api import models as models_api
@@ -36,6 +40,8 @@ from pdomain_ocr_trainer_spa.middleware.error_handler import app_error_handler
 from pdomain_ocr_trainer_spa.middleware.request_id import RequestIdMiddleware
 
 if TYPE_CHECKING:
+    from collections.abc import AsyncIterator
+
     from pdomain_ocr_trainer_spa.settings import Settings
 
 # The compiled SPA lives here (populated by make frontend-build)
@@ -61,6 +67,27 @@ def _build_app_state(settings: Settings) -> AppState:
     return state
 
 
+async def _warmup_device_info() -> None:
+    """Background probe — pre-populate device cache at startup."""
+    try:
+        from pdomain_ops.gpu.device_probe import (  # pyright: ignore[reportMissingImports]
+            list_devices,  # type: ignore[import-untyped,import-not-found]
+        )
+
+        loop = asyncio.get_event_loop()
+        await loop.run_in_executor(ThreadPoolExecutor(max_workers=1), list_devices)
+    except Exception:  # noqa: BLE001, S110  # optional warmup — never crash startup
+        pass
+
+
+@asynccontextmanager
+async def _lifespan(_app: FastAPI) -> AsyncIterator[None]:
+    """FastAPI lifespan: warm up device probe on startup."""
+    _task = asyncio.create_task(_warmup_device_info())  # fire-and-forget
+    del _task
+    yield
+
+
 def build_app(settings: Settings) -> FastAPI:
     """Construct and return the configured FastAPI application."""
     app = FastAPI(
@@ -69,6 +96,7 @@ def build_app(settings: Settings) -> FastAPI:
         openapi_url="/api/openapi.json",
         docs_url="/api/docs",
         redoc_url=None,
+        lifespan=_lifespan,
     )
 
     app.state.settings = settings
@@ -104,6 +132,7 @@ def build_app(settings: Settings) -> FastAPI:
     app.include_router(eval_api.router)
     app.include_router(sources.router)
     app.include_router(publish_api.router)
+    app.include_router(ui_prefs.router)
 
     # SPA catch-all — MUST be last so /api/* routes are not shadowed
     @app.get("/{full_path:path}", include_in_schema=False)
