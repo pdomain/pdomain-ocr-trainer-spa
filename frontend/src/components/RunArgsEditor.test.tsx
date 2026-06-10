@@ -4,7 +4,8 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
-import { RunArgsEditor, fieldSpecForTask } from "./RunArgsEditor";
+import { RunArgsEditor } from "./RunArgsEditor";
+import { fieldSpecForTask } from "./runArgsEditorConfig";
 import type { TrainingArgs } from "../api/profiles";
 
 function Harness({

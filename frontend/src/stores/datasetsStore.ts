@@ -105,6 +105,7 @@ export const createDatasetsStore = () =>
         const committed = committedColumnOf(view, key);
         if (committed === target) {
           // Returned to its committed column — drop the staged entry.
+          // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- intentional cache invalidation; key is a chip key string
           delete next[key];
         } else {
           next[key] = target;

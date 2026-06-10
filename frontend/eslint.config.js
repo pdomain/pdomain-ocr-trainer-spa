@@ -85,8 +85,9 @@ export default tseslint.config(
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
+      // react-refresh: non-component exports moved to sibling .ts files.
       "react-refresh/only-export-components": [
-        "warn",
+        "error",
         { allowConstantExport: true },
       ],
       "no-unused-vars": "off",
@@ -110,7 +111,8 @@ export default tseslint.config(
         { assertionStyle: "as" },
       ],
       "@typescript-eslint/no-unnecessary-condition": "error",
-      "@typescript-eslint/no-non-null-assertion": "warn",
+      // no-non-null-assertion: all violations fixed (null check + throw pattern).
+      "@typescript-eslint/no-non-null-assertion": "error",
       "@typescript-eslint/no-empty-function": "warn",
       "@typescript-eslint/require-await": "warn",
       "@typescript-eslint/no-misused-promises": [
@@ -138,8 +140,9 @@ export default tseslint.config(
       "@typescript-eslint/no-unnecessary-type-assertion": "error",
       // no-base-to-string: all violations fixed via type narrowing.
       "@typescript-eslint/no-base-to-string": "error",
-      // no-dynamic-delete: one deliberate usage for cache invalidation.
-      "@typescript-eslint/no-dynamic-delete": "warn",
+      // no-dynamic-delete: one deliberate usage for cache invalidation;
+      // suppressed inline with rationale comment.
+      "@typescript-eslint/no-dynamic-delete": "error",
       // no-unnecessary-type-conversion: String(x) where x is already a
       // string — existing pattern in template helpers and error formatting.
       "@typescript-eslint/no-unnecessary-type-conversion": "warn",
