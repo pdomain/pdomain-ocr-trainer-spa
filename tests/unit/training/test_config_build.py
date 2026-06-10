@@ -1,4 +1,7 @@
-"""config_build tests — Run.args -> torch-free DetectionConfig / RecognitionConfig."""
+"""config_build tests — Run.args -> torch-free typed config models.
+
+Covers DetectionConfig, RecognitionConfig, and TypefaceConfig builders.
+"""
 
 from __future__ import annotations
 
@@ -6,6 +9,7 @@ from pdomain_ocr_trainer_spa.core.enums import TaskEnum
 from pdomain_ocr_trainer_spa.training.config_build import (
     build_detection_config,
     build_recognition_config,
+    build_typeface_config,
 )
 
 
@@ -55,3 +59,40 @@ def test_build_recognition_config_custom_characters_implies_custom() -> None:
         {"train_path": "/t", "val_path": "/v", "custom_characters": "xyz"},
     )
     assert build_recognition_config(run).vocab == "CUSTOM:xyz"
+
+
+# ---------------------------------------------------------------------------
+# TypefaceConfig tests (M12)
+# ---------------------------------------------------------------------------
+
+
+class _RunView:
+    def __init__(self) -> None:
+        self.profile = "clogaelach"
+        self.task = TaskEnum.typeface_classification
+        self.args: dict[str, object] = {
+            "train_path": "/ml-training/clogaelach/typeface-classification",
+            "val_path": "/ml-validation/clogaelach/typeface-classification",
+            "output_dir": "/runs/123",
+            "epochs": 15,
+        }
+
+
+def test_build_typeface_config_basic() -> None:
+    view = _RunView()
+    cfg = build_typeface_config(view)
+    assert str(cfg.train_path) == "/ml-training/clogaelach/typeface-classification"
+    assert str(cfg.val_path) == "/ml-validation/clogaelach/typeface-classification"
+    assert cfg.epochs == 15
+
+
+def test_build_typeface_config_defaults() -> None:
+    view = _RunView()
+    view.args = {
+        "train_path": "/ml-training/clogaelach/typeface-classification",
+        "val_path": "/ml-validation/clogaelach/typeface-classification",
+        "output_dir": "/runs/123",
+    }
+    cfg = build_typeface_config(view)
+    assert cfg.epochs == 20  # TypefaceConfig default
+    assert cfg.arch == "resnet18"  # TypefaceConfig default
