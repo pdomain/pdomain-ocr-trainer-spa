@@ -38,6 +38,7 @@ if TYPE_CHECKING:
 
     from pdomain_ocr_training.protocols import DetectionConfig, RecognitionConfig
 
+
 EVENT_PREFIX = "@@PDEVENT@@"
 
 
@@ -47,6 +48,11 @@ class _TrainingRunner(Protocol):
     ``LocalTrainingRunner`` satisfies this; tests inject a torch-free fake.
     Each ``train_*`` method yields ``TrainingEvent``-shaped objects. The
     config models are torch-free pydantic models (D-T1).
+
+    M12: ``train_typeface`` is gated on the upstream ``pdomain_ocr_training``
+    adding the method (cross-repo gate).  The worker branches on the task
+    string before calling ``train_typeface`` and casts the runner; the method
+    is intentionally absent from this Protocol until the upstream ships it.
     """
 
     def train_detection(self, profile: str, config: DetectionConfig) -> Iterator[object]: ...
@@ -91,10 +97,13 @@ def _iter_events(
     runner: _TrainingRunner, *, task: str, profile: str, args: dict[str, object]
 ) -> Iterator[object]:
     """Drive the runner's ``train_*`` generator for the given task."""
+    from typing import Any, cast
+
     from pdomain_ocr_trainer_spa.core.enums import TaskEnum
     from pdomain_ocr_trainer_spa.training.config_build import (
         build_detection_config,
         build_recognition_config,
+        build_typeface_config,
     )
 
     class _RunView:
@@ -107,6 +116,13 @@ def _iter_events(
     if task == "detection":
         det_cfg = build_detection_config(view)
         return runner.train_detection(profile, det_cfg)
+    if task == "typeface-classification":
+        # Cast: LocalTrainingRunner gains train_typeface when the upstream
+        # pdomain_ocr_training M12 gate lands; until then the method is only
+        # present on injected test fakes.
+        tc_cfg = build_typeface_config(view)
+        typed_runner = cast("Any", runner)
+        return typed_runner.train_typeface(profile, tc_cfg)
     rec_cfg = build_recognition_config(view)
     return runner.train_recognition(profile, rec_cfg)
 
