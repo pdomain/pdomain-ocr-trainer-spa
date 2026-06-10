@@ -76,13 +76,13 @@ describe("NewRunPage", () => {
       expect(screen.getByTestId("new-run-page")).toBeInTheDocument(),
     );
     expect(screen.getByTestId("new-run-profile")).toBeInTheDocument();
-    expect(screen.getByTestId("new-run-task")).toBeInTheDocument();
-    expect(screen.getByTestId("new-run-start")).toBeInTheDocument();
+    expect(screen.getByTestId("task-select")).toBeInTheDocument();
+    expect(screen.getByTestId("submit-run")).toBeInTheDocument();
 
     await waitFor(() =>
-      expect(screen.getByTestId("new-run-start")).not.toBeDisabled(),
+      expect(screen.getByTestId("submit-run")).not.toBeDisabled(),
     );
-    await userEvent.click(screen.getByTestId("new-run-start"));
+    await userEvent.click(screen.getByTestId("submit-run"));
 
     await waitFor(() => {
       const posted = fetchMock.mock.calls.find(
@@ -121,9 +121,9 @@ describe("NewRunPage", () => {
       </MemoryRouter>,
     );
     await waitFor(() =>
-      expect(screen.getByTestId("new-run-start")).not.toBeDisabled(),
+      expect(screen.getByTestId("submit-run")).not.toBeDisabled(),
     );
-    await userEvent.click(screen.getByTestId("new-run-start"));
+    await userEvent.click(screen.getByTestId("submit-run"));
     await waitFor(() =>
       expect(screen.getByTestId("new-run-error")).toHaveTextContent(
         "No training data",

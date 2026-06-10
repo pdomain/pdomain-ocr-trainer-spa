@@ -13,7 +13,11 @@ import type { Profile, TrainingArgs } from "../api/profiles";
 import { createRun } from "../api/runs";
 import { ApiError } from "../api/profiles";
 
-const TASKS = ["detection", "recognition"] as const;
+const TASKS = [
+  "detection",
+  "recognition",
+  "typeface-classification",
+] as const;
 
 export function NewRunPage(): JSX.Element {
   const navigate = useNavigate();
@@ -87,63 +91,65 @@ export function NewRunPage(): JSX.Element {
         </p>
       )}
 
-      <Card>
-        <label>
-          Profile
-          <select
-            data-testid="new-run-profile"
-            value={profile}
-            onChange={(e) => setProfile(e.target.value)}
-          >
-            {profiles.map((p) => (
-              <option key={p.name} value={p.name}>
-                {p.name}
-              </option>
-            ))}
-          </select>
-        </label>
+      <div data-testid="new-run-form">
+        <Card>
+          <label>
+            Profile
+            <select
+              data-testid="new-run-profile"
+              value={profile}
+              onChange={(e) => setProfile(e.target.value)}
+            >
+              {profiles.map((p) => (
+                <option key={p.name} value={p.name}>
+                  {p.name}
+                </option>
+              ))}
+            </select>
+          </label>
 
-        <label>
-          Task
-          <select
-            data-testid="new-run-task"
-            value={task}
-            onChange={(e) => setTask(e.target.value)}
-          >
-            {TASKS.map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
-            ))}
-          </select>
-        </label>
+          <label>
+            Task
+            <select
+              data-testid="task-select"
+              value={task}
+              onChange={(e) => setTask(e.target.value)}
+            >
+              {TASKS.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
+          </label>
 
-        <label>
-          Model-name qualifier (optional)
-          <input
-            data-testid="new-run-qualifier"
-            value={qualifier}
-            onChange={(e) => setQualifier(e.target.value)}
+          <label>
+            Model-name qualifier (optional)
+            <input
+              data-testid="new-run-qualifier"
+              value={qualifier}
+              onChange={(e) => setQualifier(e.target.value)}
+            />
+          </label>
+        </Card>
+
+        <Card>
+          <RunArgsEditor
+            task={task}
+            value={args}
+            onChange={setArgs}
+            testIdPrefix="new-run-args"
           />
-        </label>
-      </Card>
+        </Card>
 
-      <Card>
-        <RunArgsEditor
-          task={task}
-          value={args}
-          onChange={setArgs}
-          testIdPrefix="new-run-args"
-        />
-      </Card>
-
-      <Button
-        data-testid="new-run-start"
-        disabled={submitting || profile === ""}
-        onClick={() => void handleStart()}
-      >
-        {submitting ? "Starting…" : "Start run"}
-      </Button>
+        <Button
+          data-testid="submit-run"
+          disabled={submitting || profile === ""}
+          onClick={() => void handleStart()}
+        >
+          {submitting ? "Starting…" : "Start run"}
+        </Button>
+      </div>
     </div>
   );
 }
