@@ -114,10 +114,7 @@ export function KanbanBoard<
         event.preventDefault();
         if (!grab) {
           // Grab — pick up this chip (plus any selected siblings).
-          const ids =
-            selectedIds?.has(item.id)
-              ? [...selectedIds]
-              : [item.id];
+          const ids = selectedIds?.has(item.id) ? [...selectedIds] : [item.id];
           setGrab({
             itemIds: ids,
             fromColumnId: item.columnId,
