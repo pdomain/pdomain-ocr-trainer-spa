@@ -10,6 +10,7 @@ import json
 from typing import TYPE_CHECKING
 
 from fastapi import APIRouter, Depends, Response
+from pydantic import BaseModel
 
 from pdomain_ocr_trainer_spa.core.app_state import get_app_state
 from pdomain_ocr_trainer_spa.core.enums import TaskEnum  # noqa: TC001 — pydantic resolves at model-build time
@@ -19,11 +20,13 @@ from pdomain_ocr_trainer_spa.core.models import (  # noqa: TC001 — pydantic re
     KanbanView,
 )
 from pdomain_ocr_trainer_spa.domain import datasets as dom
+from pdomain_ocr_trainer_spa.domain.labeler_export import resolve_export_root
 
 if TYPE_CHECKING:
     from pdomain_ocr_trainer_spa.core.app_state import AppState
 
 router = APIRouter(prefix="/api/profiles", tags=["datasets"])
+_diag_router = APIRouter(prefix="/api", tags=["datasets"])
 
 
 @router.get("/{profile}/datasets/{task}/kanban")
@@ -90,3 +93,27 @@ async def apply_assignments(
     if errors:
         response.headers["X-Apply-Errors"] = json.dumps(errors)
     return view
+
+
+# ---------------------------------------------------------------------------
+# Diagnostics — Track D
+# ---------------------------------------------------------------------------
+
+
+class LabelerExportDiagnostics(BaseModel):
+    """Response body for GET /api/labeler-export-diagnostics (Track D)."""
+
+    mode: str  # "configured" | "discovered" | "absent"
+    export_root: str | None
+
+
+@_diag_router.get("/labeler-export-diagnostics", tags=["datasets"])
+async def labeler_export_diagnostics(
+    state: AppState = Depends(get_app_state),
+) -> LabelerExportDiagnostics:
+    """Return the resolved labeler export root and discovery mode (Track D)."""
+    root, mode = resolve_export_root(state.settings.labeler_export_root)
+    return LabelerExportDiagnostics(
+        mode=mode.value,
+        export_root=str(root) if root is not None else None,
+    )

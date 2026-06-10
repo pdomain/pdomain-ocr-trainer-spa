@@ -25,6 +25,7 @@ from pdomain_ocr_trainer_spa.core.models import (
     KanbanProjectRow,
     KanbanView,
 )
+from pdomain_ocr_trainer_spa.domain.labeler_export import resolve_export_root
 from pdomain_ocr_trainer_spa.domain.profiles import normalize_profile_name
 
 if TYPE_CHECKING:
@@ -159,8 +160,11 @@ def _iter_export_dirs(settings: Settings, profile: str, task: TaskEnum) -> list[
 
     Layout: ``<export-root>/<project_id>/<profile-subfolder>/<task>/``.
     A ``profile`` of ``all`` matches the ``all`` subfolder.
+
+    Uses ``resolve_export_root`` so auto-discovery via pdomain-ops fills the gap
+    when ``settings.labeler_export_root`` is ``None`` (Track D).
     """
-    root = settings.labeler_export_root
+    root, _mode = resolve_export_root(settings.labeler_export_root)
     if root is None or not root.exists():
         return []
     found: list[tuple[str, Path]] = []

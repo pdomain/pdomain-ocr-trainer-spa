@@ -134,6 +134,7 @@ def build_app(settings: Settings) -> FastAPI:
     app.include_router(jobs.router)
     app.include_router(profiles.router)
     app.include_router(datasets.router)
+    app.include_router(datasets._diag_router)
     app.include_router(runs.router)
     app.include_router(models_api.router)
     app.include_router(eval_api.router)
