@@ -115,13 +115,13 @@ export function KanbanBoard<
         if (!grab) {
           // Grab — pick up this chip (plus any selected siblings).
           const ids =
-            selectedIds && selectedIds.has(item.id)
+            selectedIds?.has(item.id)
               ? [...selectedIds]
               : [item.id];
           setGrab({
-            itemIds: ids as TItem["id"][],
-            fromColumnId: item.columnId as TColumn["id"],
-            targetColumnId: item.columnId as TColumn["id"],
+            itemIds: ids,
+            fromColumnId: item.columnId,
+            targetColumnId: item.columnId,
           });
         } else {
           // Drop — commit the move into the ghost's target column.
@@ -142,7 +142,7 @@ export function KanbanBoard<
         const delta = key === "ArrowRight" ? 1 : -1;
         const current = columnIndexOf(grab.targetColumnId);
         const next = Math.min(columns.length - 1, Math.max(0, current + delta));
-        setGrab({ ...grab, targetColumnId: columns[next].id as TColumn["id"] });
+        setGrab({ ...grab, targetColumnId: columns[next].id });
         return;
       }
       if (key === "Escape") {

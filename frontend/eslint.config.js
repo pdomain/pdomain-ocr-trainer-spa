@@ -109,7 +109,7 @@ export default tseslint.config(
         "error",
         { assertionStyle: "as" },
       ],
-      "@typescript-eslint/no-unnecessary-condition": "warn",
+      "@typescript-eslint/no-unnecessary-condition": "error",
       "@typescript-eslint/no-non-null-assertion": "warn",
       "@typescript-eslint/no-empty-function": "warn",
       "@typescript-eslint/require-await": "warn",
@@ -134,18 +134,17 @@ export default tseslint.config(
       "@typescript-eslint/no-misused-spread": "warn",
       // array-type: existing code mixes T[] and Array<T>; let it be for now.
       "@typescript-eslint/array-type": "off",
-      // no-unnecessary-type-assertion: fires on defensive casts in existing
-      // code; not worth blocking CI on.
-      "@typescript-eslint/no-unnecessary-type-assertion": "warn",
-      // no-base-to-string: template literals with typed values; downgrade.
-      "@typescript-eslint/no-base-to-string": "warn",
+      // no-unnecessary-type-assertion: all violations fixed.
+      "@typescript-eslint/no-unnecessary-type-assertion": "error",
+      // no-base-to-string: all violations fixed via type narrowing.
+      "@typescript-eslint/no-base-to-string": "error",
       // no-dynamic-delete: one deliberate usage for cache invalidation.
       "@typescript-eslint/no-dynamic-delete": "warn",
       // no-unnecessary-type-conversion: String(x) where x is already a
       // string — existing pattern in template helpers and error formatting.
       "@typescript-eslint/no-unnecessary-type-conversion": "warn",
-      // prefer-optional-chain: stylistic; existing code uses && chaining.
-      "@typescript-eslint/prefer-optional-chain": "warn",
+      // prefer-optional-chain: all violations fixed.
+      "@typescript-eslint/prefer-optional-chain": "error",
     },
   },
   // Must come last: turns off any stylistic ESLint rule that would

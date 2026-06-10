@@ -18,7 +18,7 @@ function detailCount(env: ErrorEnvelope): number {
 }
 
 /** Per-code toast builders. Keyed by the stable `ErrorEnvelope.code`. */
-export const errorMessages: Record<string, ErrorToastBuilder> = {
+export const errorMessages: Partial<Record<string, ErrorToastBuilder>> = {
   // --- dataset kanban -----------------------------------------------------
   "dataset.apply_failed": (env) => ({
     kind: "error",

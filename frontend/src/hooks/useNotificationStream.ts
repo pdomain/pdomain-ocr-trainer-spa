@@ -49,11 +49,13 @@ export function terminalToast(job: WatchedJob, event: JobEvent): Toast {
   }
   // succeeded — kind-specific copy.
   if (job.kind === "eval") {
-    const cer = event.payload.cer;
-    const wer = event.payload.wer;
+    const cerRaw = event.payload.cer;
+    const werRaw = event.payload.wer;
+    const cer = typeof cerRaw === "number" ? cerRaw : undefined;
+    const wer = typeof werRaw === "number" ? werRaw : undefined;
     const metrics =
       cer !== undefined && wer !== undefined
-        ? `CER ${String(cer)}, WER ${String(wer)}`
+        ? `CER ${cer.toFixed(3)}, WER ${wer.toFixed(3)}`
         : label;
     return { kind: "success", title: `Eval done — ${metrics}` };
   }

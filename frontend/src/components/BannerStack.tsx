@@ -52,7 +52,7 @@ export function BannerStack({
   const refresh = useCallback(() => {
     // Banners are advisory — a failed fetch must never crash the shell.
     fetcher()
-      .then((res) => setBanners(res?.banners ?? []))
+      .then((res) => setBanners(res.banners))
       .catch(() => setBanners([]));
   }, [fetcher]);
 

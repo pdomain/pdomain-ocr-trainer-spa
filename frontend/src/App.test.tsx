@@ -46,6 +46,13 @@ beforeEach(() => {
           json: () => Promise.resolve([]),
         } as Response);
       }
+      if (typeof url === "string" && url.includes("/api/banners")) {
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          json: () => Promise.resolve({ banners: [] }),
+        } as Response);
+      }
       // Default: profiles list + any other API
       return Promise.resolve({
         ok: true,

@@ -89,7 +89,7 @@ export function DatasetsPage({
           continue;
         }
         for (const chip of row.pages) {
-          const effective = (staged[chip.key] ?? columnId) as KanbanColumnId;
+          const effective = staged[chip.key] ?? columnId;
           map.get(effective)?.push({
             id: chip.key,
             columnId: effective,

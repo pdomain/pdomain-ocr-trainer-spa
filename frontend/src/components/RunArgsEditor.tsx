@@ -169,7 +169,9 @@ export function RunArgsEditor({
               type={field.kind === "number" ? "number" : "text"}
               disabled={disabled}
               value={
-                current === undefined || current === null ? "" : String(current)
+                typeof current === "number" || typeof current === "string"
+                  ? String(current)
+                  : ""
               }
               onChange={(e) => {
                 if (field.kind === "number") {

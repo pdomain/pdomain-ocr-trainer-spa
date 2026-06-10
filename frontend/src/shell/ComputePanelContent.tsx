@@ -22,7 +22,9 @@ export function ComputePanelContent(): React.JSX.Element {
       <p role="alert" style={{ margin: 0, color: "var(--color-danger)" }}>
         {device.error instanceof Error
           ? device.error.message
-          : String(device.error)}
+          : typeof device.error === "string"
+            ? device.error
+            : "Unknown error"}
       </p>
     );
   }

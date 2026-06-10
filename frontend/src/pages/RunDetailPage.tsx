@@ -60,13 +60,18 @@ export function RunDetailPage(): React.JSX.Element {
 
   // Live SSE: stream the owning job while the run is non-terminal.
   useEffect(() => {
-    if (!run || run.job_id === null || TERMINAL.has(run.status)) return;
+    if (!run?.job_id || TERMINAL.has(run.status)) return;
     const sub = subscribeToJob(run.job_id, {
       onEvent: (event: JobEvent) => {
         if (event.kind === "log") {
-          const line = String(
-            event.payload.line ?? event.payload.message ?? "",
-          );
+          const rawLine = event.payload.line;
+          const rawMsg = event.payload.message;
+          const line =
+            typeof rawLine === "string"
+              ? rawLine
+              : typeof rawMsg === "string"
+                ? rawMsg
+                : "";
           if (line) setStdout((prev) => [...prev, line]);
         }
         if (event.kind === "progress") {
