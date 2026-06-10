@@ -16,6 +16,7 @@ import type { InstalledApp, LaunchResult } from "@pdomain/pdomain-ui/shell";
 import { ProfilesPage } from "./pages/ProfilesPage";
 import { ProfileDetailPage } from "./pages/ProfileDetailPage";
 import { DatasetsPage } from "./pages/DatasetsPage";
+import { TypefaceKanbanPage } from "./pages/TypefaceKanbanPage";
 import { RunListPage } from "./pages/RunListPage";
 import { RunDetailPage } from "./pages/RunDetailPage";
 import { NewRunPage } from "./pages/NewRunPage";
@@ -65,6 +66,10 @@ function AppRoutes(): React.JSX.Element {
       <Route path="/" element={<Navigate to="/profiles" replace />} />
       <Route path="/profiles" element={<ProfilesPage />} />
       <Route path="/profiles/:name" element={<ProfileDetailPage />} />
+      <Route
+        path="/profiles/:name/datasets/typeface-classification"
+        element={<TypefaceKanbanPage />}
+      />
       <Route path="/profiles/:name/datasets/:task" element={<DatasetsPage />} />
       <Route path="/runs" element={<RunListPage />} />
       <Route path="/runs/new" element={<NewRunPage />} />
