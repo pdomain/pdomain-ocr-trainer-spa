@@ -30,7 +30,7 @@ define _pnpm
 endef
 
 .PHONY: help setup install uninstall remove-venv reset lint format format-check typecheck \
-        pre-commit-check test test-slow e2e e2e-browser frontend-install \
+        pre-commit-check test test-slow e2e e2e-browser playwright-install frontend-install \
         frontend-typecheck frontend-test frontend-build frontend-lint \
         frontend-format frontend-format-check frontend-knip \
         build clean ci ci-full upgrade-deps \
@@ -64,6 +64,8 @@ setup: ## Sync Python deps + install pre-commit hooks
 	uv sync --group dev
 	@echo "🪝 Setting up pre-commit hooks..."
 	uv run pre-commit install || true
+	@echo "🎭 Installing Playwright browsers (e2e)..."
+	uv run --group e2e playwright install chromium
 	@echo "✅ Setup complete!"
 
 install: setup ## Alias for setup
@@ -146,6 +148,9 @@ build: frontend-build ## Build release artifacts (sdist + wheel, both from sourc
 	# from the source tree eliminates this failure mode (matches pdomain-ocr-simple-gui).
 	uv build --sdist
 	uv build --wheel
+
+playwright-install:  ## Install Playwright browsers (run once)
+	uv run --group e2e playwright install chromium
 
 e2e: frontend-build ## Run Playwright browser e2e tests (requires chromium)
 	@echo "🌐 Running Playwright e2e tests..."

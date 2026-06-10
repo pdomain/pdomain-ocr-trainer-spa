@@ -51,13 +51,26 @@ try:
 except ImportError:
 
     class DoctrExportManifest(BaseModel):  # type: ignore[no-redef]
-        """Fallback manifest model when pdomain-ops pre-Track-B is installed."""
+        """Fallback manifest model when pdomain-ops pre-Track-B is installed.
 
-        schema_id: str = ""
+        The on-disk JSON key is ``"schema"``; Pydantic reserves that attribute
+        name on BaseModel, so we use ``schema_key`` with an alias.
+        """
+
+        model_config = {"populate_by_name": True}
+
+        schema_key: str = ""  # on-disk key: "schema"
         version: int = 0
         generated_at: str = ""
         app: str = ""
         projects: dict[str, Any] = {}
+
+        @classmethod
+        def model_validate(cls, obj: Any, *args: Any, **kwargs: Any) -> DoctrExportManifest:  # type: ignore[override]
+            """Accept both ``"schema"`` and ``"schema_key"`` from on-disk JSON."""
+            if isinstance(obj, dict) and "schema" in obj and "schema_key" not in obj:
+                obj = {**obj, "schema_key": obj.pop("schema")}
+            return super().model_validate(obj, *args, **kwargs)
 
     def read_export_manifest(export_root: Path) -> DoctrExportManifest | None:  # type: ignore[misc]
         """Read manifest.json from disk using the fallback model."""
@@ -70,7 +83,7 @@ except ImportError:
             data = json.loads(manifest_path.read_text(encoding="utf-8"))
         except (OSError, ValueError):
             return None
-        return DoctrExportManifest(**data)
+        return DoctrExportManifest.model_validate(data)
 
 
 # ---------------------------------------------------------------------------
