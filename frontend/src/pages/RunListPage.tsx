@@ -26,7 +26,7 @@ function formatDuration(start: string, end: string | null): string {
   return `${Math.floor(secs / 60)}m ${secs % 60}s`;
 }
 
-export function RunListPage(): JSX.Element {
+export function RunListPage(): React.JSX.Element {
   const [runs, setRuns] = useState<Run[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

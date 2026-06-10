@@ -12,7 +12,7 @@ import { ApiError } from "../api/profiles";
 
 const TASKS = ["detection", "recognition"] as const;
 
-export function EvalFormPage(): JSX.Element {
+export function EvalFormPage(): React.JSX.Element {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const [profiles, setProfiles] = useState<Profile[]>([]);

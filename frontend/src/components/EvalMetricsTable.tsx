@@ -5,6 +5,7 @@
 // EvalMetricsTable yet — this carries the spec-13 testid contract and is
 // drop-in-replaceable once pdomain-ui ships one.
 
+import React from "react";
 import type { EvalMetrics, EvalSlice } from "../api/eval";
 
 interface Props {
@@ -29,7 +30,7 @@ const OVERALL_FIELDS: Array<[keyof EvalMetrics, string]> = [
   ["f1_macro", "F1 macro"],
 ];
 
-export function EvalMetricsTable({ overall, slices }: Props): JSX.Element {
+export function EvalMetricsTable({ overall, slices }: Props): React.JSX.Element {
   const sorted = [...slices].sort(
     (a, b) => Math.abs(b.delta_cer ?? 0) - Math.abs(a.delta_cer ?? 0),
   );

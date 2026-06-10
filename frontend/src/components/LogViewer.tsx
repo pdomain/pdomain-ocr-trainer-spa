@@ -13,7 +13,7 @@ export interface LogViewerProps {
   stderr: string[];
 }
 
-export function LogViewer({ stdout, stderr }: LogViewerProps): JSX.Element {
+export function LogViewer({ stdout, stderr }: LogViewerProps): React.JSX.Element {
   const [stream, setStream] = useState<"stdout" | "stderr">("stdout");
   const [autoScroll, setAutoScroll] = useState(true);
   const [wrap, setWrap] = useState(true);

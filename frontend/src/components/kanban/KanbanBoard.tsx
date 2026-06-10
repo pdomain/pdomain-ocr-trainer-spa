@@ -201,7 +201,7 @@ export function KanbanBoard<
                     key={item.id}
                     role="listitem"
                     tabIndex={0}
-                    aria-grabbed={isGrabbed}
+                    data-grabbed={isGrabbed ? "true" : undefined}
                     data-testid={chipTestId?.(item)}
                     data-pending={isPending ? "true" : undefined}
                     data-selected={isSelected ? "true" : undefined}

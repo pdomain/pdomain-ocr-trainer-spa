@@ -123,10 +123,9 @@ export default tseslint.config(
       "@typescript-eslint/no-unsafe-argument": "warn",
       "@typescript-eslint/no-unsafe-call": "warn",
       "@typescript-eslint/no-unsafe-return": "warn",
-      // no-deprecated: JSX namespace was deprecated in React 18.3+; the
-      // codebase uses JSX.Element as return type convention throughout.
-      // Downgrade to warn so CI stays green while the migration is gradual.
-      "@typescript-eslint/no-deprecated": "warn",
+      // no-deprecated: All JSX.Element usages replaced with React.JSX.Element.
+      // ActiveJob false-positive (pdomain-ui JSDoc) suppressed inline.
+      "@typescript-eslint/no-deprecated": "error",
       // no-invalid-void-type: void in union types (e.g. Promise<void | T>)
       // is a common API-shape pattern in the query layer. Downgrade to warn.
       "@typescript-eslint/no-invalid-void-type": "warn",

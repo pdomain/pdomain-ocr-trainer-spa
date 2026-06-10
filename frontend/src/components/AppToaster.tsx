@@ -6,12 +6,13 @@
 // per `kind` so info/success get `role="status"` and warn/error get
 // `role="alert"` (spec 11 §7 — sonner's default behaviour).
 
+import React from "react";
 import { Toaster as SonnerToaster, toast as sonnerToast } from "sonner";
 import type { Toast } from "../lib/toast";
 import { toastDuration } from "../lib/toast";
 
 /** The single sonner toaster mount (spec 11 §6). */
-export function AppToaster(): JSX.Element {
+export function AppToaster(): React.JSX.Element {
   return (
     <SonnerToaster
       position="top-right"

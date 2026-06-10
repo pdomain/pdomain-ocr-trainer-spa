@@ -4,9 +4,12 @@ import {
   SettingsSlot,
   useUtilityDock,
 } from "@pdomain/pdomain-ui/shell";
+// ActiveJob is not deprecated. Its JSDoc in pdomain-ui shares a block with
+// deprecated props, triggering a false positive. See lint-deviations.md.
 import type { ActiveJob } from "@pdomain/pdomain-ui/shell";
 
 export interface TrainerHeaderProps {
+  // eslint-disable-next-line @typescript-eslint/no-deprecated
   activeJobs: ActiveJob[];
   appVersion: string;
 }

@@ -5,7 +5,7 @@ import { Badge, Button, Card } from "@pdomain/pdomain-ui/primitives";
 import { fetchModels, deleteModel } from "../api/models";
 import type { ModelListItem } from "../api/models";
 
-export function ModelsPage(): JSX.Element {
+export function ModelsPage(): React.JSX.Element {
   const [models, setModels] = useState<ModelListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

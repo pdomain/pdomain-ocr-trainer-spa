@@ -206,9 +206,9 @@ describe("DatasetsPage — keyboard-only flow (spec 12 §9 scenario 3)", () => {
       "kanban-column-unassigned-chip-myproj-myproj_1_0.png",
     );
     chipEl.focus();
-    // Space → grab (aria-grabbed flips true).
+    // Space → grab (data-grabbed flips true; aria-grabbed is deprecated in ARIA 1.2).
     await user.keyboard(" ");
-    expect(chipEl).toHaveAttribute("aria-grabbed", "true");
+    expect(chipEl).toHaveAttribute("data-grabbed", "true");
     // ArrowRight → ghost target moves to Training.
     await user.keyboard("{ArrowRight}");
     expect(screen.getByTestId("kanban-column-train")).toHaveAttribute(
@@ -239,7 +239,7 @@ describe("DatasetsPage — keyboard-only flow (spec 12 §9 scenario 3)", () => {
     await user.keyboard(" ");
     await user.keyboard("{ArrowRight}");
     await user.keyboard("{Escape}");
-    expect(chipEl).toHaveAttribute("aria-grabbed", "false");
+    expect(chipEl).not.toHaveAttribute("data-grabbed");
     expect(screen.getByTestId("kanban-footer-pending-count")).toHaveTextContent(
       "No pending changes",
     );

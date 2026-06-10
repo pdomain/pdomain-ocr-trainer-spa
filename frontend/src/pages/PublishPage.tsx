@@ -13,7 +13,7 @@ type PublishTarget =
   | { kind: "dataset"; profile: Profile; task: string }
   | { kind: "model"; item: ModelListItem };
 
-export function PublishPage(): JSX.Element {
+export function PublishPage(): React.JSX.Element {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [models, setModels] = useState<ModelListItem[]>([]);
   const [loading, setLoading] = useState(true);

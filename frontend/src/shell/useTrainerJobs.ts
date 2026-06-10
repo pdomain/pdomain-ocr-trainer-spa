@@ -46,6 +46,7 @@ function toJobStatus(state: string): JobStatus {
 }
 
 export interface TrainerJobsResult {
+  // eslint-disable-next-line @typescript-eslint/no-deprecated -- ActiveJob false positive (pdomain-ui JSDoc); see lint-deviations.md
   pill: ActiveJob[];
   dock: Job[];
 }
@@ -66,6 +67,7 @@ export function useTrainerJobs(): TrainerJobsResult {
   const inFlight = all.filter(
     (j) => j.state === "running" || j.state === "queued",
   );
+  // eslint-disable-next-line @typescript-eslint/no-deprecated -- ActiveJob false positive
   const pill: ActiveJob[] = inFlight.map((j) => ({
     id: j.id,
     title: j.run_id ?? j.id,

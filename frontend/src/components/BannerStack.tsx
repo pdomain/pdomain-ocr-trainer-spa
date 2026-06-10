@@ -43,7 +43,7 @@ export interface BannerStackProps {
 /** Top-of-page stack of active environment banners. */
 export function BannerStack({
   fetcher = fetchBanners,
-}: BannerStackProps): JSX.Element | null {
+}: BannerStackProps): React.JSX.Element | null {
   const [banners, setBanners] = useState<Banner[]>([]);
   const [dismissed, setDismissed] = useState<Set<string>>(() =>
     loadDismissed(),

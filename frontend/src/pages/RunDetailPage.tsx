@@ -14,7 +14,7 @@ import type { MetricPoint } from "../components/LossChart";
 
 const TERMINAL = new Set(["succeeded", "failed", "cancelled"]);
 
-export function RunDetailPage(): JSX.Element {
+export function RunDetailPage(): React.JSX.Element {
   const { runId = "" } = useParams<{ runId: string }>();
   const [run, setRun] = useState<Run | null>(null);
   const [error, setError] = useState<string | null>(null);

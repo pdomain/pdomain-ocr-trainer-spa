@@ -8,7 +8,7 @@ import { fetchEvalResult } from "../api/eval";
 import type { EvalResult } from "../api/eval";
 import { EvalMetricsTable } from "../components/EvalMetricsTable";
 
-export function EvalResultPage(): JSX.Element {
+export function EvalResultPage(): React.JSX.Element {
   const { runId = "" } = useParams<{ runId: string }>();
   const [result, setResult] = useState<EvalResult | null>(null);
   const [error, setError] = useState<string | null>(null);

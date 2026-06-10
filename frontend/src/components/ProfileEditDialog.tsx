@@ -34,7 +34,7 @@ export function ProfileEditDialog({
   onSubmitCreate,
   onSubmitEdit,
   onClose,
-}: ProfileEditDialogProps): JSX.Element {
+}: ProfileEditDialogProps): React.JSX.Element {
   const [name, setName] = useState(profile?.name ?? "");
   const [displayName, setDisplayName] = useState(profile?.display_name ?? "");
   const [language, setLanguage] = useState(profile?.language ?? "");

@@ -12,7 +12,7 @@ import {
 import type { ModelListItem } from "../api/models";
 import { ApiError } from "../api/profiles";
 
-export function ModelDetailPage(): JSX.Element {
+export function ModelDetailPage(): React.JSX.Element {
   const { name = "" } = useParams<{ name: string }>();
   const navigate = useNavigate();
   const [item, setItem] = useState<ModelListItem | null>(null);

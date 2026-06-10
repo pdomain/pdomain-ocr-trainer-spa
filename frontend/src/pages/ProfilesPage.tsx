@@ -11,7 +11,7 @@ type DialogState =
   | { mode: "create" }
   | { mode: "edit"; profile: Profile };
 
-export function ProfilesPage(): JSX.Element {
+export function ProfilesPage(): React.JSX.Element {
   const profiles = useProfilesStore((s) => s.profiles);
   const hasLegacyLayout = useProfilesStore((s) => s.hasLegacyLayout);
   const loading = useProfilesStore((s) => s.loading);

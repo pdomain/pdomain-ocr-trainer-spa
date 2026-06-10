@@ -79,7 +79,7 @@ function StringListField({
   value: unknown;
   disabled: boolean;
   onChange: (next: string[]) => void;
-}): JSX.Element {
+}): React.JSX.Element {
   const committed = Array.isArray(value) ? (value as string[]).join(", ") : "";
   const [text, setText] = useState(committed);
   // Re-sync when the committed value changes from outside (task switch, reset).
@@ -122,7 +122,7 @@ export function RunArgsEditor({
   onChange,
   testIdPrefix = "run-args",
   disabled = false,
-}: RunArgsEditorProps): JSX.Element {
+}: RunArgsEditorProps): React.JSX.Element {
   const fields = fieldSpecForTask(task);
 
   const setField = (key: string, next: unknown) => {

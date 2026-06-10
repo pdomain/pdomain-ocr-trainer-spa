@@ -27,7 +27,7 @@ const TABS: { id: Tab; label: string }[] = [
   { id: "defaults", label: "Defaults" },
 ];
 
-export function ProfileDetailPage(): JSX.Element {
+export function ProfileDetailPage(): React.JSX.Element {
   const params = useParams<{ name: string }>();
   const profile = params.name ?? "all";
 

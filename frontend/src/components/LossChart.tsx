@@ -5,6 +5,8 @@
 // and renders a series of metric points. Swapping in recharts later is a
 // drop-in behind the same testid.
 
+import React from "react";
+
 export interface MetricPoint {
   step: number;
   value: number;
@@ -18,7 +20,7 @@ export interface LossChartProps {
 export function LossChart({
   series,
   label = "metric",
-}: LossChartProps): JSX.Element {
+}: LossChartProps): React.JSX.Element {
   if (series.length === 0) {
     return (
       <div data-testid="run-detail-loss-chart">

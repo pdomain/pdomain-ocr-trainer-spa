@@ -15,7 +15,7 @@ import { ApiError } from "../api/profiles";
 
 const TASKS = ["detection", "recognition", "typeface-classification"] as const;
 
-export function NewRunPage(): JSX.Element {
+export function NewRunPage(): React.JSX.Element {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const [profiles, setProfiles] = useState<Profile[]>([]);

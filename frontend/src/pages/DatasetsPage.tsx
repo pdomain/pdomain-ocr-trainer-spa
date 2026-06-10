@@ -44,7 +44,7 @@ interface DatasetsPageProps {
 
 export function DatasetsPage({
   overrideTask,
-}: DatasetsPageProps = {}): JSX.Element {
+}: DatasetsPageProps = {}): React.JSX.Element {
   const params = useParams<{ name: string; task: string }>();
   const profile = params.name ?? "all";
   const task = overrideTask ?? params.task ?? "recognition";

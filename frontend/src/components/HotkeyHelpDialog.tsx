@@ -25,7 +25,7 @@ function comboTokens(combo: string): string[] {
 export function HotkeyHelpDialog({
   open,
   onClose,
-}: HotkeyHelpDialogProps): JSX.Element | null {
+}: HotkeyHelpDialogProps): React.JSX.Element | null {
   const groups = useSyncExternalStore(subscribeHotkeys, hotkeysByScope);
   const dialogRef = useRef<HTMLDivElement>(null);
 

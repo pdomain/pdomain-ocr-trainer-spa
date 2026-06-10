@@ -48,7 +48,7 @@ export function PublishDialog({
   defaultRepo = "",
   onClose,
   onSuccess,
-}: PublishDialogProps): JSX.Element {
+}: PublishDialogProps): React.JSX.Element {
   const [repo, setRepo] = useState(defaultRepo);
   const [visibility, setVisibility] = useState<"private" | "public">("private");
   const [license, setLicense] = useState("Apache-2.0");
