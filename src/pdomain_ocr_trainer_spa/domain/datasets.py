@@ -212,6 +212,31 @@ def _freshness_state_path(settings: Settings, profile: str) -> Path:
     return settings.app_data_root / "profiles" / profile / "freshness_state.json"
 
 
+def _normalize_exported_at(proj_data: object) -> str:
+    """Extract and normalize exported_at from a project manifest entry.
+
+    Handles both the real DoctrExportProject (pydantic datetime) and the
+    fallback dict / raw-JSON representation. Returns an ISO 8601 string
+    with UTC offset for reliable string comparison.
+    """
+    from datetime import UTC, datetime
+
+    if isinstance(proj_data, dict):
+        raw = proj_data.get("exported_at", "")
+    else:
+        raw = getattr(proj_data, "exported_at", "")
+    # If it's already a datetime, convert via isoformat
+    if isinstance(raw, datetime):
+        if raw.tzinfo is None:
+            raw = raw.replace(tzinfo=UTC)
+        return raw.isoformat()
+    # Normalize the string: replace trailing "Z" with "+00:00"
+    s = str(raw)
+    if s.endswith("Z"):
+        s = s[:-1] + "+00:00"
+    return s
+
+
 def _load_fresh_project_ids(settings: Settings, profile: str) -> frozenset[str]:
     """Return project_ids that have a manifest exported_at newer than last-seen.
 
@@ -227,12 +252,9 @@ def _load_fresh_project_ids(settings: Settings, profile: str) -> frozenset[str]:
     record = ExportFreshnessRecord.load(freshness_path)
     fresh: set[str] = set()
     for project_id, proj_data in manifest.projects.items():
-        if isinstance(proj_data, dict):
-            exported_at = proj_data.get("exported_at", "")
-        else:
-            exported_at = str(getattr(proj_data, "exported_at", ""))
+        exported_at = _normalize_exported_at(proj_data)
         last_seen = record.project_seen_at.get(project_id)
-        if last_seen is None or str(exported_at) > str(last_seen):
+        if last_seen is None or exported_at > last_seen:
             fresh.add(project_id)
     return frozenset(fresh)
 
@@ -257,12 +279,18 @@ def _update_freshness_record(settings: Settings, profile: str, fresh_ids: frozen
         proj_data = manifest.projects.get(project_id)
         if proj_data is None:
             continue
-        if isinstance(proj_data, dict):
-            exported_at = proj_data.get("exported_at", "")
-        else:
-            exported_at = str(getattr(proj_data, "exported_at", ""))
-        record.project_seen_at[project_id] = str(exported_at)
+        record.project_seen_at[project_id] = _normalize_exported_at(proj_data)
     record.save(freshness_path)
+
+
+def count_fresh_projects(settings: Settings, *, profile: str = "all") -> int:
+    """Return the number of projects with a manifest exported_at newer than last-seen.
+
+    Used by the banners endpoint to decide whether to emit the new-labeled-pages
+    banner without building a full KanbanView (Track D).
+    """
+    normalized = normalize_profile_name(profile)
+    return len(_load_fresh_project_ids(settings, normalized))
 
 
 def set_include_toggles(

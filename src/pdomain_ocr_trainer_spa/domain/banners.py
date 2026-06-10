@@ -116,10 +116,29 @@ def _disk_low_banner(settings: Settings) -> Banner | None:
     )
 
 
-def synthesize_banners(settings: Settings) -> list[Banner]:
+def _new_labeled_pages_banner(fresh_project_count: int) -> Banner | None:
+    """Return the new-labeled-pages banner when fresh exports are detected (Track D)."""
+    if fresh_project_count == 0:
+        return None
+    noun = "project" if fresh_project_count == 1 else "projects"
+    has_have = "has" if fresh_project_count == 1 else "have"
+    return Banner(
+        id="new-labeled-pages",
+        severity="info",
+        title="New labeled pages available",
+        description=(
+            f"{fresh_project_count} {noun} {has_have} "
+            "new or updated labeled exports. Open the Dataset kanban to review."
+        ),
+        action=BannerAction(label="Open Datasets", href="/datasets"),
+        dismissible=True,
+    )
+
+
+def synthesize_banners(settings: Settings, *, fresh_project_count: int = 0) -> list[Banner]:
     """Return the active banner list derived from the current environment.
 
-    The order is deterministic: ``hf-token-missing`` then ``disk-low``.
+    Order: hf-token-missing, disk-low, new-labeled-pages.
     ``app-version-mismatch`` is omitted — that banner is client-only.
     """
     banners: list[Banner] = []
@@ -127,4 +146,7 @@ def synthesize_banners(settings: Settings) -> list[Banner]:
         banner = builder(settings)
         if banner is not None:
             banners.append(banner)
+    fresh_banner = _new_labeled_pages_banner(fresh_project_count)
+    if fresh_banner is not None:
+        banners.append(fresh_banner)
     return banners

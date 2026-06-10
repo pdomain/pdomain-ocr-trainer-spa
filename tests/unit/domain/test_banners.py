@@ -106,3 +106,24 @@ def test_hf_token_present_suppresses_banner_for_read_path(settings: Settings, tm
 
     banners = dom.synthesize_banners(settings)
     assert not any(b.id == "hf-token-missing" for b in banners)
+
+
+# ---------------------------------------------------------------------------
+# Track D: new-labeled-pages banner
+# ---------------------------------------------------------------------------
+
+
+def test_new_labeled_pages_banner_fires_when_fresh(settings: Settings) -> None:
+    banners = dom.synthesize_banners(settings, fresh_project_count=3)
+    ids = [b.id for b in banners]
+    assert "new-labeled-pages" in ids
+    banner = next(b for b in banners if b.id == "new-labeled-pages")
+    assert banner.severity == "info"
+    assert banner.dismissible is True
+    assert "3" in banner.description
+
+
+def test_new_labeled_pages_banner_absent_when_zero(settings: Settings) -> None:
+    banners = dom.synthesize_banners(settings, fresh_project_count=0)
+    ids = [b.id for b in banners]
+    assert "new-labeled-pages" not in ids

@@ -16,6 +16,7 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
 from pdomain_ocr_trainer_spa.core.app_state import get_app_state
+from pdomain_ocr_trainer_spa.domain import datasets as datasets_dom
 from pdomain_ocr_trainer_spa.domain.banners import Banner, synthesize_banners
 
 if TYPE_CHECKING:
@@ -34,5 +35,6 @@ class BannerListResponse(BaseModel):
 async def list_banners(
     state: AppState = Depends(get_app_state),
 ) -> BannerListResponse:
-    """Return the active environment banners for the current app state."""
-    return BannerListResponse(banners=synthesize_banners(state.settings))
+    """Return the active environment banners for the current app state (Track D: includes freshness)."""
+    fresh_count = datasets_dom.count_fresh_projects(state.settings)
+    return BannerListResponse(banners=synthesize_banners(state.settings, fresh_project_count=fresh_count))
