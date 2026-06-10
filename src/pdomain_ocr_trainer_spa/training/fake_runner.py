@@ -1,8 +1,16 @@
-"""FakeLongJobRunner — the CI-safe LongJobRunner seam (spec 14-testing §2.1).
+"""Fake runner seams for CI (spec 14-testing §2.1, M12).
 
-Instead of spawning a worker subprocess, it emits a scripted sequence of
-pdomain-ops JobEvents and advances JobStatus.state through the lifecycle.
-No subprocess, no GPU, no torch.
+Two distinct seams live here:
+
+* :class:`FakeLongJobRunner` — CI-safe ``LongJobRunner`` seam.  Emits a
+  scripted sequence of pdomain-ops ``JobEvent`` objects and advances
+  ``JobStatus.state`` through the lifecycle.  No subprocess, no GPU, no torch.
+
+* :class:`FakeTrainingRunner` — CI-safe ``ITrainingRunner`` seam (M12 plan
+  Task 2).  Implements ``train_detection``, ``train_recognition``, and
+  ``train_typeface`` using scripted ``TrainingEvent`` streams so the worker
+  dispatch path can be exercised without torch or DocTR.  Use this in tests
+  that call ``_iter_events`` or ``run_worker`` directly.
 """
 
 from __future__ import annotations
@@ -15,7 +23,7 @@ from pdomain_ops.gpu.local_jobs import UnknownJobError
 from pdomain_ops.gpu.types import JobEvent, JobStatus
 
 if TYPE_CHECKING:
-    from collections.abc import AsyncIterator
+    from collections.abc import AsyncIterator, Iterator
 
 _TERMINAL = {"succeeded", "failed", "cancelled"}
 
@@ -122,3 +130,71 @@ class FakeLongJobRunner:
             yield event
             if event.kind == "state" and event.payload.get("state") in _TERMINAL:
                 return
+
+
+class FakeTrainingRunner:
+    """CI-safe ITrainingRunner seam (M12 plan Task 2).
+
+    Implements ``train_detection``, ``train_recognition``, and
+    ``train_typeface`` with scripted ``TrainingEvent`` streams.  No torch, no
+    DocTR, no GPU required.  Use in tests that exercise ``_iter_events`` or
+    ``run_worker`` directly.
+    """
+
+    def train_detection(
+        self,
+        profile: str,
+        config: object,
+    ) -> Iterator[object]:
+        """Fake detection training: 2 metric events then done."""
+        from pdomain_ocr_training.protocols import TrainingEvent
+
+        del profile, config
+        for epoch in range(1, 3):
+            yield TrainingEvent(
+                kind="metric",
+                message=f"epoch {epoch}",
+                progress=epoch / 2,
+                data={"f1": 0.80 + epoch * 0.05, "precision": 0.82, "recall": 0.79},
+            )
+        yield TrainingEvent(kind="done", message="training complete", progress=1.0)
+
+    def train_recognition(
+        self,
+        profile: str,
+        config: object,
+    ) -> Iterator[object]:
+        """Fake recognition training: 2 metric events then done."""
+        from pdomain_ocr_training.protocols import TrainingEvent
+
+        del profile, config
+        for epoch in range(1, 3):
+            yield TrainingEvent(
+                kind="metric",
+                message=f"epoch {epoch}",
+                progress=epoch / 2,
+                data={"cer": 0.10 - epoch * 0.02},
+            )
+        yield TrainingEvent(kind="done", message="training complete", progress=1.0)
+
+    def train_typeface(
+        self,
+        profile: str,
+        config: object,
+    ) -> Iterator[object]:
+        """Fake typeface-classification training: emits progress then done.
+
+        Metric events carry ``accuracy`` and ``f1_macro`` so the worker can
+        relay them to the frontend without torch.
+        """
+        from pdomain_ocr_training.protocols import TrainingEvent
+
+        del profile, config
+        for epoch in range(1, 4):
+            yield TrainingEvent(
+                kind="metric",
+                message=f"epoch {epoch}",
+                progress=epoch / 3,
+                data={"accuracy": 0.80 + epoch * 0.05, "f1_macro": 0.78 + epoch * 0.05},
+            )
+        yield TrainingEvent(kind="done", message="training complete", progress=1.0)

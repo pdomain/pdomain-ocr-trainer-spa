@@ -155,3 +155,72 @@ def test_eval_typeface_api_returns_202(settings: Settings, client: object) -> No
     assert resp.status_code == 202
     data = resp.json()
     assert "run_id" in data
+
+
+def test_eval_typeface_result_round_trip(settings: Settings, client: object) -> None:
+    """GET /api/eval/{id}/result returns typeface accuracy + f1_macro + per_class.
+
+    Plan Task 5 acceptance: the round-trip through the fake seam for a
+    typeface eval run.  The test writes an EvalResult with local per-class
+    fields (accuracy, f1_macro, per_class as dict[str, ClassMetrics]) and
+    verifies the API endpoint returns them correctly.
+    """
+    from fastapi.testclient import TestClient
+
+    from pdomain_ocr_trainer_spa.core.models import ClassMetrics, EvalMetrics, EvalResult
+
+    assert isinstance(client, TestClient)
+    model = _seed_typeface_model(settings)
+
+    # Create an eval run
+    run = eval_dom.create_eval_run(
+        settings,
+        profile="roman-test",
+        task=TaskEnum.typeface_classification,
+        model_name=model,
+    )
+
+    # Simulate the eval worker writing a typeface result with per-class data
+    per_class: dict[str, ClassMetrics] = {
+        "roman": ClassMetrics(n=120, precision=0.95, recall=0.93, f1=0.94),
+        "italic": ClassMetrics(n=80, precision=0.88, recall=0.91, f1=0.895),
+    }
+    result = EvalResult(
+        run_id=run.id,
+        profile="roman-test",
+        task=TaskEnum.typeface_classification,
+        model_name=model,
+        val_source="local:ml-validation/roman-test/typeface-classification",
+        overall=EvalMetrics(
+            accuracy=0.923,
+            f1_macro=0.917,
+            per_class=per_class,
+        ),
+        sample_count=200,
+        finished_at=datetime.now(UTC),
+    )
+    eval_dom.write_result(settings, result)
+    # Mark run as running then succeeded so get_result doesn't 409
+    from pdomain_ocr_trainer_spa.domain import runs as run_dom
+
+    run = run_dom.mark_running(settings, run, "fake-job-id")
+    run_dom.mark_terminal(settings, run, status="succeeded", exit_code=0)
+
+    # Round-trip: GET /api/eval/{id}/result
+    resp = client.get(f"/api/eval/{run.id}/result")
+    assert resp.status_code == 200, resp.text
+    data = resp.json()
+
+    # Overall typeface metrics
+    overall = data["overall"]
+    assert overall["accuracy"] == pytest.approx(0.923)
+    assert overall["f1_macro"] == pytest.approx(0.917)
+    assert "per_class" in overall
+    per_class_resp = overall["per_class"]
+    assert "roman" in per_class_resp
+    assert "italic" in per_class_resp
+    assert per_class_resp["roman"]["f1"] == pytest.approx(0.94)
+
+    # Round-trip fields
+    assert data["task"] == "typeface-classification"
+    assert data["sample_count"] == 200
