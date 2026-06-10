@@ -46,6 +46,29 @@ affected files, and the justification.
   formatting. Suppressed with inline comments at each usage site until
   pdomain-ui corrects the JSDoc layout.
 
+### `react-refresh/only-export-components` — `AppToaster.tsx` exemption
+
+- **Files:** `frontend/src/components/AppToaster.tsx`
+- **Justification:** `emitToast` is part of the spec 11 §6 driver contract
+  (`toast-{id}` testid) and must be importable from `AppToaster`. Moving it
+  to a separate lib file would make it an orphan in the knip graph (no
+  internal callers yet). Suppressed with a file-level
+  `/* eslint-disable react-refresh/only-export-components */` comment at the
+  top of the file.
+
+### `@typescript-eslint/no-misused-spread` — internal `request` helpers
+
+- **Files:** `frontend/src/api/datasets.ts:64`, `frontend/src/api/eval.ts:72`,
+  `frontend/src/api/models.ts:69`, `frontend/src/api/profiles.ts:70`,
+  `frontend/src/api/runs.ts:70`
+- **Justification:** The `...init?.headers` spread pattern is used in each
+  file's private `request()`/`jsonRequest()` helper. `RequestInit.headers` is
+  typed as `HeadersInit | undefined`, which includes `Headers` (iterable).
+  Spreading a `Headers` instance into an object would give index keys, not
+  header entries — but in practice, these internal helpers are never called
+  with `Headers` instances, only `Record<string, string>` or `undefined`.
+  Suppressed with inline `// eslint-disable-next-line` comments.
+
 ### `@typescript-eslint/array-type` — kept `off`
 
 - **Files:** `frontend/eslint.config.js`
