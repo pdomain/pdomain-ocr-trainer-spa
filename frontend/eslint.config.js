@@ -1,15 +1,21 @@
 // Flat ESLint config for the SPA.
 //
-// Canonical workspace config (2026-05-24):
+// Canonical workspace config (2026-06-10):
 //   - typescript-eslint strictTypeChecked + stylisticTypeChecked
 //     (type-aware rules; requires parserOptions.projectService = true)
 //   - react-hooks recommended (rules-of-hooks + exhaustive-deps)
-//   - react-refresh (only-export-components warning for HMR sanity)
+//   - react-refresh (only-export-components error; non-component exports
+//     moved to sibling .ts files)
+//   - jsx-a11y recommended (all violations fixed; rules promoted to error)
 //   - eslint-config-prettier last, to disable any rules that would
 //     fight Prettier's formatting decisions
 //
-// NOTE: failOnWarnings (--max-warnings 0) is left for a future pass
-// after all existing warnings are resolved.
+// --max-warnings 0 is enforced via the `lint` script in package.json.
+// All rules are at `error` level (no downgraded `warn`), except:
+//   - @typescript-eslint/array-type: off (mixed T[]/Array<T> tolerated)
+//   - @typescript-eslint/no-confusing-void-expression: off
+//   - @typescript-eslint/prefer-nullish-coalescing: off
+// See docs/conventions/lint-deviations.md for intentional suppressions.
 import js from "@eslint/js";
 import tseslint from "typescript-eslint";
 import reactHooks from "eslint-plugin-react-hooks";
@@ -91,8 +97,9 @@ export default tseslint.config(
         { allowConstantExport: true },
       ],
       "no-unused-vars": "off",
+      // no-unused-vars: all violations fixed or prefixed with _.
       "@typescript-eslint/no-unused-vars": [
-        "warn",
+        "error",
         {
           argsIgnorePattern: "^_",
           varsIgnorePattern: "^_",
@@ -113,27 +120,29 @@ export default tseslint.config(
       "@typescript-eslint/no-unnecessary-condition": "error",
       // no-non-null-assertion: all violations fixed (null check + throw pattern).
       "@typescript-eslint/no-non-null-assertion": "error",
-      "@typescript-eslint/no-empty-function": "warn",
-      "@typescript-eslint/require-await": "warn",
+      // no-empty-function: one display-only no-op suppressed inline.
+      "@typescript-eslint/no-empty-function": "error",
+      // require-await: all violations fixed or suppressed.
+      "@typescript-eslint/require-await": "error",
       "@typescript-eslint/no-misused-promises": [
         "error",
         { checksVoidReturn: { attributes: false } },
       ],
-      "@typescript-eslint/no-unsafe-assignment": "warn",
-      "@typescript-eslint/no-unsafe-member-access": "warn",
-      "@typescript-eslint/no-unsafe-argument": "warn",
-      "@typescript-eslint/no-unsafe-call": "warn",
-      "@typescript-eslint/no-unsafe-return": "warn",
+      // no-unsafe-*: all violations fixed via type narrowing or casts.
+      "@typescript-eslint/no-unsafe-assignment": "error",
+      "@typescript-eslint/no-unsafe-member-access": "error",
+      "@typescript-eslint/no-unsafe-argument": "error",
+      "@typescript-eslint/no-unsafe-call": "error",
+      "@typescript-eslint/no-unsafe-return": "error",
       // no-deprecated: All JSX.Element usages replaced with React.JSX.Element.
       // ActiveJob false-positive (pdomain-ui JSDoc) suppressed inline.
       "@typescript-eslint/no-deprecated": "error",
-      // no-invalid-void-type: void in union types (e.g. Promise<void | T>)
-      // is a common API-shape pattern in the query layer. Downgrade to warn.
-      "@typescript-eslint/no-invalid-void-type": "warn",
-      // no-misused-spread: new rule in typescript-eslint 8.x; fires on
-      // legitimate {...queryParams, ...extraParams} patterns where one
-      // operand is an array from URLSearchParams. Downgrade to warn.
-      "@typescript-eslint/no-misused-spread": "warn",
+      // no-invalid-void-type: request<void> usages replaced with
+      // request<undefined> (204 responses). No remaining violations.
+      "@typescript-eslint/no-invalid-void-type": "error",
+      // no-misused-spread: HeadersInit spread suppressed inline at each
+      // internal request helper (Headers instance never passed at call-sites).
+      "@typescript-eslint/no-misused-spread": "error",
       // array-type: existing code mixes T[] and Array<T>; let it be for now.
       "@typescript-eslint/array-type": "off",
       // no-unnecessary-type-assertion: all violations fixed.
@@ -143,9 +152,8 @@ export default tseslint.config(
       // no-dynamic-delete: one deliberate usage for cache invalidation;
       // suppressed inline with rationale comment.
       "@typescript-eslint/no-dynamic-delete": "error",
-      // no-unnecessary-type-conversion: String(x) where x is already a
-      // string — existing pattern in template helpers and error formatting.
-      "@typescript-eslint/no-unnecessary-type-conversion": "warn",
+      // no-unnecessary-type-conversion: all violations fixed via type narrowing.
+      "@typescript-eslint/no-unnecessary-type-conversion": "error",
       // prefer-optional-chain: all violations fixed.
       "@typescript-eslint/prefer-optional-chain": "error",
     },

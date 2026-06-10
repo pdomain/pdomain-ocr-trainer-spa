@@ -66,6 +66,7 @@ export class ApiError extends Error {
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const resp = await fetch(path, {
     ...init,
+    // eslint-disable-next-line @typescript-eslint/no-misused-spread -- HeadersInit is always Record<string,string> at internal call-sites; Headers instance never passed
     headers: { "Content-Type": "application/json", ...init?.headers },
   });
   if (resp.status === 204) {
@@ -105,13 +106,13 @@ export function updateProfile(
 }
 
 export function deleteProfile(name: string): Promise<void> {
-  return request<void>(`/api/profiles/${encodeURIComponent(name)}`, {
+  return request<undefined>(`/api/profiles/${encodeURIComponent(name)}`, {
     method: "DELETE",
   });
 }
 
 export function migrateLegacy(): Promise<void> {
-  return request<void>("/api/profiles/migrate-legacy", { method: "POST" });
+  return request<undefined>("/api/profiles/migrate-legacy", { method: "POST" });
 }
 
 // --- training-config defaults (spec 04 §3.3) -------------------------------
@@ -168,7 +169,7 @@ export function deleteTrainingDefaults(
   profile: string,
   task: string,
 ): Promise<void> {
-  return request<void>(
+  return request<undefined>(
     `/api/profiles/${encodeURIComponent(profile)}/training-defaults/${encodeURIComponent(task)}`,
     { method: "DELETE" },
   );

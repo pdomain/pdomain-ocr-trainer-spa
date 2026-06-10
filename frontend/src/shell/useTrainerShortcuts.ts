@@ -4,6 +4,7 @@ import type { ShortcutBinding } from "@pdomain/pdomain-ui/hooks";
 // No-op handler — these bindings are registered into ShortcutsProvider
 // for display in the keybinds dock surface only. Real navigation handlers
 // are wired via useNavigate in App.tsx (router-driven navigation).
+// eslint-disable-next-line @typescript-eslint/no-empty-function -- intentional display-only no-op; see comment above
 const noop = () => {};
 
 /**

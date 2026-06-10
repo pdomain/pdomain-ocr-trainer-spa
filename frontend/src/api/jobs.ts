@@ -110,7 +110,7 @@ export function subscribeToJob(
     if (closed) return;
     let event: JobEvent;
     try {
-      event = JSON.parse(raw.data) as JobEvent;
+      event = JSON.parse(raw.data as string) as JobEvent;
     } catch {
       return; // malformed frame — ignore
     }

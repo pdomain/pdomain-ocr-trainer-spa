@@ -60,6 +60,7 @@ function datasetsBase(profile: string, task: string): string {
 async function jsonRequest<T>(path: string, init?: RequestInit): Promise<T> {
   const resp = await fetch(path, {
     ...init,
+    // eslint-disable-next-line @typescript-eslint/no-misused-spread -- HeadersInit is always Record<string,string> at internal call-sites; Headers instance never passed
     headers: { "Content-Type": "application/json", ...init?.headers },
   });
   const body = (await resp.json()) as unknown;
