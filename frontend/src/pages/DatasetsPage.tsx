@@ -30,10 +30,24 @@ function chipTestId(item: ChipItem): string {
   return `kanban-column-${item.columnId}-chip-${item.projectId}-${item.chip.crop_name ?? item.chip.page_name}`;
 }
 
-export function DatasetsPage(): JSX.Element {
+interface DatasetsPageProps {
+  /** Override the task instead of reading :task from the URL.
+   *
+   * Use this when the route does not capture a `:task` param — e.g. the
+   * typeface-classification route `/profiles/:name/datasets/typeface-classification`
+   * has a literal segment rather than a dynamic param.  Without this prop,
+   * `params.task` would be `undefined` and the page would silently default to
+   * `"recognition"` (see M12 bug fix).
+   */
+  overrideTask?: string;
+}
+
+export function DatasetsPage({
+  overrideTask,
+}: DatasetsPageProps = {}): JSX.Element {
   const params = useParams<{ name: string; task: string }>();
   const profile = params.name ?? "all";
-  const task = params.task ?? "recognition";
+  const task = overrideTask ?? params.task ?? "recognition";
 
   const view = useDatasetsStore((s) => s.view);
   const loading = useDatasetsStore((s) => s.loading);

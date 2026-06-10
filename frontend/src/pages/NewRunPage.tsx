@@ -107,7 +107,7 @@ export function NewRunPage(): JSX.Element {
           <label>
             Task
             <select
-              data-testid="task-select"
+              data-testid="new-run-task"
               value={task}
               onChange={(e) => setTask(e.target.value)}
             >
@@ -139,7 +139,7 @@ export function NewRunPage(): JSX.Element {
         </Card>
 
         <Button
-          data-testid="submit-run"
+          data-testid="new-run-start"
           disabled={submitting || profile === ""}
           onClick={() => void handleStart()}
         >

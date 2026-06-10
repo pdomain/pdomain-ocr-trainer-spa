@@ -12,9 +12,12 @@
 import { DatasetsPage } from "./DatasetsPage";
 
 export function TypefaceKanbanPage(): React.JSX.Element {
+  // Pass overrideTask so DatasetsPage does not fall back to params.task
+  // (which is undefined in a literal-segment route like
+  // /profiles/:name/datasets/typeface-classification).
   return (
     <div data-testid="typeface-kanban-page">
-      <DatasetsPage />
+      <DatasetsPage overrideTask="typeface-classification" />
     </div>
   );
 }

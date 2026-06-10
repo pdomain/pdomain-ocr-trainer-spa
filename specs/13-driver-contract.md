@@ -33,14 +33,15 @@ The contract has two parts:
 ## 2. URL invariants
 
 | URL pattern | Stability |
-|---|---|
+| --- | --- |
 | `/profiles` | **Stable.** Profile list. |
-| `/profiles/{name}` | **Stable.** Profile detail. `name` is the normalized form. |
-| `/profiles/{name}/datasets/{task}` | **Stable.** Kanban for this profile + task. |
+| `/profiles/{name}` | **Stable.** Profile detail. `name` is normalized. |
+| `/profiles/{name}/datasets/{task}` | **Stable.** Kanban for profile + task. |
+| `/profiles/{name}/datasets/typeface-classification` | **Stable.** M12. |
 | `/runs` | **Stable.** Run list. |
-| `/runs/{run_id}` | **Stable.** Run detail. `run_id` is the ULID; never a slug. |
+| `/runs/{run_id}` | **Stable.** Run detail. `run_id` is the ULID. |
 | `/models` | **Stable.** Model list. |
-| `/models/{name}` | **Stable.** Model detail; `name` is the full prefixed model name. |
+| `/models/{name}` | **Stable.** Model detail; `name` is the prefixed name. |
 | `/eval` | **Stable.** Eval form. |
 | `/eval/{run_id}/result` | **Stable.** Eval result page. |
 | `/publish` | **Stable.** Publish form. |
@@ -81,7 +82,7 @@ buttons / inputs / `<a>` without a `data-testid`.
 ### 4.1 App chrome
 
 | testid | Element |
-|---|---|
+| --- | --- |
 | `header-bar` | Top header container |
 | `header-app-version` | Version badge |
 | `header-profile-selector` | Profile combobox button |
@@ -89,7 +90,7 @@ buttons / inputs / `<a>` without a `data-testid`.
 | `header-jobs-badge` | Jobs count badge |
 | `header-help-button` | Opens hotkey help |
 | `sidebar-nav` | Sidebar container |
-| `sidebar-nav-{section}` | Each link (`profiles`, `datasets`, `runs`, `models`, `eval`, `publish`, `settings`) |
+| `sidebar-nav-{section}` | Each nav link (`section` ∈ profiles…settings) |
 | `banner-{id}` | One per active banner (id from `Banner.id`) |
 | `banner-{id}-action` | Banner action button |
 | `banner-{id}-dismiss` | Dismiss button |
@@ -98,7 +99,7 @@ buttons / inputs / `<a>` without a `data-testid`.
 ### 4.2 Profiles page
 
 | testid | Element |
-|---|---|
+| --- | --- |
 | `profiles-page` | Page root |
 | `profiles-new-button` | Open create dialog |
 | `profiles-table` | Table |
@@ -116,7 +117,8 @@ buttons / inputs / `<a>` without a `data-testid`.
 ### 4.3 Datasets / kanban
 
 | testid | Element |
-|---|---|
+| --- | --- |
+| `typeface-kanban-page` | Typeface-classifier kanban wrapper (M12) |
 | `kanban-page` | Page root |
 | `kanban-task-tabs` | Detection / Recognition / Typeface / Glyph tabs |
 | `kanban-task-tab-{task}` | One per tab |
@@ -127,7 +129,7 @@ buttons / inputs / `<a>` without a `data-testid`.
 | `kanban-toolbar-style-tag-filter` | Style-tag dropdown |
 | `kanban-column-{column}` | `column ∈ unassigned, train, val` |
 | `kanban-column-{column}-row-{project}` | Project row in this column |
-| `kanban-column-{column}-row-{project}-handle` | Drag handle for the whole project row |
+| `kanban-column-{column}-row-{project}-handle` | Drag handle for project row |
 | `kanban-column-{column}-chip-{project}-{name}` | Page or crop chip |
 | `kanban-footer-pending-count` | Pending-moves indicator |
 | `kanban-footer-discard` | Discard staged moves |
@@ -141,7 +143,7 @@ regardless of the underlying pdomain-ui markup.
 ### 4.4 Run detail
 
 | testid | Element |
-|---|---|
+| --- | --- |
 | `run-detail-page` | Page root |
 | `run-detail-status-badge` | Status badge |
 | `run-detail-progress-bar` | Progress bar |
@@ -163,7 +165,7 @@ regardless of the underlying pdomain-ui markup.
 ### 4.4a Run list
 
 | testid | Element |
-|---|---|
+| --- | --- |
 | `run-list-page` | Page root |
 | `run-list-refresh` | Refresh button |
 | `run-list-filter-profile` | Profile substring filter input |
@@ -179,7 +181,7 @@ regardless of the underlying pdomain-ui markup.
 ### 4.4b New run form
 
 | testid | Element |
-|---|---|
+| --- | --- |
 | `new-run-page` | Page root |
 | `new-run-profile` | Profile selector |
 | `new-run-task` | Task selector |
@@ -191,7 +193,7 @@ regardless of the underlying pdomain-ui markup.
 ### 4.5 Models page + detail
 
 | testid | Element |
-|---|---|
+| --- | --- |
 | `models-page` | Page root |
 | `models-refresh` | Refresh button |
 | `models-filter-profile` | Profile filter input |
@@ -224,13 +226,13 @@ regardless of the underlying pdomain-ui markup.
 | `models-detail-rename-submit` | Rename-dialog submit |
 | `models-detail-publish-dialog` | Publish dialog (M11) |
 | `models-detail-publish-repo` | Repo input (M11) |
-| `models-detail-publish-visibility-{value}` | Visibility radios (`private`, `public`) (M11) |
+| `models-detail-publish-visibility-{value}` | Visibility radios (M11) |
 | `models-detail-publish-submit` | Submit (M11) |
 
 ### 4.6 Eval form + result
 
 | testid | Element |
-|---|---|
+| --- | --- |
 | `eval-form-page` | Page root |
 | `eval-form-error` | Error banner |
 | `eval-form-profile` | Profile combobox |
@@ -253,7 +255,7 @@ regardless of the underlying pdomain-ui markup.
 | `eval-result-overall-cer` | Overall CER metric |
 | `eval-result-overall-wer` | Overall WER metric |
 | `eval-result-overall-{metric}` | Other overall metric cells |
-| `eval-result-slice-{feature}` | One row per slice (`feature` is the encoded slice id) |
+| `eval-result-slice-{feature}` | One row per slice (encoded feature id) |
 | `eval-result-download-json` | Download JSON button |
 | `eval-result-download-md` | Download Markdown button |
 | `eval-result-compare` | Open compare dialog (M13) |
