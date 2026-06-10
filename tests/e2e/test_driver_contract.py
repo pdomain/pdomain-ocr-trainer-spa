@@ -37,15 +37,14 @@ _SPEC = _REPO_ROOT / "specs" / "13-driver-contract.md"
 _FRONTEND_SRC = _REPO_ROOT / "frontend" / "src"
 _APP_TSX = _FRONTEND_SRC / "App.tsx"
 
-# Chrome testids spec 13 §4.1 lists that are NOT yet implemented as part
-# of M9's minimal header. They depend on larger features (pdomain-ui AppShell
-# `TopNav` + the active-profile selector, spec 03 §6.1; jobs SSE badge).
+# Chrome testids spec 13 §4.1 lists that are NOT yet implemented.
+# They depend on larger features (active-profile selector, spec 03 §6.1).
 # Tracked for a later milestone; the conformance test documents the gap
 # rather than silently passing.
+# NOTE: header-jobs-badge is now implemented in TrainerHeader; removed.
 _DEFERRED_CHROME = {
     "header-profile-selector",
     "header-profile-selector-option-{name}",
-    "header-jobs-badge",
     # sonner owns the toast DOM; we cannot attach our own data-testid to
     # its internal markup. A driver targets `[data-sonner-toast]` plus
     # the `id` we pass through `emitToast` (see AppToaster.tsx). The
@@ -309,19 +308,19 @@ def test_minimal_header_chrome_present(source_text: str) -> None:
 def test_sidebar_nav_links_cover_every_section(source_text: str) -> None:
     """`sidebar-nav-{section}` is realised for every spec 13 §4.1 section.
 
-    AppHeader renders the links from a list, so the testid is a
+    TrainerRail renders the links from a list, so the testid is a
     template literal (`\\`sidebar-nav-${section}\\``). The links are
     accepted if that template lead-in exists AND the section list in
-    AppHeader.tsx names every required section.
+    TrainerRail.tsx names every required section.
     """
     sections = ["profiles", "datasets", "runs", "models", "eval", "publish", "settings"]
     has_template = "sidebar-nav-" in _dynamic_testid_prefixes(source_text)
     assert has_template, "no `sidebar-nav-${...}` template literal in source"
 
-    header = (_FRONTEND_SRC / "components" / "AppHeader.tsx").read_text(encoding="utf-8")
-    named = set(re.findall(r'section:\s*"([a-z]+)"', header))
+    rail = (_FRONTEND_SRC / "shell" / "TrainerRail.tsx").read_text(encoding="utf-8")
+    named = set(re.findall(r'section:\s*"([a-z]+)"', rail))
     missing = [s for s in sections if s not in named]
-    assert not missing, f"AppHeader sidebar nav missing sections: {missing}"
+    assert not missing, f"TrainerRail sidebar nav missing sections: {missing}"
 
 
 # --------------------------------------------------------------------------
