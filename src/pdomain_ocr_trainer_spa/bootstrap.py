@@ -134,25 +134,25 @@ def build_app(settings: Settings) -> FastAPI:
     app.include_router(publish_api.router)
     app.include_router(ui_prefs.router)
 
-    # SPA catch-all — MUST be last so /api/* routes are not shadowed
-    @app.get("/{full_path:path}", include_in_schema=False)
-    async def spa_fallback(full_path: str) -> FileResponse:
-        """Serve the React SPA index.html for any unmatched path."""
-        del full_path
-        static = _static_dir()
-        index = static / "index.html"
-        if not index.exists():
-            raise HTTPException(
-                status_code=503,
-                detail="Frontend not built — run make frontend-build",
-            )
-        return FileResponse(index)
-
+    # Static assets — MUST be mounted before the SPA catch-all
     static = _static_dir()
     app.mount(
         "/assets",
         StaticFiles(directory=str(static / "assets"), check_dir=False),
         name="assets",
     )
+
+    # SPA catch-all — MUST be last so /api/* routes and /assets/* are not shadowed
+    @app.get("/{full_path:path}", include_in_schema=False)
+    async def spa_fallback(full_path: str) -> FileResponse:
+        """Serve the React SPA index.html for any unmatched path."""
+        del full_path
+        index = _static_dir() / "index.html"
+        if not index.exists():
+            raise HTTPException(
+                status_code=503,
+                detail="Frontend not built — run make frontend-build",
+            )
+        return FileResponse(index)
 
     return app
