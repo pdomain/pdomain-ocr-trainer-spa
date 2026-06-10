@@ -25,7 +25,11 @@ from pdomain_ocr_trainer_spa.core.models import (
     KanbanProjectRow,
     KanbanView,
 )
-from pdomain_ocr_trainer_spa.domain.labeler_export import resolve_export_root
+from pdomain_ocr_trainer_spa.domain.labeler_export import (
+    ExportFreshnessRecord,
+    read_export_manifest,
+    resolve_export_root,
+)
 from pdomain_ocr_trainer_spa.domain.profiles import normalize_profile_name
 
 if TYPE_CHECKING:
@@ -203,6 +207,64 @@ def _read_include_toggles(settings: Settings, profile: str) -> tuple[bool, bool]
     )
 
 
+def _freshness_state_path(settings: Settings, profile: str) -> Path:
+    """Path to a profile's ``freshness_state.json`` under the app-data root."""
+    return settings.app_data_root / "profiles" / profile / "freshness_state.json"
+
+
+def _load_fresh_project_ids(settings: Settings, profile: str) -> frozenset[str]:
+    """Return project_ids that have a manifest exported_at newer than last-seen.
+
+    Returns an empty frozenset when no manifest is present (zero regression).
+    """
+    root, _mode = resolve_export_root(settings.labeler_export_root)
+    if root is None:
+        return frozenset()
+    manifest = read_export_manifest(root)
+    if manifest is None:
+        return frozenset()
+    freshness_path = _freshness_state_path(settings, profile)
+    record = ExportFreshnessRecord.load(freshness_path)
+    fresh: set[str] = set()
+    for project_id, proj_data in manifest.projects.items():
+        if isinstance(proj_data, dict):
+            exported_at = proj_data.get("exported_at", "")
+        else:
+            exported_at = str(getattr(proj_data, "exported_at", ""))
+        last_seen = record.project_seen_at.get(project_id)
+        if last_seen is None or str(exported_at) > str(last_seen):
+            fresh.add(project_id)
+    return frozenset(fresh)
+
+
+def _update_freshness_record(settings: Settings, profile: str, fresh_ids: frozenset[str]) -> None:
+    """Persist the current manifest exported_at values for the given fresh projects.
+
+    Called after a successful kanban build so subsequent scans do not re-flag
+    already-seen exports. Only writes if fresh_ids is non-empty.
+    """
+    if not fresh_ids:
+        return
+    root, _mode = resolve_export_root(settings.labeler_export_root)
+    if root is None:
+        return
+    manifest = read_export_manifest(root)
+    if manifest is None:
+        return
+    freshness_path = _freshness_state_path(settings, profile)
+    record = ExportFreshnessRecord.load(freshness_path)
+    for project_id in fresh_ids:
+        proj_data = manifest.projects.get(project_id)
+        if proj_data is None:
+            continue
+        if isinstance(proj_data, dict):
+            exported_at = proj_data.get("exported_at", "")
+        else:
+            exported_at = str(getattr(proj_data, "exported_at", ""))
+        record.project_seen_at[project_id] = str(exported_at)
+    record.save(freshness_path)
+
+
 def set_include_toggles(
     settings: Settings,
     *,
@@ -277,12 +339,15 @@ def _unassigned_rows(
     profile: str,
     task: TaskEnum,
     on_disk: dict[str, LabelMap],
+    fresh_ids: frozenset[str],
 ) -> list[KanbanProjectRow]:
     """Build pending (export-root) rows, suppressing exports fully present on disk.
 
     Mirrors ``ExportManager.scan``: a project whose every item already exists
     on disk *with an identical value* is omitted. An item present on disk with a
     differing value is flagged ``is_changed`` and kept (spec 05 §6).
+    ``fresh_ids`` (Track D) marks rows whose manifest exported_at is newer than
+    the last-seen timestamp stored in the freshness record.
     """
     on_disk_labels: LabelMap = {}
     for split_labels in on_disk.values():
@@ -321,6 +386,7 @@ def _unassigned_rows(
                 source="pending",
                 page_count=len(chips),
                 is_changed=any(c.is_changed for c in chips),
+                is_fresh=project_id in fresh_ids,
                 style_tags=[],
                 pages=chips,
             )
@@ -334,17 +400,20 @@ def build_kanban(settings: Settings, *, profile: str, task: TaskEnum) -> KanbanV
     normalized = normalize_profile_name(profile)
     on_disk = {split: _on_disk_labels(settings, split, normalized, task) for split in _SPLIT_DIRS}
     include_detection, include_recognition = _read_include_toggles(settings, normalized)
-    return KanbanView(
+    fresh_ids = _load_fresh_project_ids(settings, normalized)
+    view = KanbanView(
         profile=normalized,
         task=task,
         columns={
-            "unassigned": KanbanColumn(rows=_unassigned_rows(settings, normalized, task, on_disk)),
+            "unassigned": KanbanColumn(rows=_unassigned_rows(settings, normalized, task, on_disk, fresh_ids)),
             "train": KanbanColumn(rows=_rows_from_labels(task, on_disk["train"], "on_disk")),
             "val": KanbanColumn(rows=_rows_from_labels(task, on_disk["val"], "on_disk")),
         },
         include_detection=include_detection,
         include_recognition=include_recognition,
     )
+    _update_freshness_record(settings, normalized, fresh_ids)
+    return view
 
 
 # ---------------------------------------------------------------------------

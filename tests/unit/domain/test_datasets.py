@@ -327,3 +327,85 @@ def test_detection_unchanged_export_is_suppressed(export_settings: Settings) -> 
     _seed_detection_export(export_settings, "p", {"p_1.png": meta})
     view = dom.build_kanban(export_settings, profile="all", task=TaskEnum.detection)
     assert not view.columns["unassigned"].rows
+
+
+# ---------------------------------------------------------------------------
+# Track D: manifest-based freshness (is_fresh)
+# ---------------------------------------------------------------------------
+
+
+def _write_manifest(export_root: Path, exported_at: str, project_id: str) -> None:
+    """Write a minimal manifest.json into export_root."""
+    import json
+
+    manifest = {
+        "schema": "pdomain.doctr-export-manifest",
+        "version": 1,
+        "generated_at": "2026-06-10T12:00:00Z",
+        "app": "pdomain-ocr-labeler-spa",
+        "projects": {
+            project_id: {
+                "exported_at": exported_at,
+                "page_count": 1,
+                "tasks": {"recognition": {"item_count": 1}},
+            }
+        },
+    }
+    (export_root / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+
+
+def test_fresh_flag_set_when_manifest_newer(
+    export_settings: Settings,
+) -> None:
+    """Projects with a manifest exported_at newer than last-seen are flagged is_fresh."""
+    _seed_export(export_settings, "myproj", {"myproj_0001.png": "test"})
+    assert export_settings.labeler_export_root is not None
+    _write_manifest(export_settings.labeler_export_root, "2026-06-10T11:00:00Z", "myproj")
+    # No freshness record exists — first scan → is_fresh
+    view = dom.build_kanban(export_settings, profile="all", task=TaskEnum.recognition)
+    unassigned = view.columns["unassigned"].rows
+    assert len(unassigned) == 1
+    assert unassigned[0].project_id == "myproj"
+    assert unassigned[0].is_fresh is True
+
+
+def test_fresh_flag_not_set_when_seen_at_matches(
+    export_settings: Settings,
+) -> None:
+    """Projects where exported_at == last-seen are not flagged is_fresh."""
+    from pdomain_ocr_trainer_spa.domain.labeler_export import ExportFreshnessRecord
+
+    _seed_export(export_settings, "myproj", {"myproj_0001.png": "test"})
+    assert export_settings.labeler_export_root is not None
+    _write_manifest(export_settings.labeler_export_root, "2026-06-10T11:00:00Z", "myproj")
+    # Pre-seed the freshness record with the same timestamp
+    rec = ExportFreshnessRecord(project_seen_at={"myproj": "2026-06-10T11:00:00+00:00"})
+    freshness_path = export_settings.app_data_root / "profiles" / "all" / "freshness_state.json"
+    freshness_path.parent.mkdir(parents=True, exist_ok=True)
+    rec.save(freshness_path)
+    view = dom.build_kanban(export_settings, profile="all", task=TaskEnum.recognition)
+    unassigned = view.columns["unassigned"].rows
+    assert not any(r.is_fresh for r in unassigned)
+
+
+def test_no_manifest_no_fresh_flag(export_settings: Settings) -> None:
+    """When no manifest.json exists, is_fresh is always False (zero regression)."""
+    _seed_export(export_settings, "myproj", {"myproj_0001.png": "test"})
+    # No manifest.json written
+    view = dom.build_kanban(export_settings, profile="all", task=TaskEnum.recognition)
+    unassigned = view.columns["unassigned"].rows
+    assert not any(r.is_fresh for r in unassigned)
+
+
+def test_freshness_record_updated_after_build(
+    export_settings: Settings,
+) -> None:
+    """build_kanban persists the seen timestamp so the next scan does not re-flag."""
+    _seed_export(export_settings, "myproj", {"myproj_0001.png": "x"})
+    assert export_settings.labeler_export_root is not None
+    _write_manifest(export_settings.labeler_export_root, "2026-06-10T11:00:00Z", "myproj")
+    # First scan — fresh
+    dom.build_kanban(export_settings, profile="all", task=TaskEnum.recognition)
+    # Second scan — record was persisted, no longer fresh
+    view2 = dom.build_kanban(export_settings, profile="all", task=TaskEnum.recognition)
+    assert not any(r.is_fresh for r in view2.columns["unassigned"].rows)

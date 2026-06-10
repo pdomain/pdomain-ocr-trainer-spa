@@ -136,6 +136,7 @@ class KanbanProjectRow(BaseModel):
     source: Literal["pending", "on_disk"]
     page_count: int
     is_changed: bool = False
+    is_fresh: bool = False  # manifest exported_at is newer than last-seen (Track D)
     style_tags: list[str] = []
     pages: list[KanbanPageChip] = []
 

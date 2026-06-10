@@ -37,10 +37,8 @@ except ImportError:
 # Optional manifest model — falls back to raw JSON dict when import missing
 # ---------------------------------------------------------------------------
 try:
-    from pdomain_ops.schemas.doctr_export import (  # pyright: ignore[reportMissingImports]
+    from pdomain_ops.schemas.doctr_export import (  # pyright: ignore[reportMissingImports, reportAssignmentType]  # noqa: I001
         DoctrExportManifest,
-    )
-    from pdomain_ops.schemas.doctr_export import (  # pyright: ignore[reportMissingImports]
         read_manifest as _read_manifest_impl,
     )
 
@@ -48,7 +46,7 @@ try:
         """Read the manifest.json from an export root; None if absent or unreadable."""
         if not export_root.exists():
             return None
-        return _read_manifest_impl(export_root)
+        return _read_manifest_impl(export_root)  # pyright: ignore[reportReturnType]
 
 except ImportError:
 
