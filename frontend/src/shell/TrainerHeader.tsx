@@ -48,10 +48,7 @@ export function TrainerHeader({
         </span>
         {/* header-jobs-badge: wraps JobsPill to preserve spec-13 testid */}
         <span data-testid="header-jobs-badge">
-          <JobsPill
-            activeJobs={activeJobs}
-            onClick={() => toggle("jobs")}
-          />
+          <JobsPill activeJobs={activeJobs} onClick={() => toggle("jobs")} />
         </span>
         {/* header-help-button: wraps ShortcutsHelpButton to preserve spec-13 testid */}
         <span data-testid="header-help-button">

@@ -7,13 +7,16 @@ import App from "./App";
 
 // Minimal mock for AppShell to avoid deep pdomain-ui render tree
 vi.mock("@pdomain/pdomain-ui/shell", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@pdomain/pdomain-ui/shell")>();
+  const actual =
+    await importOriginal<typeof import("@pdomain/pdomain-ui/shell")>();
   return {
     ...actual,
-    AppShell: ({ main }: { main: React.ReactNode }) =>
-      <div data-testid="app-shell">{main}</div>,
-    SuiteSiblingsProvider: ({ children }: { children: React.ReactNode }) =>
-      <>{children}</>,
+    AppShell: ({ main }: { main: React.ReactNode }) => (
+      <div data-testid="app-shell">{main}</div>
+    ),
+    SuiteSiblingsProvider: ({ children }: { children: React.ReactNode }) => (
+      <>{children}</>
+    ),
     JobsPill: () => <button>jobs</button>,
     ShortcutsHelpButton: () => <button>?</button>,
     SettingsSlot: () => <button>⚙</button>,
@@ -23,8 +26,9 @@ vi.mock("@pdomain/pdomain-ui/shell", async (importOriginal) => {
 });
 
 vi.mock("@pdomain/pdomain-ui/hooks", () => ({
-  ShortcutsProvider: ({ children }: { children: React.ReactNode }) =>
-    <>{children}</>,
+  ShortcutsProvider: ({ children }: { children: React.ReactNode }) => (
+    <>{children}</>
+  ),
   useShortcuts: vi.fn(),
 }));
 
@@ -51,7 +55,7 @@ describe("App", () => {
     render(
       <QueryClientProvider client={qc}>
         <App />
-      </QueryClientProvider>
+      </QueryClientProvider>,
     );
     expect(screen.getByTestId("app-shell")).toBeTruthy();
   });

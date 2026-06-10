@@ -65,10 +65,7 @@ function AppRoutes(): React.JSX.Element {
       <Route path="/" element={<Navigate to="/profiles" replace />} />
       <Route path="/profiles" element={<ProfilesPage />} />
       <Route path="/profiles/:name" element={<ProfileDetailPage />} />
-      <Route
-        path="/profiles/:name/datasets/:task"
-        element={<DatasetsPage />}
-      />
+      <Route path="/profiles/:name/datasets/:task" element={<DatasetsPage />} />
       <Route path="/runs" element={<RunListPage />} />
       <Route path="/runs/new" element={<NewRunPage />} />
       <Route path="/runs/:runId" element={<RunDetailPage />} />

@@ -12,7 +12,10 @@ export default defineConfig({
       // causing "TypeError: jsxDEV is not a function". This alias routes all jsxDEV
       // calls through our shim which re-exports jsxDEV = jsx from jsx-runtime.
       // Remove once pdomain-ui is rebuilt with the production JSX transform.
-      "react/jsx-dev-runtime": resolve(__dirname, "src/jsx-dev-runtime-shim.ts"),
+      "react/jsx-dev-runtime": resolve(
+        __dirname,
+        "src/jsx-dev-runtime-shim.ts",
+      ),
     },
   },
   build: {

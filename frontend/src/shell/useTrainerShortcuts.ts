@@ -2,9 +2,8 @@ import { useShortcuts } from "@pdomain/pdomain-ui/hooks";
 import type { ShortcutBinding } from "@pdomain/pdomain-ui/hooks";
 
 // No-op handler — these bindings are registered into ShortcutsProvider
-// for display in the keybinds dock surface only. The actual keydown
-// handlers remain in AppChrome (useHotkey) until AppChrome is removed
-// in Milestone C. After AppChrome removal, real handlers move here.
+// for display in the keybinds dock surface only. Real navigation handlers
+// are wired via useNavigate in App.tsx (router-driven navigation).
 const noop = () => {};
 
 /**

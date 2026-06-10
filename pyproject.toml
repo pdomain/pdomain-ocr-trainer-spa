@@ -178,7 +178,7 @@ addopts = [
     "--cov=pdomain_ocr_trainer_spa",
     "--cov-branch",
     "--cov-report=term-missing:skip-covered",
-    "-m", "not slow",
+    "-m", "not slow and not e2e",
 ]
 testpaths = ["tests"]
 pythonpath = ["src", "."]

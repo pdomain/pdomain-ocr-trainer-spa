@@ -108,7 +108,7 @@ pre-commit-check: ## Run pre-commit on all files
 	uv run pre-commit run --all-files
 
 test: ## Run pytest (excludes slow/e2e tests)
-	uv run pytest tests/ -v -n auto
+	uv run pytest tests/ -v -n auto --ignore=tests/e2e
 
 test-slow: ## Run slow tests (real subprocess + HF mocks)
 	uv run pytest tests/ -v -m slow

@@ -1,5 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import type { ActiveJob, AppShellJobsProps, Job } from "@pdomain/pdomain-ui/shell";
+import type {
+  ActiveJob,
+  AppShellJobsProps,
+  Job,
+} from "@pdomain/pdomain-ui/shell";
 
 /** Raw job shape from GET /api/jobs */
 interface RawTrainerJob {
@@ -10,7 +14,13 @@ interface RawTrainerJob {
   pct?: number; // 0–100
 }
 
-type JobStatus = "queued" | "running" | "paused" | "succeeded" | "done" | "failed";
+type JobStatus =
+  | "queued"
+  | "running"
+  | "paused"
+  | "succeeded"
+  | "done"
+  | "failed";
 
 function toJobStatus(state: string): JobStatus {
   if (
