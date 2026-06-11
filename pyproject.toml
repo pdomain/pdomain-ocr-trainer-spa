@@ -13,12 +13,12 @@ readme = "README.md"
 license = { text = "Unlicense" }
 requires-python = ">=3.13"
 dependencies = [
-    "pdomain-book-tools>=0.14.1",
-    "pdomain-ops>=0.3.0",
+    "pdomain-book-tools>=0.18.3",
+    "pdomain-ops>=0.11.0",
     # pdomain-ocr-training base install is torch-free: the FastAPI web process
     # imports only the typed config models + ITrainingRunner Protocol.
     # The training worker needs the heavy stack — see the `train` extra.
-    "pdomain-ocr-training>=0.2.2",
+    "pdomain-ocr-training>=0.2.3",
     "fastapi>=0.111",
     "uvicorn[standard]>=0.29",
     "pydantic>=2.7",
