@@ -107,3 +107,63 @@ def test_update_uv_version_refs_updates_quoted_setup_uv_with_inline_comment(tmp_
 
     assert update_github_actions.update_uv_version_refs(workflow, version="0.11.16")
     assert 'version: "0.11.16"' in workflow.read_text(encoding="utf-8")
+
+
+def _make_fake_runner(uv_version: str = "9.99.0") -> update_github_actions.GhRunner:
+    """Return a fake GhRunner that resolves managed actions and uv releases without network."""
+    import json
+    import subprocess
+
+    fake_sha = "a" * 40
+    fake_commit_sha = "b" * 40
+
+    def fake_runner(command: list[str]) -> subprocess.CompletedProcess[str]:
+        endpoint = command[-1]
+        if "astral-sh/uv" in endpoint and endpoint.endswith("/releases/latest"):
+            # uv version must match \d+\.\d+\.\d+
+            payload: dict[str, object] = {"tag_name": f"v{uv_version}"}
+        elif endpoint.endswith("/releases/latest"):
+            payload = {"tag_name": "v1.0.0"}
+        elif "/git/ref/tags/" in endpoint:
+            payload = {"object": {"sha": fake_sha, "type": "tag"}}
+        elif "/git/tags/" in endpoint:
+            payload = {"object": {"sha": fake_commit_sha, "type": "commit"}}
+        else:
+            payload = {}
+        return subprocess.CompletedProcess(args=command, returncode=0, stdout=json.dumps(payload), stderr="")
+
+    return fake_runner
+
+
+def test_update_github_actions_does_not_touch_pyproject(tmp_path: Path) -> None:
+    """update_github_actions() must not write to pyproject.toml.
+
+    The [tool.uv] required-version is a deliberate contributor floor (>=0.11.16)
+    and must not auto-track the latest uv release.  Writing the latest bare version
+    here poisons the dep-refresh job: setup-uv installs the old pinned uv, then
+    `uv lock --upgrade` immediately fails because required-version==<new> != <old>.
+    """
+    workflows = tmp_path / ".github" / "workflows"
+    workflows.mkdir(parents=True)
+    (workflows / "ci.yml").write_text(
+        "jobs:\n"
+        "  ci:\n"
+        "    steps:\n"
+        '      - uses: "actions/checkout@' + "a" * 40 + '"\n'
+        "        with:\n"
+        '          version: "0.11.16"\n',
+        encoding="utf-8",
+    )
+
+    pyproject = tmp_path / "pyproject.toml"
+    original_content = '[tool.uv]\nrequired-version = ">=0.11.16"\n'
+    pyproject.write_text(original_content, encoding="utf-8")
+
+    update_github_actions.update_github_actions(
+        workflow_dir=workflows,
+        runner=_make_fake_runner(),
+    )
+
+    # pyproject.toml must be byte-for-byte unchanged — update_github_actions()
+    # must not accept or act on a pyproject path at all
+    assert pyproject.read_text(encoding="utf-8") == original_content
