@@ -1,6 +1,7 @@
 [tools]
 python = "3.13"
 node = "24"
+pnpm = "11"     # Frontend package manager; pnpm-lock.yaml is canonical
 
 [env]
 UV_LINK_MODE = "copy"
