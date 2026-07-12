@@ -7,9 +7,7 @@ import { ProfileEditDialog } from "../components/ProfileEditDialog";
 import type { Profile } from "../api/profiles";
 
 type DialogState =
-  | { mode: "closed" }
-  | { mode: "create" }
-  | { mode: "edit"; profile: Profile };
+  { mode: "closed" } | { mode: "create" } | { mode: "edit"; profile: Profile };
 
 export function ProfilesPage(): React.JSX.Element {
   const profiles = useProfilesStore((s) => s.profiles);

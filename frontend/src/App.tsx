@@ -113,9 +113,7 @@ function AppShellWithHeader(): React.JSX.Element {
 
 export default function App(): React.JSX.Element {
   return (
-    <BrowserRouter
-      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
-    >
+    <BrowserRouter>
       <SuiteSiblingsProvider value={{ fetchInstalled, postLaunch }}>
         <ShortcutsProvider>
           <AppShellWithHeader />

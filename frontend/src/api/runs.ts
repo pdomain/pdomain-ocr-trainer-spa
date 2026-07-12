@@ -4,11 +4,7 @@ import { ApiError } from "./profiles";
 import type { TrainingArgs } from "./profiles";
 
 export type RunStatus =
-  | "pending"
-  | "running"
-  | "succeeded"
-  | "failed"
-  | "cancelled";
+  "pending" | "running" | "succeeded" | "failed" | "cancelled";
 
 export type RunKind = "train" | "eval" | "publish-dataset" | "publish-model";
 

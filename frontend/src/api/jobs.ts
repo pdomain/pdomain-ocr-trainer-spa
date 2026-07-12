@@ -5,11 +5,7 @@
 // module is the framework-agnostic transport seam underneath it.
 
 export type JobState =
-  | "queued"
-  | "running"
-  | "succeeded"
-  | "failed"
-  | "cancelled";
+  "queued" | "running" | "succeeded" | "failed" | "cancelled";
 
 /** SPA projection of the pdomain-ops `JobStatus` (GET /api/jobs/{id}). */
 export interface Job {

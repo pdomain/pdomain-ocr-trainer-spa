@@ -23,12 +23,7 @@ interface RawTrainerJob {
 }
 
 type JobStatus =
-  | "queued"
-  | "running"
-  | "paused"
-  | "succeeded"
-  | "done"
-  | "failed";
+  "queued" | "running" | "paused" | "succeeded" | "done" | "failed";
 
 function toJobStatus(state: string): JobStatus {
   if (
