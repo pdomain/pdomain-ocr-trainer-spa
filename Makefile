@@ -38,7 +38,7 @@ endef
         release-patch release-minor release-major _do-release ci-slow \
         local-setup local-dev local-check local-upgrade-deps local-run \
         local-setup-py local-frontend-install local-frontend-build \
-        update-pdomain-deps ci-against-main
+        update-pdomain-deps ci-against-master
 
 help: ## Show this help message
 	@echo "Available commands:"
@@ -230,8 +230,8 @@ local-frontend-build: local-frontend-install ## Vite build using local-linked si
 update-pdomain-deps: ## Bump all pdomain sibling deps (py: pdomain-book-tools, pdomain-ops, pdomain-ocr-training; npm: pdomain-ui) to registry latest
 	@./scripts/update-pdomain-deps.sh
 
-ci-against-main: ## Validate against pd-* siblings' latest main, then revert (transient)
-	@./scripts/ci-against-main.sh
+ci-against-master: ## Validate against pd-* siblings' latest master, then revert (transient)
+	@./scripts/ci-against-master.sh
 
 # ---------------------------------------------------------------------------
 # Releases
