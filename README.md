@@ -13,10 +13,11 @@ machinery, web SPA front-end, structurally modelled on
 ## What it is
 
 The trainer side of the OCR pipeline: profile management, dataset
-kanban (Unassigned / Training / Validation), DocTR detection +
-recognition + typeface-classifier + glyph-classifier training runs,
-evaluation slicing, model registry, and Hugging Face dataset / model
-publishing.
+kanban (Unassigned / Training / Validation), DocTR detection and recognition
+training runs, evaluation slicing, model registry, and Hugging Face dataset /
+model publishing. The typeface-classifier dataset and UI workflow ship, but a
+real `train_typeface` runner is still unavailable. Glyph-classifier datasets
+are reserved, and their training workflow is not implemented yet.
 
 The legacy `pdomain-ocr-training` keeps working unchanged until parity ships
 here. Both consume and emit the same on-disk shapes
