@@ -1,21 +1,21 @@
 import { useShortcuts } from "@pdomain/pdomain-ui/hooks";
 import type { ShortcutBinding } from "@pdomain/pdomain-ui/hooks";
 
-// No-op handler — these bindings are registered into ShortcutsProvider
-// for display in the keybinds dock surface only. Real navigation handlers
-// are wired via useNavigate in App.tsx (router-driven navigation).
+// No-op handler — the installed @pdomain/pdomain-ui useShortcuts only
+// splits a binding's `keys` string on "+" and matches a single
+// KeyboardEvent.key, so it has no support for multi-key chords (e.g.
+// "g p"). Nav chords are not registered here for that reason. The "?"
+// binding below is a display-only placeholder: it's not dispatched by
+// this hook's handler at all — ShortcutsProvider has its own window
+// keydown listener that opens the cheatsheet on "?" directly.
 // eslint-disable-next-line @typescript-eslint/no-empty-function -- intentional display-only no-op; see comment above
 const noop = () => {};
 
 /**
- * Trainer nav chord bindings registered into ShortcutsProvider so they
+ * Trainer shortcut bindings registered into ShortcutsProvider so they
  * appear in the AppShell keybinds dock surface.
  */
 export const TRAINER_SHORTCUTS: ShortcutBinding[] = [
-  { keys: "g p", label: "Go to Profiles", group: "nav", handler: noop },
-  { keys: "g r", label: "Go to Runs", group: "nav", handler: noop },
-  { keys: "g m", label: "Go to Models", group: "nav", handler: noop },
-  { keys: "g e", label: "Go to Eval", group: "nav", handler: noop },
   { keys: "?", label: "Open shortcuts help", group: "global", handler: noop },
 ];
 

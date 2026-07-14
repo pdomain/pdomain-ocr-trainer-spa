@@ -7,7 +7,6 @@ const NAV_SECTIONS = [
   { section: "models", label: "Models", to: "/models" },
   { section: "eval", label: "Eval", to: "/eval" },
   { section: "publish", label: "Publish", to: "/publish" },
-  { section: "settings", label: "Settings", to: "/settings" },
 ] as const;
 
 /** Vertical nav for AppShell rail slot. Preserves spec-13 §4.1 sidebar-nav testids. */

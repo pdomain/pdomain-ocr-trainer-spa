@@ -21,7 +21,6 @@ describe("TrainerRail", () => {
     "models",
     "eval",
     "publish",
-    "settings",
   ];
   for (const section of sections) {
     it(`renders sidebar-nav-${section} testid`, () => {
@@ -29,4 +28,9 @@ describe("TrainerRail", () => {
       expect(screen.getByTestId(`sidebar-nav-${section}`)).toBeTruthy();
     });
   }
+
+  it("does not render a settings nav link (no /settings route exists)", () => {
+    render(wrap(createElement(TrainerRail)));
+    expect(screen.queryByTestId("sidebar-nav-settings")).toBeNull();
+  });
 });
