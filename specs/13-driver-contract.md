@@ -46,7 +46,10 @@ The contract has two parts:
 | `/eval` | **Stable.** Eval form. |
 | `/eval/{run_id}/result` | **Stable.** Eval result page. |
 | `/publish` | **Stable.** Publish form. |
-| `/settings` | **Stable.** Read-only settings view. |
+
+Settings are surfaced via the AppShell utility dock
+(`trainerSettingsPanels.ts` → `settingsPanels`), not a URL — there is
+no `/settings` route or page.
 
 Query params:
 
@@ -91,7 +94,7 @@ buttons / inputs / `<a>` without a `data-testid`.
 | `header-jobs-badge` | Jobs count badge |
 | `header-help-button` | Opens hotkey help |
 | `sidebar-nav` | Sidebar container |
-| `sidebar-nav-{section}` | Each nav link (`section` ∈ profiles…settings) |
+| `sidebar-nav-{section}` | Each nav link (`section` ∈ profiles…publish) |
 | `banner-{id}` | One per active banner (id from `Banner.id`) |
 | `banner-{id}-action` | Banner action button |
 | `banner-{id}-dismiss` | Dismiss button |

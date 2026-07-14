@@ -74,12 +74,13 @@ _DEFERRED_TESTIDS: dict[str, str] = {
     "kanban-task-tabs": "kanban task-tab navigation not built",
     "kanban-task-tab-{task}": "kanban task-tab navigation not built",
     "kanban-toolbar-style-tag-filter": "style-tag filter not built (needs backend style-tag data)",
-    # /publish and /settings pages are not built yet (no milestone has
-    # shipped them); their URLs are waived in test_router_*.
 }
 
-# §2 URLs whose page is not built yet (see _DEFERRED_TESTIDS note).
-_DEFERRED_URLS = {"/publish", "/settings"}
+# §2 URLs whose page is not built yet. Empty: /publish is built (App.tsx
+# has the route, PublishPage.tsx exists) and /settings was removed from
+# spec 13 §2 entirely (settings are surfaced via the AppShell utility
+# dock, not a URL) — neither waiver applies any more.
+_DEFERRED_URLS: set[str] = set()
 
 
 # --------------------------------------------------------------------------
@@ -313,7 +314,7 @@ def test_sidebar_nav_links_cover_every_section(source_text: str) -> None:
     accepted if that template lead-in exists AND the section list in
     TrainerRail.tsx names every required section.
     """
-    sections = ["profiles", "datasets", "runs", "models", "eval", "publish", "settings"]
+    sections = ["profiles", "datasets", "runs", "models", "eval", "publish"]
     has_template = "sidebar-nav-" in _dynamic_testid_prefixes(source_text)
     assert has_template, "no `sidebar-nav-${...}` template literal in source"
 

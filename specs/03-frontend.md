@@ -46,7 +46,9 @@ not reusable primitives:
 
 ## 2. Project layout
 
-```
+<!-- markdownlint-disable MD013 -->
+
+```text
 frontend/
 ├── package.json
 ├── index.html             # loads /env.js then /src/main.tsx
@@ -85,7 +87,6 @@ frontend/
 │   │   ├── TrainPage.tsx          # detection + recognition config cards + Start
 │   │   ├── RunsPage.tsx           # run history list
 │   │   ├── RunDetailPage.tsx      # one run: live log + progress + artefacts + export
-│   │   ├── SettingsPage.tsx       # read-only config view
 │   │   └── *.test.tsx
 │   ├── components/
 │   │   ├── ProfileEditDialog.tsx  # pdomain-ui Dialog + Field/FieldRow
@@ -108,6 +109,8 @@ frontend/
     └── favicon.svg
 ```
 
+<!-- markdownlint-enable MD013 -->
+
 No `tailwind.config.ts`, no `components.json`, no `src/components/ui/`,
 no `src/styles/tokens.css` — pdomain-ui owns all of that.
 
@@ -117,6 +120,13 @@ no `src/styles/tokens.css` — pdomain-ui owns all of that.
 
 React Router v7 data router. `routes.tsx` exports the route definitions
 so tests can assert structure.
+
+> Note: this route table (`routes.tsx` / `RunsPage.tsx` / `TrainPage.tsx`)
+> predates and diverges from the shipped `frontend/src/App.tsx` routing —
+> the shipped app uses `<Routes>`/`<Route>` in `App.tsx`, has no
+> `/settings` route, and names pages differently (e.g. `RunListPage`,
+> `NewRunPage`). Full reconciliation of this section with the shipped
+> frontend is out of scope here; tracked as follow-up drift.
 
 ```ts
 export const routes = [
@@ -130,7 +140,6 @@ export const routes = [
   ]},
   { path: "/runs", element: <RunsPage /> },
   { path: "/runs/:run_id", element: <RunDetailPage /> },
-  { path: "/settings", element: <SettingsPage /> },
 ];
 ```
 
@@ -222,6 +231,8 @@ interface SelectionStore {
 
 Hand-written wrappers under `src/api/*.ts` use the generated types:
 
+<!-- markdownlint-disable MD013 -->
+
 ```ts
 // api/runs.ts
 import type { paths } from "./types";
@@ -232,6 +243,8 @@ export async function createRun(req: CreateRunRequest): Promise<CreateRunRespons
   return fetchJson("/api/runs", { method: "POST", body: req });
 }
 ```
+
+<!-- markdownlint-enable MD013 -->
 
 `api/jobs.ts` is a thin layer over the pdomain-ui `useLongJob` hook, which
 owns the SSE/polling subscription to a job's event stream
@@ -245,7 +258,9 @@ owns the SSE/polling subscription to a job's event stream
 
 The app is wrapped in the pdomain-ui `AppShell`:
 
-```
+<!-- markdownlint-disable MD013 -->
+
+```text
 ┌────────────────────────────────────────────────────────────────────┐
 │ AppShell · header  (TopNav + Breadcrumb)                           │
 │  pdomain-ocr-training  [profile: clogaelach ▼]   [⊞ launcher]  v0.x      │
@@ -259,6 +274,8 @@ The app is wrapped in the pdomain-ui `AppShell`:
 └──────────┴─────────────────────────────────────────────────────────┘
 ```
 
+<!-- markdownlint-enable MD013 -->
+
 - `AppShell` props: `appId="pdomain-ocr-trainer-spa"`, `appDisplayName`,
   `appIconUrl`, `launcherSlot="header"`, `deployMode="local"`,
   `uiPrefsConfig`.
@@ -270,8 +287,10 @@ The app is wrapped in the pdomain-ui `AppShell`:
 
 ### 6.2 Legacy element → component mapping
 
+<!-- markdownlint-disable MD013 -->
+
 | Legacy NiceGUI element | Component |
-|---|---|
+| --- | --- |
 | App header/banner | pdomain-ui `AppShell` + `TopNav` + `LauncherSlot` (`useSuiteSiblings`) |
 | Profile card (active-profile picker) | pdomain-ui `Select` in `TopNav`; `ProfilesPage` uses `Card` + `Field`/`FieldRow` |
 | Profile edit (language / typeface / display_name) | `ProfileEditDialog` — pdomain-ui `Dialog` + `Field`/`FieldRow` + `Select` |
@@ -283,6 +302,8 @@ The app is wrapped in the pdomain-ui `AppShell`:
 | Dataset kanban (drag-drop) | pdomain-ui **`KanbanBoard` / `KanbanColumn` / `PageChip`** |
 | Model name / export controls | **SPA-local `ModelExportPanel`** in `RunDetailPage` |
 | Loss curve | **SPA-local `LossChart`** (recharts) |
+
+<!-- markdownlint-enable MD013 -->
 
 ### 6.3 New pdomain-ui components (specced here, built in pdomain-ui)
 
@@ -356,14 +377,18 @@ trainer sets.
 
 Minimum contract:
 
+<!-- markdownlint-disable MD013 -->
+
 | `data-testid` | Element |
-|---|---|
+| --- | --- |
 | `profile-selector` | active-profile `Select` in `TopNav` |
 | `config-submit` | detection + recognition config-card submit `Button`s (scoped per card) |
 | `kanban-detection-column` | detection `KanbanColumn` |
 | `kanban-recognition-column` | recognition `KanbanColumn` |
 | `training-log-panel` | `LogViewer` root |
 | `run-start-button` | `RunControls` Start `Button` |
+
+<!-- markdownlint-enable MD013 -->
 
 ---
 
@@ -385,5 +410,5 @@ Minimum contract:
 - pdomain-ui component surface: workspace cross-cut design
   (`ocr-container/docs/specs/2026-05-16-cross-cut-design.md` §4, §6).
 - Legacy trainer UI surface: `pdomain-ocr-training/src/pdomain_ocr_training/ui.py`
-  + `dataset_ui.py` (profile card, detection card, recognition card,
+  - `dataset_ui.py` (profile card, detection card, recognition card,
   output card, dataset section).
