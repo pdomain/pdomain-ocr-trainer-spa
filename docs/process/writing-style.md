@@ -1,12 +1,27 @@
+---
+Status: active
+Owner: CT
+Created: 2026-07-13
+Last verified: 2026-07-14
+Kind: process
+---
+
 # Writing Style
+
+## Agent Index
+
+- **Kind:** process
+- **Status:** active
+- **Read when:** writing reader-facing prose for this repository.
+- **Search terms:** writing style, readability, documentation, reports.
 
 Use this style for docs, reports, issue text, PR text, and user-facing copy.
 
 ## Goal
 
 Write text that is easy to scan without sounding clipped. Make it clear for
-readers who are tired, new to the project, or reading in a second language.
-Aim for about a 7th grade English level.
+readers who are tired, new to the project, or reading in a second language. Aim
+for about a 7th grade English level.
 
 ## Rules
 
@@ -39,10 +54,9 @@ Aim for about a 7th grade English level.
 
 ## Commands
 
-- Combine command steps when readers should run them together before other
-  work.
-- Do not copy setup, test, release, or dependency details from another doc.
-  Link to the source doc instead.
+- Combine command steps when readers should run them together before other work.
+- Do not copy setup, test, release, or dependency details from another doc. Link
+  to the source doc instead.
 
 ## Before Publishing
 

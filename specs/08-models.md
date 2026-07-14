@@ -97,7 +97,8 @@ every successful train run:
 Verbatim from `pdomain-ocr-training/docs/ROADMAP.md` §Model metadata
 sidecar with `args` and `eval` additions for the SPA. Schema is
 **append-only** by convention; new fields land as optional, never
-breaking older readers ([Q6](../OPEN_QUESTIONS.md): explicit
+breaking older readers (see the
+[append-only sidecar decision](17-decisions.md#d-t16-sidecar-schema-is-append-only-by-convention): explicit
 `sidecar_schema: int` for safety?).
 
 For local sources, `revision` is `"fs:<sha256-of-labels-and-image-mtimes>"`

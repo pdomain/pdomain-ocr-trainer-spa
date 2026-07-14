@@ -244,7 +244,7 @@ class HuggingFaceDatasetSource:
                     continue
                 if len(rows) >= limit:
                     break
-        except Exception:  # noqa: BLE001
+        except Exception:  # noqa: BLE001  # preview treats any malformed remote row as unavailable
             return []
         else:
             return rows

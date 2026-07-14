@@ -35,7 +35,7 @@ def test_local_source_lists_detection_pages(tmp_path) -> None:
     src = LocalDatasetSource(train, tmp_path / "v")
     rows = list(src.list("all", TaskEnum.detection, SplitEnum.train))
     assert all(isinstance(r, DatasetPageRef) for r in rows)
-    assert {r.page_name: r.label_bbox_count for r in rows} == {"p1.png": 2, "p2.png": 1}  # type: ignore[union-attr]
+    assert {r.page_name: r.label_bbox_count for r in rows} == {"p1.png": 2, "p2.png": 1}  # type: ignore[union-attr]  # fixture guarantees page rows
 
 
 def test_local_source_lists_recognition_crops(tmp_path) -> None:
@@ -44,7 +44,7 @@ def test_local_source_lists_recognition_crops(tmp_path) -> None:
     src = LocalDatasetSource(tmp_path / "t", val)
     rows = list(src.list("all", TaskEnum.recognition, SplitEnum.val))
     assert all(isinstance(r, DatasetCropRef) for r in rows)
-    assert {r.crop_name: r.label_text for r in rows} == {  # type: ignore[union-attr]
+    assert {r.crop_name: r.label_text for r in rows} == {  # type: ignore[union-attr]  # fixture guarantees crop rows
         "c1.png": "hello",
         "c2.png": "world",
     }

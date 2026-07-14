@@ -64,14 +64,14 @@ def build_job_runner(settings: Settings) -> LongJobRunner:
     async method returning an AsyncIterator; every concrete impl (including
     pdomain-ops' own LocalLongJobRunner) implements it as an async generator,
     which basedpyright sees as a structural mismatch. The ignores below track
-    that upstream Protocol-shape quirk — see docs/process/lint-deviations.md.
+    that upstream Protocol-shape quirk — see docs/conventions/lint-deviations.md.
     """
     if settings.job_runner_kind == "fake":
         from pdomain_ocr_trainer_spa.training.fake_runner import FakeLongJobRunner
 
-        return FakeLongJobRunner()  # pyright: ignore[reportReturnType]
+        return FakeLongJobRunner()  # pyright: ignore[reportReturnType]  # upstream Protocol misdeclares its async generator
     from pdomain_ops.gpu.local_jobs import LocalLongJobRunner
 
-    return LocalLongJobRunner(  # pyright: ignore[reportReturnType]
+    return LocalLongJobRunner(  # pyright: ignore[reportReturnType]  # upstream Protocol misdeclares its async generator
         db_path=settings.jobs_db_path,
     )

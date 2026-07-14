@@ -234,7 +234,8 @@ Checked-in transcripts captured once and frozen; a manual
 `scripts/refresh_log_fixtures.py` re-records them on demand.
 
 > The stdout → `JobEvent` parse on the *runner* side is
-> `pdomain-ocr-ops`' responsibility ([Q27](../OPEN_QUESTIONS.md),
+> `pdomain-ocr-ops`' responsibility (see the
+> [trainer workflow architecture](../docs/architecture/trainer-workflows.md),
 > `pdomain-ocr-ops#76`) and is tested there.
 
 ### 5.3 Stub worker for slow tests

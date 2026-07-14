@@ -44,8 +44,9 @@ given implementation task.
   `<Verb><Noun>Response`).
 - **`data-testid`.** Every interactive element keeps a stable testid;
   see [`13-driver-contract.md`](13-driver-contract.md).
-- **Open questions.** Inline as `([Qn](../OPEN_QUESTIONS.md))`. Do not
-  pretend they're answered.
+- **Unresolved intent.** Link deferred or blocked choices to the
+  [intent map](../docs/context/intent-map.md). Link shipped choices to current
+  architecture or the [decisions record](../docs/context/decisions.md).
 - **Re-use over re-spec.** When a topic is identical to the labeler
   SPA, link rather than duplicate (`see pdomain-ocr-labeler-spa
   specs/10-jobs-and-sse.md`).

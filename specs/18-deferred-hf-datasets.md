@@ -67,7 +67,7 @@ Each is independently shippable, in order. SPA mapping in brackets.
   `pd-ocr-shape: typeface-classification/v1` and yields
   `(image, typeface)` pairs.
 - A deliberately small image-classification model (architecture
-  TBD — [Q9](../OPEN_QUESTIONS.md)).
+  TBD; see the [blocked production round-trip](../docs/context/intent-map.md)).
 - **Ship criterion:** a classifier profile with one `hf:` source
   trains end-to-end against a hand-uploaded test dataset.
 
@@ -117,19 +117,19 @@ is materialized and concatenated into a transient training dir; a
 ratio mixing (detection) applies the per-source `weight`. The model
 sidecar's `trained_on[]` array records, per source: `repo`,
 `revision`, `rows`, and the **user-asked** `weight` (not the
-post-normalization value — [Q18](../OPEN_QUESTIONS.md)).
+post-normalization value; see the
+[deferred source-weight decision](../docs/context/intent-map.md)).
 
 Concrete adapter/route shapes, error codes, and the dataset-card
 block: [`09-hf-integration.md`](09-hf-integration.md) §3–§8.
 
 ---
 
-## 4. Open questions owned by this milestone
+## 4. Deferred choices owned by this milestone
 
-[Q15](../OPEN_QUESTIONS.md) (HF read vs publish flag split),
-[Q17](../OPEN_QUESTIONS.md) (`hf_default_owner` default),
-[Q18](../OPEN_QUESTIONS.md) (source-weight normalization),
-[Q19](../OPEN_QUESTIONS.md) (LFS quota handling) — all gated to
+The [shipped HF authority decision](../docs/context/decisions.md), plus the
+deferred `hf_default_owner`, source-weight normalization, and LFS quota work in
+the [intent map](../docs/context/intent-map.md) — all gated to
 M10/M11, none block core parity.
 
 ---

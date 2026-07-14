@@ -115,7 +115,8 @@ class Banner(BaseModel):
 ```
 
 Dismissal is **per-tab** in v1, kept in `sessionStorage`. No
-backend state ([Q22](../OPEN_QUESTIONS.md): persist dismissals
+backend state (see the
+[deferred dismissal option](../docs/context/intent-map.md): persist dismissals
 per-browser?).
 
 Banner refresh: re-query every 60 s while any banner is shown,

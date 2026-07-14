@@ -1,6 +1,9 @@
 ---
-status: active
-created: 2026-06-10
+Status: partial
+Owner: CT
+Created: 2026-06-10
+Last verified: 2026-07-14
+Kind: plan
 repo: pdomain/pdomain-ocr-trainer-spa
 milestone: M12
 track: E
@@ -9,39 +12,74 @@ spec: specs/16-milestones.md §M12
 
 # M12 — Typeface Classifier Implementation Plan
 
+## Agent Index
+
+- **Kind:** plan
+- **Status:** partial
+- **Read when:** working on unfinished production typeface training or
+  evaluation.
+- **Search terms:** M12, typeface classifier, train_typeface, upstream gate.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use
 > superpowers:subagent-driven-development (recommended) or
 > superpowers:executing-plans to implement this plan task-by-task. Steps use
 > checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Ship M12: typeface-classification training, eval, and publish inside
-the SPA, gated on `pdomain-ocr-training` growing a `TypefaceConfig` and
+## Goal
+
+Ship typeface-classification training, evaluation, and publishing inside the
+SPA, gated on `pdomain-ocr-training` growing a `TypefaceConfig` and
 `train_typeface` method behind `ITrainingRunner`.
 
-**Architecture:** The SPA side mirrors the existing detection/recognition
-pattern exactly: a typed `TypefaceConfig` config model (torch-free), a
-`train_typeface` method on `ITrainingRunner`, a worker dispatch path in
-`worker/train.py`, a typeface kanban in `domain/datasets.py`, an eval
-branch for per-class slicing, and a `run_form` + `eval_form` frontend
-variant. The training/inference engine belongs entirely in
-`pdomain-ocr-training`. This plan defines the exact Protocol surface this
-SPA requires, marks it as a cross-repo gate, and plans only the SPA-side
-work.
+## Architecture
 
-**Tech Stack:** Python 3.13, FastAPI, Pydantic v2, `pdomain-ocr-training`
+The SPA side mirrors the existing detection and recognition pattern exactly: a
+typed `TypefaceConfig` config model (torch-free), a `train_typeface` method on
+`ITrainingRunner`, a worker dispatch path in `worker/train.py`, a typeface
+kanban in `domain/datasets.py`, an eval branch for per-class slicing, and a
+`run_form` + `eval_form` frontend variant. The training/inference engine belongs
+entirely in `pdomain-ocr-training`. This plan defines the exact Protocol surface
+this SPA requires, marks it as a cross-repo gate, and plans only the SPA-side
+work. The dataset API and browser seam shipped before the production runner and
+real evaluation path.
+
+## Tech Stack
+
+The planned stack is Python 3.13, FastAPI, Pydantic v2, `pdomain-ocr-training`
 (`TypefaceConfig`, `ITrainingRunner.train_typeface`, `TypefaceEvalConfig`,
 `TypefaceEvalResult` — cross-repo gate), `pdomain-ui` `KanbanBoard` (crop
 thumbnail strip mode for classifier kanbans), React 18 + TypeScript, Vite,
-Vitest, `pytest-playwright` for browser verification.
+Vitest, and `pytest-playwright` for browser verification. The current frontend
+uses React 19 and `@pdomain/pdomain-ui ^0.11.0`; older versions in execution
+steps are historical projections.
+
+## Global Constraints
+
+The FastAPI process must remain Torch-free. Production typeface work must wait
+for upstream typed configuration, runner, and evaluation contracts. Seam tests
+must not be treated as evidence that real training or evaluation works.
+
+## Adversarial Review
+
+- **Stage:** migration-time review of a partially implemented plan.
+- **Source:** 2026-07-14 comparison of this plan with current source and tests.
+- **Accepted finding:** SPA route, kanban API, and browser tests prove the seam,
+  but not production training or evaluation.
+- **Change to result:** the plan remains partial; completed UI work moved into
+  current architecture while upstream work remains blocked.
+- **Implementation deviations:** dependencies advanced and the dataset/UI seam
+  shipped before the upstream training round-trip.
+- **Residual risks:** `TypefaceConfig`, `train_typeface`, and real evaluation
+  may differ from this projected interface when implemented.
 
 ---
 
 ## Cross-repo gate: required `pdomain-ocr-training` additions
 
 **This plan cannot be implemented until `pdomain-ocr-training` ships the
-following surface.** Do not begin Task 1 until that library's version
-satisfying these contracts is available on `pdomain-index-pip`. File a
-cross-repo recommendation issue (see §below) to track the upstream work.
+following surface.** Do not begin Task 1 until that library's version satisfying
+these contracts is available on `pdomain-index-pip`. File a cross-repo
+recommendation issue (see §below) to track the upstream work.
 
 ### Required Protocol extension in `pdomain_ocr_training/protocols.py`
 
@@ -146,25 +184,25 @@ Cross-repo recommendation
 
 ## File map
 
-| Action | Path |
-| --- | --- |
+| Action | Path                                                           |
+| ------ | -------------------------------------------------------------- |
 | Modify | `src/pdomain_ocr_trainer_spa/core/enums.py` (no change needed) |
-| Modify | `src/pdomain_ocr_trainer_spa/training/config_build.py` |
-| Modify | `src/pdomain_ocr_trainer_spa/training/fake_runner.py` |
-| Modify | `src/pdomain_ocr_trainer_spa/worker/train.py` |
-| Modify | `src/pdomain_ocr_trainer_spa/worker/evaluate.py` |
-| Modify | `src/pdomain_ocr_trainer_spa/domain/datasets.py` |
-| Modify | `src/pdomain_ocr_trainer_spa/domain/eval.py` |
-| Modify | `src/pdomain_ocr_trainer_spa/api/runs.py` |
-| Modify | `src/pdomain_ocr_trainer_spa/api/eval.py` |
-| Modify | `src/pdomain_ocr_trainer_spa/api/datasets.py` |
-| Create | `frontend/src/pages/TypefaceKanbanPage.tsx` |
-| Create | `frontend/src/pages/TypefaceKanbanPage.test.tsx` |
-| Modify | `frontend/src/App.tsx` (add route) |
-| Modify | `tests/unit/training/test_config_build.py` (create if absent) |
-| Modify | `tests/unit/domain/test_datasets.py` |
-| Modify | `tests/unit/domain/test_eval.py` |
-| Create | `tests/e2e/test_m12_typeface.py` |
+| Modify | `src/pdomain_ocr_trainer_spa/training/config_build.py`         |
+| Modify | `src/pdomain_ocr_trainer_spa/training/fake_runner.py`          |
+| Modify | `src/pdomain_ocr_trainer_spa/worker/train.py`                  |
+| Modify | `src/pdomain_ocr_trainer_spa/worker/evaluate.py`               |
+| Modify | `src/pdomain_ocr_trainer_spa/domain/datasets.py`               |
+| Modify | `src/pdomain_ocr_trainer_spa/domain/eval.py`                   |
+| Modify | `src/pdomain_ocr_trainer_spa/api/runs.py`                      |
+| Modify | `src/pdomain_ocr_trainer_spa/api/eval.py`                      |
+| Modify | `src/pdomain_ocr_trainer_spa/api/datasets.py`                  |
+| Create | `frontend/src/pages/TypefaceKanbanPage.tsx`                    |
+| Create | `frontend/src/pages/TypefaceKanbanPage.test.tsx`               |
+| Modify | `frontend/src/App.tsx` (add route)                             |
+| Modify | `tests/unit/training/test_config_build.py` (create if absent)  |
+| Modify | `tests/unit/domain/test_datasets.py`                           |
+| Modify | `tests/unit/domain/test_eval.py`                               |
+| Create | `tests/e2e/test_m12_typeface.py`                               |
 
 ---
 
@@ -183,10 +221,10 @@ If this fails, stop. The upstream gate is not satisfied.
 
 **Files:**
 
-+ Modify: `src/pdomain_ocr_trainer_spa/training/config_build.py`
-+ Create: `tests/unit/training/test_config_build.py`
+- Modify: `src/pdomain_ocr_trainer_spa/training/config_build.py`
+- Create: `tests/unit/training/test_config_build.py`
 
-+ [ ] **Step 1: Write the failing test**
+- [ ] **Step 1: Write the failing test**
 
 ```python
 # tests/unit/training/test_config_build.py
@@ -232,7 +270,7 @@ def test_build_typeface_config_defaults() -> None:
     assert cfg.arch == "resnet18"     # TypefaceConfig default
 ```
 
-+ [ ] **Step 2: Run the failing test**
+- [ ] **Step 2: Run the failing test**
 
 ```bash
 cd /workspaces/ocr-container/pdomain-ocr-trainer-spa
@@ -241,7 +279,7 @@ uv run pytest tests/unit/training/test_config_build.py -v 2>&1 | tail -10
 
 Expected: `ImportError: cannot import name 'build_typeface_config'`
 
-+ [ ] **Step 3: Implement `build_typeface_config` in `config_build.py`**
+- [ ] **Step 3: Implement `build_typeface_config` in `config_build.py`**
 
 ```python
 # Add to src/pdomain_ocr_trainer_spa/training/config_build.py
@@ -262,7 +300,7 @@ def build_typeface_config(run: RunLike) -> TypefaceConfig:
     return TypefaceConfig.model_validate(payload)
 ```
 
-+ [ ] **Step 4: Run the tests**
+- [ ] **Step 4: Run the tests**
 
 ```bash
 cd /workspaces/ocr-container/pdomain-ocr-trainer-spa
@@ -271,7 +309,7 @@ uv run pytest tests/unit/training/test_config_build.py -v 2>&1 | tail -10
 
 Expected: PASS
 
-+ [ ] **Step 5: Commit**
+- [ ] **Step 5: Commit**
 
 ```bash
 cd /workspaces/ocr-container/pdomain-ocr-trainer-spa
@@ -287,11 +325,11 @@ git commit -m "feat(m12): build_typeface_config — torch-free TypefaceConfig \
 
 **Files:**
 
-+ Modify: `src/pdomain_ocr_trainer_spa/training/fake_runner.py`
-+ Modify: `src/pdomain_ocr_trainer_spa/worker/train.py`
-+ Modify: `tests/unit/training/` or `tests/integration/`
+- Modify: `src/pdomain_ocr_trainer_spa/training/fake_runner.py`
+- Modify: `src/pdomain_ocr_trainer_spa/worker/train.py`
+- Modify: `tests/unit/training/` or `tests/integration/`
 
-+ [ ] **Step 1: Read the existing fake runner**
+- [ ] **Step 1: Read the existing fake runner**
 
 ```bash
 cat \
@@ -301,7 +339,7 @@ cat \
 The fake runner must implement `train_typeface` returning a scripted event
 stream so tests can drive the full job lifecycle without torch.
 
-+ [ ] **Step 2: Write the failing test for the worker dispatch**
+- [ ] **Step 2: Write the failing test for the worker dispatch**
 
 ```python
 # Add to tests/unit/training/test_config_build.py or create
@@ -326,7 +364,7 @@ def test_iter_events_typeface_calls_train_typeface(tmp_path) -> None:
     assert "done" in kinds
 ```
 
-+ [ ] **Step 3: Run the failing test**
+- [ ] **Step 3: Run the failing test**
 
 ```bash
 cd /workspaces/ocr-container/pdomain-ocr-trainer-spa
@@ -335,7 +373,7 @@ uv run pytest tests/unit/training/test_worker_dispatch.py -v 2>&1 | tail -10
 
 Expected: FAIL — `_iter_events` doesn't handle `typeface-classification` yet
 
-+ [ ] **Step 4: Add `train_typeface` to `FakeTrainingRunner`**
+- [ ] **Step 4: Add `train_typeface` to `FakeTrainingRunner`**
 
 Read the existing `FakeTrainingRunner` implementation, then add:
 
@@ -358,7 +396,7 @@ def train_typeface(
     yield TrainingEvent(kind="done", message="training complete", progress=1.0)
 ```
 
-+ [ ] **Step 5: Extend `_iter_events` in `worker/train.py`**
+- [ ] **Step 5: Extend `_iter_events` in `worker/train.py`**
 
 ```python
 # In worker/train.py — extend _iter_events
@@ -412,7 +450,7 @@ if TYPE_CHECKING:
         RecognitionConfig, TypefaceConfig
 ```
 
-+ [ ] **Step 6: Run the dispatch test**
+- [ ] **Step 6: Run the dispatch test**
 
 ```bash
 cd /workspaces/ocr-container/pdomain-ocr-trainer-spa
@@ -421,7 +459,7 @@ uv run pytest tests/unit/training/test_worker_dispatch.py -v 2>&1 | tail -10
 
 Expected: PASS
 
-+ [ ] **Step 7: Commit**
+- [ ] **Step 7: Commit**
 
 ```bash
 cd /workspaces/ocr-container/pdomain-ocr-trainer-spa
@@ -441,8 +479,8 @@ kanban for the typeface task (spec 05 §10).
 
 **Files:**
 
-+ Modify: `src/pdomain_ocr_trainer_spa/domain/datasets.py`
-+ Modify: `tests/unit/domain/test_datasets.py`
+- Modify: `src/pdomain_ocr_trainer_spa/domain/datasets.py`
+- Modify: `tests/unit/domain/test_datasets.py`
 
 The typeface dataset layout on disk:
 
@@ -453,7 +491,7 @@ The typeface dataset layout on disk:
         <crop_name>.png
 ```
 
-+ [ ] **Step 1: Write the failing test**
+- [ ] **Step 1: Write the failing test**
 
 ```python
 # Add to tests/unit/domain/test_datasets.py
@@ -491,7 +529,7 @@ def test_typeface_kanban_no_longer_raises_501(tmp_path: Path,
     assert view.task == TaskEnum.typeface_classification
 ```
 
-+ [ ] **Step 2: Run the failing tests**
+- [ ] **Step 2: Run the failing tests**
 
 ```bash
 cd /workspaces/ocr-container/pdomain-ocr-trainer-spa
@@ -502,10 +540,10 @@ uv run pytest \
   -v 2>&1 | tail -15
 ```
 
-Expected: FAIL with `AppError: Task 'typeface-classification' kanban is not
-implemented yet`
+Expected: FAIL with
+`AppError: Task 'typeface-classification' kanban is not implemented yet`
 
-+ [ ] **Step 3: Implement typeface kanban in `domain/datasets.py`**
+- [ ] **Step 3: Implement typeface kanban in `domain/datasets.py`**
 
 Extend `_SUPPORTED_TASKS` and add the `metadata.jsonl` reader:
 
@@ -576,7 +614,7 @@ def _values_equal(task: TaskEnum, left: object, right: object) -> bool:
     return left == right
 ```
 
-+ [ ] **Step 4: Run the tests**
+- [ ] **Step 4: Run the tests**
 
 ```bash
 cd /workspaces/ocr-container/pdomain-ocr-trainer-spa
@@ -585,7 +623,7 @@ uv run pytest tests/unit/domain/test_datasets.py -v 2>&1 | tail -20
 
 Expected: all PASS
 
-+ [ ] **Step 5: Commit**
+- [ ] **Step 5: Commit**
 
 ```bash
 cd /workspaces/ocr-container/pdomain-ocr-trainer-spa
@@ -601,25 +639,24 @@ git commit -m "feat(m12): typeface kanban — lift 501 guard, add metadata.jsonl
 
 **Files:**
 
-+ Modify: `src/pdomain_ocr_trainer_spa/api/runs.py`
-+ Modify: `src/pdomain_ocr_trainer_spa/domain/runs.py`
-+ Modify: `tests/unit/domain/test_runs.py` (add typeface test)
+- Modify: `src/pdomain_ocr_trainer_spa/api/runs.py`
+- Modify: `src/pdomain_ocr_trainer_spa/domain/runs.py`
+- Modify: `tests/unit/domain/test_runs.py` (add typeface test)
 
 The existing `POST /api/runs` route handles task validation with a flag check
 (`Settings.enable_typeface_training`). This is already present per
-`settings.py`.
-What needs adding is the `train_path` / `val_path` resolution for the typeface
-task.
+`settings.py`. What needs adding is the `train_path` / `val_path` resolution for
+the typeface task.
 
-+ [ ] **Step 1: Read `domain/runs.py` and understand how train/val paths are
-  resolved**
+- [ ] **Step 1: Read `domain/runs.py` and understand how train/val paths are
+      resolved**
 
 ```bash
 cat \
   /workspaces/ocr-container/pdomain-ocr-trainer-spa/src/pdomain_ocr_trainer_spa/domain/runs.py
 ```
 
-+ [ ] **Step 2: Write the failing test**
+- [ ] **Step 2: Write the failing test**
 
 ```python
 # Add to tests/unit/domain/test_runs.py
@@ -651,7 +688,7 @@ def test_create_run_typeface(settings, client) -> None:
     assert "job_id" in data
 ```
 
-+ [ ] **Step 3: Run the failing test**
+- [ ] **Step 3: Run the failing test**
 
 ```bash
 cd /workspaces/ocr-container/pdomain-ocr-trainer-spa
@@ -661,7 +698,7 @@ uv run pytest tests/unit/domain/test_runs.py::test_create_run_typeface -v \
 
 Expected: FAIL (the runs domain likely doesn't resolve typeface paths yet)
 
-+ [ ] **Step 4: Extend `domain/runs.py` path resolution for typeface**
+- [ ] **Step 4: Extend `domain/runs.py` path resolution for typeface**
 
 Read `domain/runs.py` first. The path-resolution logic sets `args["train_path"]`
 and `args["val_path"]` from settings. Add the typeface case:
@@ -680,7 +717,7 @@ if task is TaskEnum.typeface_classification:
     )
 ```
 
-+ [ ] **Step 5: Run the test**
+- [ ] **Step 5: Run the test**
 
 ```bash
 cd /workspaces/ocr-container/pdomain-ocr-trainer-spa
@@ -689,7 +726,7 @@ uv run pytest tests/unit/domain/test_runs.py -v 2>&1 | tail -15
 
 Expected: all PASS
 
-+ [ ] **Step 6: Commit**
+- [ ] **Step 6: Commit**
 
 ```bash
 cd /workspaces/ocr-container/pdomain-ocr-trainer-spa
@@ -713,11 +750,11 @@ uv run python -c "from pdomain_ocr_training.protocols import \
 
 **Files:**
 
-+ Modify: `src/pdomain_ocr_trainer_spa/worker/evaluate.py`
-+ Modify: `src/pdomain_ocr_trainer_spa/domain/eval.py`
-+ Modify: `tests/unit/domain/test_eval.py`
+- Modify: `src/pdomain_ocr_trainer_spa/worker/evaluate.py`
+- Modify: `src/pdomain_ocr_trainer_spa/domain/eval.py`
+- Modify: `tests/unit/domain/test_eval.py`
 
-+ [ ] **Step 1: Read the existing `worker/evaluate.py`**
+- [ ] **Step 1: Read the existing `worker/evaluate.py`**
 
 ```bash
 cat \
@@ -726,7 +763,7 @@ cat \
 
 Understand how the existing detection/recognition eval dispatches.
 
-+ [ ] **Step 2: Write the failing eval test**
+- [ ] **Step 2: Write the failing eval test**
 
 ```python
 # Add to tests/unit/domain/test_eval.py
@@ -753,7 +790,7 @@ def test_eval_typeface_returns_accuracy(tmp_path, settings, client) -> None:
     assert resp.status_code == 202
 ```
 
-+ [ ] **Step 3: Run the failing test**
+- [ ] **Step 3: Run the failing test**
 
 ```bash
 cd /workspaces/ocr-container/pdomain-ocr-trainer-spa
@@ -764,7 +801,7 @@ uv run pytest \
 
 Expected: FAIL
 
-+ [ ] **Step 4: Extend `worker/evaluate.py` for typeface**
+- [ ] **Step 4: Extend `worker/evaluate.py` for typeface**
 
 Following the existing pattern, add a `TypefaceEvalConfig` build path and a
 `TypefaceEvalResult` → `EvalResult` adapter in the worker. Mirror
@@ -792,11 +829,11 @@ def _iter_eval_events(
     # ... existing detection/recognition dispatch ...
 ```
 
-Implement `_typeface_result_to_event` that serialises `TypefaceEvalResult`
-to the same `EvalResult` JSON shape the frontend expects (using
-`accuracy`, `f1_macro`, `per_class`, `slices`).
+Implement `_typeface_result_to_event` that serialises `TypefaceEvalResult` to
+the same `EvalResult` JSON shape the frontend expects (using `accuracy`,
+`f1_macro`, `per_class`, `slices`).
 
-+ [ ] **Step 5: Run the eval tests**
+- [ ] **Step 5: Run the eval tests**
 
 ```bash
 cd /workspaces/ocr-container/pdomain-ocr-trainer-spa
@@ -805,7 +842,7 @@ uv run pytest tests/unit/domain/test_eval.py -v 2>&1 | tail -15
 
 Expected: all PASS
 
-+ [ ] **Step 6: Commit**
+- [ ] **Step 6: Commit**
 
 ```bash
 cd /workspaces/ocr-container/pdomain-ocr-trainer-spa
@@ -821,19 +858,18 @@ git commit -m "feat(m12): typeface eval dispatch + per-class slicing"
 
 **Files:**
 
-+ Create: `frontend/src/pages/TypefaceKanbanPage.tsx`
-+ Create: `frontend/src/pages/TypefaceKanbanPage.test.tsx`
-+ Modify: `frontend/src/App.tsx`
+- Create: `frontend/src/pages/TypefaceKanbanPage.tsx`
+- Create: `frontend/src/pages/TypefaceKanbanPage.test.tsx`
+- Modify: `frontend/src/App.tsx`
 
 The typeface kanban page is a thin wrapper that sets
-`task="typeface-classification"` on the existing
-`DatasetsPage` or renders an equivalent component. Per spec 05 §10, the
-`KanbanBoard` uses thumbnail-strip mode for classifier tasks; the SPA passes
-`thumbnailMode` to `pdomain-ui`'s `KanbanBoard`. Check the current `pdomain-ui`
-version for whether `thumbnailMode` is available; if not, use the list mode
-fallback.
+`task="typeface-classification"` on the existing `DatasetsPage` or renders an
+equivalent component. Per spec 05 §10, the `KanbanBoard` uses thumbnail-strip
+mode for classifier tasks; the SPA passes `thumbnailMode` to `pdomain-ui`'s
+`KanbanBoard`. Check the current `pdomain-ui` version for whether
+`thumbnailMode` is available; if not, use the list mode fallback.
 
-+ [ ] **Step 1: Write the failing component test**
+- [ ] **Step 1: Write the failing component test**
 
 ```tsx
 // frontend/src/pages/TypefaceKanbanPage.test.tsx
@@ -854,23 +890,25 @@ vi.mock("../stores/datasetsStore", () => ({
 describe("TypefaceKanbanPage", () => {
   it("renders with typeface-classification task", () => {
     render(
-      <MemoryRouter initialEntries={["/profiles/clogaelach/datasets/typeface-classification"]}>
+      <MemoryRouter
+        initialEntries={[
+          "/profiles/clogaelach/datasets/typeface-classification",
+        ]}
+      >
         <Routes>
           <Route
             path="/profiles/:name/datasets/typeface-classification"
             element={<TypefaceKanbanPage />}
           />
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
-    expect(
-      screen.getByTestId("typeface-kanban-page")
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("typeface-kanban-page")).toBeInTheDocument();
   });
 });
 ```
 
-+ [ ] **Step 2: Run the failing test**
+- [ ] **Step 2: Run the failing test**
 
 ```bash
 cd /workspaces/ocr-container/pdomain-ocr-trainer-spa/frontend
@@ -879,7 +917,7 @@ pnpm test --run src/pages/TypefaceKanbanPage.test.tsx 2>&1 | tail -15
 
 Expected: `Cannot find module './TypefaceKanbanPage'`
 
-+ [ ] **Step 3: Implement `TypefaceKanbanPage.tsx`**
+- [ ] **Step 3: Implement `TypefaceKanbanPage.tsx`**
 
 ```tsx
 // frontend/src/pages/TypefaceKanbanPage.tsx
@@ -897,7 +935,7 @@ export function TypefaceKanbanPage(): JSX.Element {
 }
 ```
 
-+ [ ] **Step 4: Add the route to `App.tsx`**
+- [ ] **Step 4: Add the route to `App.tsx`**
 
 Read `App.tsx` first, then add alongside the existing
 `/profiles/:name/datasets/:task` route:
@@ -909,7 +947,7 @@ Read `App.tsx` first, then add alongside the existing
 />
 ```
 
-+ [ ] **Step 5: Run the frontend tests**
+- [ ] **Step 5: Run the frontend tests**
 
 ```bash
 cd /workspaces/ocr-container/pdomain-ocr-trainer-spa/frontend
@@ -918,7 +956,7 @@ pnpm test --run 2>&1 | tail -20
 
 Expected: all PASS
 
-+ [ ] **Step 6: Commit**
+- [ ] **Step 6: Commit**
 
 ```bash
 cd /workspaces/ocr-container/pdomain-ocr-trainer-spa
@@ -934,31 +972,31 @@ git commit -m "feat(m12): TypefaceKanbanPage + React Router route"
 
 **Files:**
 
-+ Modify: `frontend/src/pages/NewRunPage.tsx`
+- Modify: `frontend/src/pages/NewRunPage.tsx`
 
 The browser verification test needs `data-testid` attributes on the run-form
-elements for typeface-classification. Verify the existing `NewRunPage.tsx`
-has `data-testid="new-run-form"` and `data-testid="task-select"` (or
-equivalent) already; add them if absent.
+elements for typeface-classification. Verify the existing `NewRunPage.tsx` has
+`data-testid="new-run-form"` and `data-testid="task-select"` (or equivalent)
+already; add them if absent.
 
-+ [ ] **Step 1: Grep for existing testids**
+- [ ] **Step 1: Grep for existing testids**
 
 ```bash
 SRC=/workspaces/ocr-container/pdomain-ocr-trainer-spa/frontend/src
 grep -n "data-testid" "$SRC/pages/NewRunPage.tsx" | head -20
 ```
 
-+ [ ] **Step 2: Add missing `data-testid` attributes**
+- [ ] **Step 2: Add missing `data-testid` attributes**
 
 Ensure these are present:
 
-+ `data-testid="new-run-form"` on the form root element
-+ `data-testid="task-select"` on the task dropdown
-+ `data-testid="submit-run"` on the submit button
+- `data-testid="new-run-form"` on the form root element
+- `data-testid="task-select"` on the task dropdown
+- `data-testid="submit-run"` on the submit button
 
 Add them to `NewRunPage.tsx` where absent without changing logic.
 
-+ [ ] **Step 3: Run frontend tests**
+- [ ] **Step 3: Run frontend tests**
 
 ```bash
 cd /workspaces/ocr-container/pdomain-ocr-trainer-spa/frontend
@@ -967,7 +1005,7 @@ pnpm test --run src/pages/NewRunPage.test.tsx 2>&1 | tail -10
 
 Expected: PASS
 
-+ [ ] **Step 4: Commit**
+- [ ] **Step 4: Commit**
 
 ```bash
 cd /workspaces/ocr-container/pdomain-ocr-trainer-spa
@@ -979,7 +1017,7 @@ git commit -m "chore(m12): add data-testid contract to NewRunPage for e2e tests"
 
 ## Task 8: Run `make ci` green + full integration
 
-+ [ ] **Step 1: Run full CI**
+- [ ] **Step 1: Run full CI**
 
 ```bash
 cd /workspaces/ocr-container/pdomain-ocr-trainer-spa
@@ -988,15 +1026,14 @@ make ci 2>&1 | tail -40
 
 Fix any lint/typecheck issues before proceeding. Common issues:
 
-+ basedpyright: `TypefaceConfig` may need `# pyright:
-  ignore[reportMissingTypeStubs]`
-  if the installed wheel doesn't ship a `py.typed` marker. Check
-  `pyproject.toml`'s `[tool.basedpyright]` — `reportMissingTypeStubs = "none"`
-  is already set per the M11 packaging notes.
-+ ruff: ensure any `TYPE_CHECKING` import of `TypefaceConfig` is under
+- basedpyright: `TypefaceConfig` may need
+  `# pyright: ignore[reportMissingTypeStubs]` if the installed wheel doesn't
+  ship a `py.typed` marker. Check `pyproject.toml`'s `[tool.basedpyright]` —
+  `reportMissingTypeStubs = "none"` is already set per the M11 packaging notes.
+- ruff: ensure any `TYPE_CHECKING` import of `TypefaceConfig` is under
   `if TYPE_CHECKING:` properly.
 
-+ [ ] **Step 2: Commit the CI-green state**
+- [ ] **Step 2: Commit the CI-green state**
 
 ```bash
 cd /workspaces/ocr-container/pdomain-ocr-trainer-spa
@@ -1010,14 +1047,14 @@ git commit -m "chore(m12): lint + typecheck fixes for typeface-classification"
 
 **Files:**
 
-+ Create: `tests/e2e/test_m12_typeface.py`
-+ Modify: `Makefile` (add `e2e-browser` if not already present from Track D)
+- Create: `tests/e2e/test_m12_typeface.py`
+- Modify: `Makefile` (add `e2e-browser` if not already present from Track D)
 
-This task assumes `pytest-playwright` is already in the `[dependency-groups]
-e2e`
-group (added by Track D Task 5). If Track D has not landed, add it here.
+This task assumes `pytest-playwright` is already in the
+`[dependency-groups] e2e` group (added by Track D Task 5). If Track D has not
+landed, add it here.
 
-+ [ ] **Step 1: Write the e2e test**
+- [ ] **Step 1: Write the e2e test**
 
 ```python
 # tests/e2e/test_m12_typeface.py
@@ -1139,7 +1176,7 @@ def test_typeface_kanban_subpath_renders(page, typeface_server: str) -> None:
     assert "typeface-classification" in page.url
 ```
 
-+ [ ] **Step 2: Run the e2e tests**
+- [ ] **Step 2: Run the e2e tests**
 
 ```bash
 cd /workspaces/ocr-container/pdomain-ocr-trainer-spa
@@ -1148,7 +1185,7 @@ make e2e-browser 2>&1 | tail -30
 
 Expected: all 4 tests PASS
 
-+ [ ] **Step 3: Run full CI**
+- [ ] **Step 3: Run full CI**
 
 ```bash
 cd /workspaces/ocr-container/pdomain-ocr-trainer-spa
@@ -1157,7 +1194,7 @@ make ci 2>&1 | tail -20
 
 Expected: GREEN
 
-+ [ ] **Step 4: Commit**
+- [ ] **Step 4: Commit**
 
 ```bash
 cd /workspaces/ocr-container/pdomain-ocr-trainer-spa
@@ -1170,16 +1207,16 @@ git commit -m "feat(m12): Playwright browser verification for \
 
 ## Acceptance criteria (from spec 16-milestones.md §M12)
 
-+ [ ] Round-trip: ingest `typeface-classification/v1` dataset, train, eval,
-  publish.
-+ [ ] `GET /api/profiles/{p}/datasets/typeface-classification/kanban` → 200 with
-  crop rows.
-+ [ ] `POST /api/runs` with `task=typeface-classification` → 202; run appears in
-  `/runs`.
-+ [ ] `POST /api/eval` with `task=typeface-classification` → 202; `GET
-  /api/eval/{id}/result` → per-class accuracy/F1.
-+ [ ] Typeface kanban route renders in browser.
-+ [ ] `make ci` green.
+- [ ] Round-trip: ingest `typeface-classification/v1` dataset, train, eval,
+      publish.
+- [ ] `GET /api/profiles/{p}/datasets/typeface-classification/kanban` → 200 with
+      crop rows.
+- [ ] `POST /api/runs` with `task=typeface-classification` → 202; run appears in
+      `/runs`.
+- [ ] `POST /api/eval` with `task=typeface-classification` → 202;
+      `GET /api/eval/{id}/result` → per-class accuracy/F1.
+- [ ] Typeface kanban route renders in browser.
+- [ ] `make ci` green.
 
 ---
 
@@ -1187,21 +1224,21 @@ git commit -m "feat(m12): Playwright browser verification for \
 
 **Spec coverage:**
 
-+ [x] New typeface training task behind `ITrainingRunner.train_typeface` — Tasks
-  1–2 (gated on upstream)
-+ [x] Typeface kanban view — Task 3
-+ [x] Run form acceptance — Task 4
-+ [x] Eval per-class slicing (`class:<value>` slices) — Task 5
-+ [x] Frontend route — Task 6
-+ [x] `data-testid` contract for e2e — Task 7
-+ [x] Browser Verification milestone — Task 9
+- [x] New typeface training task behind `ITrainingRunner.train_typeface` — Tasks
+      1–2 (gated on upstream)
+- [x] Typeface kanban view — Task 3
+- [x] Run form acceptance — Task 4
+- [x] Eval per-class slicing (`class:<value>` slices) — Task 5
+- [x] Frontend route — Task 6
+- [x] `data-testid` contract for e2e — Task 7
+- [x] Browser Verification milestone — Task 9
 
 **Cross-repo gate items:**
 
-+ `TypefaceConfig` in `pdomain_ocr_training.protocols`
-+ `ITrainingRunner.train_typeface`
-+ `TypefaceEvalConfig`, `TypefaceEvalResult`
-+ `IEvalRunner.evaluate_typeface`
+- `TypefaceConfig` in `pdomain_ocr_training.protocols`
+- `ITrainingRunner.train_typeface`
+- `TypefaceEvalConfig`, `TypefaceEvalResult`
+- `IEvalRunner.evaluate_typeface`
 
 **Open questions for implementer:**
 

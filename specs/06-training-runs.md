@@ -95,7 +95,8 @@ Validation:
   `labels.json` with at least one entry (`409 run.no_training_data`).
 - Concurrency: one `train` job runs at a time across the backend
   (D-T15); further submissions queue in the `LongJobRunner` and start
-  FIFO. ([Q12](../OPEN_QUESTIONS.md))
+  FIFO. See the
+  [trainer workflow architecture](../docs/architecture/trainer-workflows.md).
 
 Side effects:
 
@@ -214,13 +215,15 @@ SSE stream directly while a run is live.
 ```
 
 Cap: 50k events per run on disk; older are GC'd oldest-first once the
-file hits the cap. ([Q13](../OPEN_QUESTIONS.md))
+file hits the cap. See the
+[deferred progress-cap review](../docs/context/intent-map.md).
 
 > Because `TrainingEvent`s are typed at the source, the legacy
 > regex `training.parser_drift` failure mode is retired — the only
 > remaining "no progress" case is a worker that never reaches its
 > first `epoch` event, surfaced as `training.import_error` /
-> `training.worker_died` per §9. ([Q14](../OPEN_QUESTIONS.md))
+> `training.worker_died` per §9. See the
+> [rejected regex-parser threshold](../docs/context/intent-map.md).
 
 ---
 
@@ -251,7 +254,8 @@ file hits the cap. ([Q13](../OPEN_QUESTIONS.md))
 ### 5.3 Typeface classification (M (a.5))
 
 - Reads `<ml_training_dir>/<profile>/typeface/metadata.jsonl`.
-- Architecture TBD ([Q9](../OPEN_QUESTIONS.md)); config model is a
+- Architecture remains blocked upstream (see the
+  [intent map](../docs/context/intent-map.md)); config model is a
   future `pdomain-ocr-training` addition.
 - `metric`-kind events carry `accuracy`, `f1_macro`, per-class
   accuracy in `data`.

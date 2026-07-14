@@ -23,7 +23,7 @@ _logger = logging.getLogger(__name__)
 # This import is intentionally guarded; see docs/conventions/lint-deviations.md
 # entry "labeler_export.py: pdomain_ops.suite.shared_paths optional import".
 try:
-    from pdomain_ops.suite.shared_paths import (  # pyright: ignore[reportMissingImports]
+    from pdomain_ops.suite.shared_paths import (  # pyright: ignore[reportMissingImports]  # guarded fallback supports older pdomain-ops wheels
         resolve_shared_path as _resolve_shared_path_impl,
     )
 
@@ -32,7 +32,7 @@ try:
 
 except ImportError:
 
-    def _shared_path_lookup(key: str) -> Path | None:  # type: ignore[misc]
+    def _shared_path_lookup(key: str) -> Path | None:  # pyright: ignore[reportRedeclaration]  # fallback API
         return None  # pdomain-ops not installed or pre-Track-B version
 
 
@@ -40,8 +40,8 @@ except ImportError:
 # Optional manifest model — falls back to raw JSON dict when import missing
 # ---------------------------------------------------------------------------
 try:
-    from pdomain_ops.schemas.doctr_export import (  # pyright: ignore[reportMissingImports]  # noqa: I001
-        DoctrExportManifest,  # pyright: ignore[reportAssignmentType]
+    from pdomain_ops.schemas.doctr_export import (  # pyright: ignore[reportMissingImports]  # noqa: I001  # guarded import order preserves the older-wheel fallback
+        DoctrExportManifest,  # pyright: ignore[reportAssignmentType]  # fallback model intentionally reuses this runtime name
         read_manifest as _read_manifest_impl,
     )
 
@@ -56,7 +56,7 @@ try:
         if not export_root.exists():
             return None
         try:
-            return _read_manifest_impl(export_root)  # pyright: ignore[reportReturnType]
+            return _read_manifest_impl(export_root)  # pyright: ignore[reportReturnType]  # optional package lacks precise return typing
         except (OSError, ValueError):
             _logger.warning(
                 "Corrupt or unreadable manifest at %s; treating as absent",
@@ -66,7 +66,7 @@ try:
 
 except ImportError:
 
-    class DoctrExportManifest(BaseModel):  # type: ignore[no-redef]
+    class DoctrExportManifest(BaseModel):  # pyright: ignore[reportRedeclaration]  # fallback model
         """Fallback manifest model when pdomain-ops pre-Track-B is installed.
 
         The on-disk JSON key is ``"schema"``; Pydantic reserves that attribute
@@ -82,13 +82,17 @@ except ImportError:
         projects: dict[str, Any] = {}
 
         @classmethod
-        def model_validate(cls, obj: Any, *args: Any, **kwargs: Any) -> DoctrExportManifest:  # type: ignore[override]
+        def model_validate(  # pyright: ignore[reportIncompatibleMethodOverride]  # permissive fallback parser
+            cls, obj: Any, *args: Any, **kwargs: Any
+        ) -> DoctrExportManifest:
             """Accept both ``"schema"`` and ``"schema_key"`` from on-disk JSON."""
             if isinstance(obj, dict) and "schema" in obj and "schema_key" not in obj:
                 obj = {**obj, "schema_key": obj.pop("schema")}
             return super().model_validate(obj, *args, **kwargs)
 
-    def read_export_manifest(export_root: Path) -> DoctrExportManifest | None:  # type: ignore[misc]
+    def read_export_manifest(  # pyright: ignore[reportRedeclaration]  # fallback API
+        export_root: Path,
+    ) -> DoctrExportManifest | None:
         """Read manifest.json from disk using the fallback model."""
         if not export_root.exists():
             return None

@@ -34,7 +34,7 @@ export function EvalFormPage(): React.JSX.Element {
         setProfile(resp.profiles[0].name);
       }
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- fetch once; profile initialization is intentionally mount-only
   }, []);
 
   const loadModels = useCallback(async () => {

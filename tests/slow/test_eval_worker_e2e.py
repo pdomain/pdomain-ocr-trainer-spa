@@ -29,12 +29,12 @@ async def _submit_and_wait(
     runner: object, *, kind: str, run_id: str, cmd: list[str], timeout_s: float = 15.0
 ) -> str:
     """Submit a process job and poll to terminal state in one event loop."""
-    job_id = await runner.submit_with_process(  # type: ignore[attr-defined]
+    job_id = await runner.submit_with_process(  # type: ignore[attr-defined]  # concrete runner exposes this integration-only helper
         kind=kind, spec={"run_id": run_id}, cmd=cmd
     )
     deadline = asyncio.get_event_loop().time() + timeout_s
     while asyncio.get_event_loop().time() < deadline:
-        status = await runner.status(job_id)  # type: ignore[attr-defined]
+        status = await runner.status(job_id)  # type: ignore[attr-defined]  # concrete runner exposes this integration-only helper
         if status.state in {"succeeded", "failed", "cancelled"}:
             return str(status.state)
         await asyncio.sleep(0.1)

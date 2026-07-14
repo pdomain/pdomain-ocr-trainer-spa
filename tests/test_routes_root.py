@@ -23,13 +23,13 @@ from pdomain_ocr_trainer_spa.settings import Settings
 @pytest.fixture
 def base_settings(tmp_path: pytest.TempPathFactory) -> Settings:
     return Settings(
-        ml_training_dir=tmp_path / "ml-training",  # type: ignore[arg-type]
-        ml_validation_dir=tmp_path / "ml-validation",  # type: ignore[arg-type]
-        matched_ocr_dir=tmp_path / "matched-ocr",  # type: ignore[arg-type]
-        app_data_root=tmp_path / "app-data",  # type: ignore[arg-type]
-        shared_models_dir=tmp_path / "shared-models",  # type: ignore[arg-type]
-        runs_dir=tmp_path / "app-data" / "runs",  # type: ignore[arg-type]
-        jobs_db_path=tmp_path / "app-data" / "jobs.db",  # type: ignore[arg-type]
+        ml_training_dir=tmp_path / "ml-training",  # type: ignore[arg-type]  # Settings accepts Path values at runtime
+        ml_validation_dir=tmp_path / "ml-validation",  # type: ignore[arg-type]  # Settings accepts Path values at runtime
+        matched_ocr_dir=tmp_path / "matched-ocr",  # type: ignore[arg-type]  # Settings accepts Path values at runtime
+        app_data_root=tmp_path / "app-data",  # type: ignore[arg-type]  # Settings accepts Path values at runtime
+        shared_models_dir=tmp_path / "shared-models",  # type: ignore[arg-type]  # Settings accepts Path values at runtime
+        runs_dir=tmp_path / "app-data" / "runs",  # type: ignore[arg-type]  # Settings accepts Path values at runtime
+        jobs_db_path=tmp_path / "app-data" / "jobs.db",  # type: ignore[arg-type]  # Settings accepts Path values at runtime
         labeler_export_root=None,
         job_runner_kind="fake",
         model_registry_kind="fake",

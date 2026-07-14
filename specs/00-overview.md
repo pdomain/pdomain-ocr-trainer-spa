@@ -316,7 +316,7 @@ If a milestone is too big, split it.
 
 | If you're touching… | Required reading |
 |---|---|
-| Anything | `00-overview.md`, `OPEN_QUESTIONS.md`, `17-decisions.md` |
+| Anything | `00-overview.md`, `17-decisions.md`, `../docs/context/intent-map.md` |
 | Backend route | `01-data-models.md`, `02-backend.md` |
 | New page in SPA | `03-frontend.md`, `13-driver-contract.md` |
 | Profile / OCR config | `04-profiles-and-config.md` |
@@ -330,5 +330,5 @@ If a milestone is too big, split it.
 | Build / install | `15-deployment-dev.md` |
 | Roadmap | `16-milestones.md` |
 
-If a question isn't answered by the linked spec, **stop and add it to
-[`OPEN_QUESTIONS.md`](../OPEN_QUESTIONS.md)** rather than guessing.
+If a question is not answered by the linked spec, **stop and record it in the
+[intent map](../docs/context/intent-map.md)** rather than guessing.

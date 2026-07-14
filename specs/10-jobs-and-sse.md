@@ -112,7 +112,8 @@ runs registry for the run whose `job_id` matches. `UnknownJobError`
 over SSE — it does **not** invent a parallel event model. Payload
 shapes for training jobs (produced by the worker `@@PDEVENT@@`
 protocol, [`02-backend.md`](02-backend.md) §5.2, and translated by
-the `pdomain-ocr-ops` stdout parser — see [Q27](../OPEN_QUESTIONS.md)):
+the shipped worker boundary described in the
+[trainer workflow architecture](../docs/architecture/trainer-workflows.md)):
 
 | `kind` | `payload` fields | Source |
 |---|---|---|
@@ -191,7 +192,8 @@ This means:
 - **Across a FastAPI restart**: the SQLite registry survives, but
   the in-memory subprocess handles do not, and the training worker
   subprocess is a child of the dead FastAPI process (D-T3,
-  [Q21](../OPEN_QUESTIONS.md)). So a job left `running` at boot is
+  [deferred restart-durability work](../docs/context/intent-map.md)). So a job
+  left `running` at boot is
   no longer truly running.
 
 `AppState.hydrate_from_disk` reconciles at startup: any `Run` in
@@ -282,7 +284,8 @@ cursor.
   `pdomain-ocr-ops/pdomain_ocr_ops/gpu/local_jobs.py:64-272`.
 - `mount_routes` exposes no job routes:
   `pdomain-ocr-ops/pdomain_ocr_ops/suite/routes.py:14`.
-- Cross-repo stdout-parser dependency: [Q27](../OPEN_QUESTIONS.md),
+- Cross-repo stdout-parser history: see the
+  [trainer workflow architecture](../docs/architecture/trainer-workflows.md),
   `pdomain/pdomain-ocr-ops#76`.
 - Crash-recovery precedent:
   `pdomain-ocr-labeler-spa/specs/10-jobs-and-sse.md`.

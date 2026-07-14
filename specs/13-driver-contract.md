@@ -22,8 +22,9 @@ The contract has two parts:
 
 1. **`data-testid` invariants** — every interactive element on
    every page has a stable id, machine-grep-able, never auto-
-   generated. ([Q24](../OPEN_QUESTIONS.md): build a peer driver
-   repo too?)
+   generated. (See the
+   [deferred peer-driver option](../docs/context/intent-map.md): build a peer
+   driver repo too?)
 2. **URL invariants** — every entity has a stable canonical URL.
    Deep-linking from external sources (a TODO list, a notification,
    a slack paste) must keep working across SPA versions.

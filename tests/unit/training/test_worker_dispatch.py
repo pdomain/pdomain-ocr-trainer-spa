@@ -21,7 +21,7 @@ def test_iter_events_routes_detection(tmp_path: Path) -> None:
         "val_path": str(tmp_path / "val"),
         "output_dir": str(tmp_path / "out"),
     }
-    events = list(_iter_events(runner, task="detection", profile="test", args=args))  # type: ignore[arg-type]
+    events = list(_iter_events(runner, task="detection", profile="test", args=args))  # type: ignore[arg-type]  # fake runner supplies the protocol surface used here
     kinds = [getattr(e, "kind", None) for e in events]
     assert "done" in kinds
 
@@ -37,7 +37,7 @@ def test_iter_events_routes_recognition(tmp_path: Path) -> None:
         "output_dir": str(tmp_path / "out"),
         "vocab": "french",
     }
-    events = list(_iter_events(runner, task="recognition", profile="test", args=args))  # type: ignore[arg-type]
+    events = list(_iter_events(runner, task="recognition", profile="test", args=args))  # type: ignore[arg-type]  # fake runner supplies the protocol surface used here
     kinds = [getattr(e, "kind", None) for e in events]
     assert "done" in kinds
 
@@ -52,7 +52,7 @@ def test_iter_events_typeface_calls_train_typeface(tmp_path: Path) -> None:
         "val_path": str(tmp_path / "val"),
         "output_dir": str(tmp_path / "out"),
     }
-    events = list(_iter_events(runner, task="typeface-classification", profile="test", args=args))  # type: ignore[arg-type]
+    events = list(_iter_events(runner, task="typeface-classification", profile="test", args=args))  # type: ignore[arg-type]  # fake runner supplies the protocol surface used here
     kinds = [getattr(e, "kind", None) for e in events]
     assert "done" in kinds
     # Metric events should carry accuracy + f1_macro data

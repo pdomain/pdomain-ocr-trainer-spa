@@ -67,7 +67,7 @@ def test_create_run_no_training_data_409(client: TestClient, fake_runner: FakeLo
     from pdomain_ocr_trainer_spa.core.enums import TypefaceEnum
     from pdomain_ocr_trainer_spa.domain.profiles import create_profile
 
-    state = client.app.state.app_state  # type: ignore[attr-defined]
+    state = client.app.state.app_state  # type: ignore[attr-defined]  # test fixture installs this FastAPI state attribute
     create_profile(state.settings, name="empty", language="ga", typeface=TypefaceEnum.roman)
     fake_runner.script = list(_SUCCESS_SCRIPT)
     r = client.post("/api/runs", json={"profile": "empty", "task": "recognition", "args": {}})

@@ -15,10 +15,10 @@ def test_diagnostics_configured(tmp_path: Path) -> None:
     export = tmp_path / "export"
     export.mkdir()
     s = Settings(
-        labeler_export_root=export,  # type: ignore[arg-type]
-        app_data_root=tmp_path / "app",  # type: ignore[arg-type]
-        runs_dir=tmp_path / "runs",  # type: ignore[arg-type]
-        jobs_db_path=tmp_path / "jobs.db",  # type: ignore[arg-type]
+        labeler_export_root=export,  # type: ignore[arg-type]  # Settings accepts Path values at runtime
+        app_data_root=tmp_path / "app",  # type: ignore[arg-type]  # Settings accepts Path values at runtime
+        runs_dir=tmp_path / "runs",  # type: ignore[arg-type]  # Settings accepts Path values at runtime
+        jobs_db_path=tmp_path / "jobs.db",  # type: ignore[arg-type]  # Settings accepts Path values at runtime
         job_runner_kind="fake",
         model_registry_kind="fake",
     )
@@ -37,9 +37,9 @@ def test_diagnostics_absent(tmp_path: Path) -> None:
     ):
         s = Settings(
             labeler_export_root=None,
-            app_data_root=tmp_path / "app",  # type: ignore[arg-type]
-            runs_dir=tmp_path / "runs",  # type: ignore[arg-type]
-            jobs_db_path=tmp_path / "jobs.db",  # type: ignore[arg-type]
+            app_data_root=tmp_path / "app",  # type: ignore[arg-type]  # Settings accepts Path values at runtime
+            runs_dir=tmp_path / "runs",  # type: ignore[arg-type]  # Settings accepts Path values at runtime
+            jobs_db_path=tmp_path / "jobs.db",  # type: ignore[arg-type]  # Settings accepts Path values at runtime
             job_runner_kind="fake",
             model_registry_kind="fake",
         )

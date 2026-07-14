@@ -170,7 +170,7 @@ def test_read_manifest_returns_none_when_real_ops_impl_raises(tmp_path: Path) ->
     # mirroring the fixed ops-branch definition with try/except (OSError, ValueError).
     import logging
 
-    def _fixed_ops_branch(export_root: Path):  # type: ignore[return]
+    def _fixed_ops_branch(export_root: Path):  # type: ignore[return]  # fake mirrors the optional dependency's runtime shape
         if not export_root.exists():
             return None
         try:
@@ -183,12 +183,12 @@ def test_read_manifest_returns_none_when_real_ops_impl_raises(tmp_path: Path) ->
             return None
 
     original_fn = _le.read_export_manifest
-    _le.read_export_manifest = _fixed_ops_branch  # type: ignore[assignment]
+    _le.read_export_manifest = _fixed_ops_branch  # type: ignore[assignment]  # test temporarily replaces the optional dependency boundary
     try:
         result = _le.read_export_manifest(tmp_path)
         assert result is None, "fixed ops-branch must return None on corrupt manifest"
     finally:
-        _le.read_export_manifest = original_fn  # type: ignore[assignment]
+        _le.read_export_manifest = original_fn  # type: ignore[assignment]  # restore the captured runtime callable
 
 
 def test_build_kanban_does_not_raise_on_corrupt_manifest(tmp_path: Path) -> None:
@@ -215,13 +215,13 @@ def test_build_kanban_does_not_raise_on_corrupt_manifest(tmp_path: Path) -> None
     (export_root / "manifest.json").write_bytes(b"NOT JSON AT ALL")
 
     s = Settings(
-        ml_training_dir=tmp_path / "ml-training",  # type: ignore[arg-type]
-        ml_validation_dir=tmp_path / "ml-validation",  # type: ignore[arg-type]
-        matched_ocr_dir=tmp_path / "matched-ocr",  # type: ignore[arg-type]
-        app_data_root=tmp_path / "app-data",  # type: ignore[arg-type]
-        shared_models_dir=tmp_path / "shared-models",  # type: ignore[arg-type]
-        runs_dir=tmp_path / "app-data" / "runs",  # type: ignore[arg-type]
-        jobs_db_path=tmp_path / "app-data" / "jobs.db",  # type: ignore[arg-type]
+        ml_training_dir=tmp_path / "ml-training",  # type: ignore[arg-type]  # Settings accepts Path values at runtime
+        ml_validation_dir=tmp_path / "ml-validation",  # type: ignore[arg-type]  # Settings accepts Path values at runtime
+        matched_ocr_dir=tmp_path / "matched-ocr",  # type: ignore[arg-type]  # Settings accepts Path values at runtime
+        app_data_root=tmp_path / "app-data",  # type: ignore[arg-type]  # Settings accepts Path values at runtime
+        shared_models_dir=tmp_path / "shared-models",  # type: ignore[arg-type]  # Settings accepts Path values at runtime
+        runs_dir=tmp_path / "app-data" / "runs",  # type: ignore[arg-type]  # Settings accepts Path values at runtime
+        jobs_db_path=tmp_path / "app-data" / "jobs.db",  # type: ignore[arg-type]  # Settings accepts Path values at runtime
         labeler_export_root=export_root,
         job_runner_kind="fake",
         model_registry_kind="fake",
@@ -233,7 +233,7 @@ def test_build_kanban_does_not_raise_on_corrupt_manifest(tmp_path: Path) -> None
     # Inject _read_manifest_impl that raises ValueError (real ops behaviour on corrupt file)
     # and replace read_export_manifest with the fixed wrapper definition so both
     # the labeler_export module and datasets module see the fixed behaviour.
-    def _fixed_read(export_root_arg: Path):  # type: ignore[return]
+    def _fixed_read(export_root_arg: Path):  # type: ignore[return]  # fake mirrors the optional dependency's runtime shape
         import logging
 
         if not export_root_arg.exists():
@@ -249,8 +249,8 @@ def test_build_kanban_does_not_raise_on_corrupt_manifest(tmp_path: Path) -> None
 
     original_le = _le.read_export_manifest
     original_dom = dom.read_export_manifest
-    _le.read_export_manifest = _fixed_read  # type: ignore[assignment]
-    dom.read_export_manifest = _fixed_read  # type: ignore[assignment]
+    _le.read_export_manifest = _fixed_read  # type: ignore[assignment]  # test temporarily replaces the optional dependency boundary
+    dom.read_export_manifest = _fixed_read  # type: ignore[assignment]  # test temporarily replaces the imported boundary
     try:
         view = dom.build_kanban(s, profile="all", task=TaskEnum.recognition)
         assert view is not None
@@ -258,8 +258,8 @@ def test_build_kanban_does_not_raise_on_corrupt_manifest(tmp_path: Path) -> None
         # No rows — corrupt manifest means no freshness, no unassigned from export
         assert not any(r.is_fresh for col in view.columns.values() for r in col.rows)
     finally:
-        _le.read_export_manifest = original_le  # type: ignore[assignment]
-        dom.read_export_manifest = original_dom  # type: ignore[assignment]
+        _le.read_export_manifest = original_le  # type: ignore[assignment]  # restore the captured runtime callable
+        dom.read_export_manifest = original_dom  # type: ignore[assignment]  # restore the captured runtime callable
 
 
 def test_importerror_guard_read_manifest_returns_none_no_exception(tmp_path: Path) -> None:

@@ -74,8 +74,8 @@ def _build_app_state(settings: Settings) -> AppState:
 async def _warmup_device_info() -> None:
     """Background probe — pre-populate device cache at startup."""
     try:
-        from pdomain_ops.gpu.device_probe import (  # pyright: ignore[reportMissingImports]
-            list_devices,  # type: ignore[import-untyped,import-not-found]
+        from pdomain_ops.gpu.device_probe import (  # pyright: ignore[reportMissingImports]  # optional API absent from older pdomain-ops wheels
+            list_devices,  # pyright: ignore[reportMissingImports]  # optional pre-device-probe API
         )
 
         loop = asyncio.get_running_loop()

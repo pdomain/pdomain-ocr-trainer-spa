@@ -54,7 +54,8 @@ Instead:
 
 Per memory `feedback_overnight_loops.md`, never invent
 metadata: the default owner stays `None` until the user sets it
-explicitly. ([Q17](../OPEN_QUESTIONS.md): default to
+explicitly. (See the
+[deferred Hugging Face defaults](../docs/context/intent-map.md): default to
 `Settings.hf_default_owner` from env or refuse to default at all?)
 
 ---
@@ -106,7 +107,7 @@ When a `Run.args.sources` list has > 1 entry, the runner:
    (detection) — implementation detail in the trainer subprocess.
    The sidecar's `trained_on[].weight` records the user-asked
    weight, not the post-normalization value
-   ([Q18](../OPEN_QUESTIONS.md)).
+   (see the [deferred source-weight decision](../docs/context/intent-map.md)).
 
 The transient dir is removed on success; preserved on failure for
 debugging.
@@ -217,7 +218,7 @@ user explicitly clicks "Refresh".
 | `hf.repo_not_found` | 404 from the API on a repo the user named. |
 | `hf.repo_exists` | Trying to create-only a repo that already exists. |
 | `hf.shape_mismatch` | A pulled dataset's `card_data.pd_ocr_shape` doesn't match the requested task. |
-| `hf.lfs_quota` | LFS quota exceeded mid-upload. ([Q19](../OPEN_QUESTIONS.md)) |
+| `hf.lfs_quota` | LFS quota exceeded mid-upload. See the [deferred resilience work](../docs/context/intent-map.md). |
 | `publish.license_missing` | At least one row missing `license`. |
 | `publish.unpublished_source` | Model trained partially from local data. |
 | `publish.legacy_name` | Model's name is in legacy form. |

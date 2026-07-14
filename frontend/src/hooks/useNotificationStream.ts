@@ -111,6 +111,6 @@ export function useNotificationStream(
       for (const sub of subscriptions) sub.close();
     };
     // `signature` captures the meaningful contents of `jobs`.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- signature tracks job content without reconnecting on array identity changes
   }, [signature, eventSourceFactory]);
 }

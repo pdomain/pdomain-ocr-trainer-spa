@@ -1,4 +1,19 @@
+---
+Status: active
+Owner: CT
+Created: 2026-07-14
+Last verified: 2026-07-14
+Kind: process
+---
+
 # pdomain-ocr-trainer-spa conventions
+
+## Agent Index
+
+- **Kind:** process
+- **Status:** active
+- **Read when:** changing code, tests, lint configuration, or documentation.
+- **Search terms:** conventions, lint suppressions, Python invocation, specs.
 
 <!-- workspace-conventions:start -->
 
@@ -7,19 +22,18 @@
 **The rule.** Follow [Writing Style](docs/process/writing-style.md) for docs,
 reports, issue text, PR text, and user-facing copy.
 
-**Why.** Detailed style guidance belongs in a process doc. CONVENTIONS.md
-should stay short.
+**Why.** Detailed style guidance belongs in a process doc. CONVENTIONS.md should
+stay short.
 
 ## Rule: No comments explaining what code does
 
-**The rule.** Don't add comments that restate what the code does;
-well-named identifiers already do that. Only add a comment when the
-WHY is non-obvious: a hidden constraint, a subtle invariant, or a
-workaround for a specific bug.
+**The rule.** Don't add comments that restate what the code does; well-named
+identifiers already do that. Only add a comment when the WHY is non-obvious: a
+hidden constraint, a subtle invariant, or a workaround for a specific bug.
 
-**Why.** Comments rot when code changes and become misleading. The rule
-also applies to docstrings — one short line max; no multi-paragraph
-docstrings and no multi-line comment blocks.
+**Why.** Comments rot when code changes and become misleading. The rule also
+applies to docstrings — one short line max; no multi-paragraph docstrings and no
+multi-line comment blocks.
 
 **Common high-confidence violations** (bot auto-fix candidates)
 
@@ -27,14 +41,15 @@ docstrings and no multi-line comment blocks.
 - `# returns the X` or `# sets the Y` before a return/assignment statement.
 - Multi-line docstrings that explain every parameter with no non-obvious WHY.
 - Section divider blocks: `# ---…---` / `# ===…===` multi-line banners used as
-  navigation headers in test files — class names and blank lines already
-  provide structure; remove the banner, keep the blank lines.
+  navigation headers in test files — class names and blank lines already provide
+  structure; remove the banner, keep the blank lines.
 - Multi-paragraph module or class docstrings with a "Focus on:" / "Covers:"
   section — collapse to a single-line summary.
 
 **Common judgment-call violations** (bot flags, CT decides)
 
-- Comments that reference the PR, issue, or task that introduced the code — belongs in commit message, not source.
+- Comments that reference the PR, issue, or task that introduced the code —
+  belongs in commit message, not source.
 - Multi-line preamble that mixes WHY (worth keeping) with WHAT (worth removing).
 
 ## Rule: Unicode escape sequences for ruff-flagged ambiguous characters
@@ -53,12 +68,12 @@ all encodings. `# noqa: RUF00x` masks the problem instead of fixing it.
 
 **Common high-confidence violations** (bot auto-fix candidates)
 
-- A string literal containing `"hello – world"` written with the literal
-  `–` character instead of the escape sequence.
+- A string literal containing `"hello – world"` written with the literal `–`
+  character instead of the escape sequence.
 - `# noqa: RUF001`, `# noqa: RUF002`, or `# noqa: RUF003` suppressions instead
   of escape sequences.
-- `RUF002` or `RUF003` added to `[tool.ruff.lint] ignore` in `pyproject.toml`
-  to paper over ambiguous characters.
+- `RUF002` or `RUF003` added to `[tool.ruff.lint] ignore` in `pyproject.toml` to
+  paper over ambiguous characters.
 
 **Common judgment-call violations** (bot flags, CT decides)
 
@@ -87,14 +102,15 @@ fast (<200 ms warm) and always selects the project venv.
 
 **Common judgment-call violations** (bot flags, CT decides)
 
-- One-off REPL commands typed in CT's interactive shell — out of scope for this rule.
+- One-off REPL commands typed in CT's interactive shell — out of scope for this
+  rule.
 
 ## Rule: Design spec files live in `docs/specs/` until the milestone ships
 
 **The rule.** A design spec file produced by `/spec-from-issue` lives at
-`docs/specs/<date>-<topic>-design.md` while the milestone's chore issues are open.
-When the milestone's last chore closes and the implementation lands, move the file to
-`docs/architecture/` in a housekeeping commit:
+`docs/specs/<date>-<topic>-design.md` while the milestone's chore issues are
+open. When the milestone's last chore closes and the implementation lands, move
+the file to `docs/architecture/` in a housekeeping commit:
 
 ```bash
 git mv docs/specs/<date>-<topic>-design.md docs/architecture/
@@ -103,28 +119,30 @@ git commit -m "docs: promote <topic> spec to architecture/ (milestone shipped)"
 
 Update any `Spec: docs/specs/...` pointers in still-open issues after the move.
 
-**Why.** `docs/specs/` is the active working area — implementing agents follow `Spec:`
-pointers to find their instructions. `docs/architecture/` is the permanent design record
-for shipped features. Mixing shipped and in-progress specs in one directory makes it
-unclear which specs are still authoritative for ongoing work.
+**Why.** `docs/specs/` is the active working area — implementing agents follow
+`Spec:` pointers to find their instructions. `docs/architecture/` is the
+permanent design record for shipped features. Mixing shipped and in-progress
+specs in one directory makes it unclear which specs are still authoritative for
+ongoing work.
 
 **Common high-confidence violations** (bot auto-fix candidates)
 
-- A spec file remaining in `docs/specs/` after its milestone's last chore issue closes.
+- A spec file remaining in `docs/specs/` after its milestone's last chore issue
+  closes.
 
 **Common judgment-call violations** (bot flags, CT decides)
 
-- A milestone with one chore still open but all substantive work done — CT decides
-  whether to move the spec early or wait for the final chore to close.
+- A milestone with one chore still open but all substantive work done — CT
+  decides whether to move the spec early or wait for the final chore to close.
 
 ## Rule: Document every lint-rule suppression
 
-**The rule.** Prefer fixing the underlying issue; suppress a lint rule only
-when the deviation is genuinely correct (e.g. an optional dependency import
-guarded by `try`/`except`). When a suppression *is* warranted —
+**The rule.** Prefer fixing the underlying issue; suppress a lint rule only when
+the deviation is genuinely correct (e.g. an optional dependency import guarded
+by `try`/`except`). When a suppression _is_ warranted —
 `# pyright: ignore[...]`, `# type: ignore[...]`, `# noqa: ...`, or a
 `[tool.ruff.lint]` `ignore` / `per-file-ignores` entry — it must (1) carry a
-short inline rationale at the point of deviation explaining *why* the
+short inline rationale at the point of deviation explaining _why_ the
 suppression is safe, and (2) be catalogued in the repo's
 `docs/conventions/lint-deviations.md`, which records the rule, the tool, the
 file locations, and the justification. Use basedpyright's native
@@ -135,9 +153,8 @@ codes are not honored by basedpyright.
 reviewed decision or a shortcut, and rots silently when the surrounding code
 changes. The inline comment makes intent visible where the code is read; the
 central doc makes the whole suppression set auditable in one place so it can't
-quietly grow. This rule is the escape valve for the
-"Unicode escape sequences" rule above — when a `# noqa` genuinely must stay,
-this is how it gets justified.
+quietly grow. This rule is the escape valve for the "Unicode escape sequences"
+rule above — when a `# noqa` genuinely must stay, this is how it gets justified.
 
 **Common high-confidence violations** (bot auto-fix candidates)
 

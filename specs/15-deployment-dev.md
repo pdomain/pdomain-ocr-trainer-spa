@@ -30,7 +30,6 @@ pdomain-ocr-trainer-spa/
 ├── .pre-commit-config.yaml
 ├── .gitignore
 ├── specs/                          (this directory)
-├── OPEN_QUESTIONS.md
 ├── src/pdomain_ocr_trainer_spa/         (Python package)
 ├── frontend/                       (Vite / React)
 └── tests/
@@ -195,7 +194,8 @@ process **never imports `torch`** — only the worker does.
 - MPS: opportunistically offered in the device dropdown when the
   platform reports it available; some DocTR ops fall back to CPU
   and stay slow. A banner warns if the user pins `mps` with an arch
-  known to be slow on CPU fallback ([Q25](../OPEN_QUESTIONS.md)).
+  known to be slow on CPU fallback (see the
+  [deferred MPS guidance](../docs/context/intent-map.md)).
 - CPU: supported, but only useful for tiny smoke runs.
 
 ---
@@ -206,8 +206,9 @@ There is **no doctr clone or submodule** (D-T9). DocTR is a normal
 dependency of `pdomain-ocr-training`, declared in that package's
 `pyproject.toml`; `uv` resolves it transitively. Any `CUSTOM:` vocab
 handling is entirely a `pdomain-ocr-training` concern — the SPA neither
-clones, vendors, nor patches doctr. ([Q26](../OPEN_QUESTIONS.md) is
-resolved.)
+clones, vendors, nor patches doctr. (The
+[DocTR dependency decision](17-decisions.md#d-t9-doctr-is-a-dependency-of-pdomain-ocr-training) records why the earlier
+clone question is resolved.)
 
 ---
 

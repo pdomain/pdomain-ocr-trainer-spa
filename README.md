@@ -1,41 +1,43 @@
+---
+Status: active
+Owner: CT
+Created: 2026-05-21
+Last verified: 2026-07-14
+Kind: architecture
+---
+
 # pdomain-ocr-trainer-spa
 
-FastAPI + React/Vite/TS replacement for the NiceGUI-based
-[`pdomain-ocr-training`](../pdomain-ocr-training/) UI. Same training and dataset
-machinery, web SPA front-end, structurally modelled on
-[`pdomain-ocr-labeler-spa`](../pdomain-ocr-labeler-spa/) and
-[`pdomain-prep-for-pgdp`](../pdomain-prep-for-pgdp/).
+## Agent Index
 
-> **Status:** M0–M9 shipped. M10 (HF read path) in progress.
-> Implementation is milestone-driven (see
-> [`specs/16-milestones.md`](specs/16-milestones.md)).
+- **Kind:** architecture
+- **Status:** active
+- **Read when:** orienting to the product, its shipped scope, or current work.
+- **Search terms:** OCR trainer, FastAPI, React, workflows, architecture.
 
-## What it is
+This repository contains the FastAPI and React/TypeScript OCR trainer SPA. It
+replaces the NiceGUI user interface from
+[pdomain-ocr-training](https://github.com/pdomain/pdomain-ocr-training) while
+continuing to use that package's training contracts.
 
-The trainer side of the OCR pipeline: profile management, dataset
-kanban (Unassigned / Training / Validation), DocTR detection and recognition
-training runs, evaluation slicing, model registry, and Hugging Face dataset /
-model publishing. The typeface-classifier dataset and UI workflow ship, but a
-real `train_typeface` runner is still unavailable. Glyph-classifier datasets
-are reserved, and their training workflow is not implemented yet.
+The shipped application manages profiles, dataset kanbans, detection and
+recognition runs, evaluation, models, and Hugging Face read and publish flows.
+The typeface dataset and browser workflow are present, but production typeface
+training and evaluation still depend on upstream contracts. Glyph-classifier
+training is not implemented.
 
-The legacy `pdomain-ocr-training` keeps working unchanged until parity ships
-here. Both consume and emit the same on-disk shapes
-(`ml-training/<profile>/{detection,recognition}/`,
-`ml-validation/<profile>/...`, `matched-ocr/`, the `dist/` model
-artefacts) so they can coexist on the same machine during the
-transition.
+## Current documentation
 
-## Specs are the source of truth
-
-Read [`specs/00-overview.md`](specs/00-overview.md) first. Every other
-spec is linked from there.
-
-If reality forces a deviation from a spec, **update the spec first,
-then the code.** Code that disagrees with the spec is wrong.
-
-Open questions live in [`OPEN_QUESTIONS.md`](OPEN_QUESTIONS.md).
+- [Trainer workflows](docs/architecture/trainer-workflows.md) records shipped
+  architecture and evidence.
+- [Labeler import and freshness](docs/architecture/labeler-import-and-freshness.md)
+  records the labeler export boundary.
+- [Current state](docs/context/current-state.md),
+  [intent map](docs/context/intent-map.md), and
+  [decisions](docs/context/decisions.md) separate present truth, remaining work,
+  and durable rationale.
+- [Development guide](DEVELOPMENT.md) gives repository-backed commands.
 
 ## License
 
-Same as the other `pdomain` repos. See `LICENSE` once it lands.
+The project uses the Unlicense, as declared in `pyproject.toml`.

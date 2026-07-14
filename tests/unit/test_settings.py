@@ -8,7 +8,7 @@ from pdomain_ocr_trainer_spa.settings import Settings
 
 
 def test_mode_configured_when_explicit(tmp_path: Path) -> None:
-    s = Settings(labeler_export_root=tmp_path)  # type: ignore[arg-type]
+    s = Settings(labeler_export_root=tmp_path)  # type: ignore[arg-type]  # Settings accepts Path values at runtime
     assert s.labeler_export_root == tmp_path
 
 

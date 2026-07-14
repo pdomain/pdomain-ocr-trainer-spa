@@ -70,7 +70,7 @@ rendering — [`07-evaluation-and-metrics.md`](07-evaluation-and-metrics.md)
   `ITrainingRunner` Protocol (D-T1).
 - Model: a small CNN with a **multi-head sigmoid** output — one head
   per binary feature. Shared trunk + per-feature heads
-  ([Q10](../OPEN_QUESTIONS.md)); architecture finalized by
+  (see the [blocked glyph-classifier work](../docs/context/intent-map.md)); architecture finalized by
   experiment.
 - Training data: `pdomain-ocr-synth` (primary, weight ~0.8) +
   human-labeled crops from `pd-ocr-labeler` (secondary, weight ~0.2,

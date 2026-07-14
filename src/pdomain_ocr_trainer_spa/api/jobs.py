@@ -194,8 +194,8 @@ async def _event_stream(
     yield f"retry: {_SSE_RETRY_MS}\n\n"
     # pdomain-ops Protocol-shape quirk: stream_events is declared `async def
     # -> AsyncIterator` but every impl is an async generator (directly
-    # iterable). See docs/process/lint-deviations.md.
-    async for event in runner.stream_events(job_id):  # pyright: ignore[reportGeneralTypeIssues]
+    # iterable). See docs/conventions/lint-deviations.md.
+    async for event in runner.stream_events(job_id):  # pyright: ignore[reportGeneralTypeIssues]  # concrete runners return async generators
         if last_event_id is None or event.seq > last_event_id:
             _persist_progress(state, run_id, event)
         if last_event_id is not None and event.seq <= last_event_id:

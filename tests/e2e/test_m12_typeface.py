@@ -57,13 +57,13 @@ def _wait_for_port(host: str, port: int, timeout: float = 5.0) -> None:
 
 def _make_settings(tmp: Path) -> Settings:
     s = Settings(
-        app_data_root=tmp / "app",  # type: ignore[arg-type]
-        ml_training_dir=tmp / "train",  # type: ignore[arg-type]
-        ml_validation_dir=tmp / "val",  # type: ignore[arg-type]
-        matched_ocr_dir=tmp / "matched-ocr",  # type: ignore[arg-type]
-        shared_models_dir=tmp / "shared-models",  # type: ignore[arg-type]
-        runs_dir=tmp / "runs",  # type: ignore[arg-type]
-        jobs_db_path=tmp / "jobs.db",  # type: ignore[arg-type]
+        app_data_root=tmp / "app",  # type: ignore[arg-type]  # Settings accepts Path values at runtime
+        ml_training_dir=tmp / "train",  # type: ignore[arg-type]  # Settings accepts Path values at runtime
+        ml_validation_dir=tmp / "val",  # type: ignore[arg-type]  # Settings accepts Path values at runtime
+        matched_ocr_dir=tmp / "matched-ocr",  # type: ignore[arg-type]  # Settings accepts Path values at runtime
+        shared_models_dir=tmp / "shared-models",  # type: ignore[arg-type]  # Settings accepts Path values at runtime
+        runs_dir=tmp / "runs",  # type: ignore[arg-type]  # Settings accepts Path values at runtime
+        jobs_db_path=tmp / "jobs.db",  # type: ignore[arg-type]  # Settings accepts Path values at runtime
         job_runner_kind="fake",
         model_registry_kind="fake",
         host="127.0.0.1",
@@ -95,7 +95,7 @@ def typeface_settings(tmp_path_factory: pytest.TempPathFactory) -> Settings:
 
 
 @pytest.fixture(scope="module")
-def typeface_client(typeface_settings: Settings):  # type: ignore[no-untyped-def]
+def typeface_client(typeface_settings: Settings):  # type: ignore[no-untyped-def]  # pytest fixture return is supplied by TestClient
     """FastAPI TestClient backed by the typeface-seeded settings."""
     from fastapi.testclient import TestClient
 
@@ -136,7 +136,7 @@ def live_server(tmp_path_factory: pytest.TempPathFactory) -> Generator[str]:
 
 
 @pytest.mark.e2e
-def test_typeface_kanban_api_returns_200(typeface_client) -> None:  # type: ignore[no-untyped-def]
+def test_typeface_kanban_api_returns_200(typeface_client) -> None:  # type: ignore[no-untyped-def]  # pytest injects an untyped fixture
     """GET .../datasets/typeface-classification/kanban → 200 with kanban view."""
     resp = typeface_client.get(
         "/api/profiles/testprofile/datasets/typeface-classification/kanban",
@@ -148,7 +148,7 @@ def test_typeface_kanban_api_returns_200(typeface_client) -> None:  # type: igno
 
 
 @pytest.mark.e2e
-def test_typeface_kanban_columns_present(typeface_client) -> None:  # type: ignore[no-untyped-def]
+def test_typeface_kanban_columns_present(typeface_client) -> None:  # type: ignore[no-untyped-def]  # pytest injects an untyped fixture
     """Kanban view has unassigned, train, val columns with the seeded crop."""
     resp = typeface_client.get(
         "/api/profiles/testprofile/datasets/typeface-classification/kanban",
@@ -162,7 +162,7 @@ def test_typeface_kanban_columns_present(typeface_client) -> None:  # type: igno
 
 
 @pytest.mark.e2e
-def test_run_form_accepts_typeface_classification(typeface_client) -> None:  # type: ignore[no-untyped-def]
+def test_run_form_accepts_typeface_classification(typeface_client) -> None:  # type: ignore[no-untyped-def]  # pytest injects an untyped fixture
     """POST /api/runs with task=typeface-classification → 202."""
     resp = typeface_client.post(
         "/api/runs",
@@ -178,7 +178,7 @@ def test_run_form_accepts_typeface_classification(typeface_client) -> None:  # t
 
 
 @pytest.mark.e2e
-def test_spa_root_serves_html(typeface_client) -> None:  # type: ignore[no-untyped-def]
+def test_spa_root_serves_html(typeface_client) -> None:  # type: ignore[no-untyped-def]  # pytest injects an untyped fixture
     """GET / serves the SPA index.html (catch-all active)."""
     resp = typeface_client.get("/")
     assert resp.status_code == 200
@@ -186,7 +186,7 @@ def test_spa_root_serves_html(typeface_client) -> None:  # type: ignore[no-untyp
 
 
 @pytest.mark.e2e
-def test_spa_typeface_subpath_serves_html(typeface_client) -> None:  # type: ignore[no-untyped-def]
+def test_spa_typeface_subpath_serves_html(typeface_client) -> None:  # type: ignore[no-untyped-def]  # pytest injects an untyped fixture
     """GET /profiles/testprofile/datasets/typeface-classification serves HTML.
 
     The React Router sub-path is handled by the SPA catch-all.
@@ -206,7 +206,7 @@ def test_spa_typeface_subpath_serves_html(typeface_client) -> None:  # type: ign
 @pytest.mark.e2e
 @pytest.mark.filterwarnings("ignore::DeprecationWarning:websockets")
 @pytest.mark.filterwarnings("ignore::DeprecationWarning:uvicorn")
-def test_browser_home_page_loads(page, live_server: str) -> None:  # type: ignore[no-untyped-def]
+def test_browser_home_page_loads(page, live_server: str) -> None:  # type: ignore[no-untyped-def]  # Playwright page fixture is untyped
     """SPA index.html is served; Playwright can reach the fake home-page testid."""
     errors: list[str] = []
     page.on("console", lambda msg: errors.append(msg.text) if msg.type == "error" else None)
@@ -218,7 +218,7 @@ def test_browser_home_page_loads(page, live_server: str) -> None:  # type: ignor
 @pytest.mark.e2e
 @pytest.mark.filterwarnings("ignore::DeprecationWarning:websockets")
 @pytest.mark.filterwarnings("ignore::DeprecationWarning:uvicorn")
-def test_browser_typeface_kanban_api(live_server: str) -> None:  # type: ignore[no-untyped-def]
+def test_browser_typeface_kanban_api(live_server: str) -> None:  # type: ignore[no-untyped-def]  # pytest fixture typing is external to this test
     """GET /api/profiles/testprofile/datasets/typeface-classification/kanban
     returns 200 from a real uvicorn server."""
     import requests
@@ -235,7 +235,7 @@ def test_browser_typeface_kanban_api(live_server: str) -> None:  # type: ignore[
 @pytest.mark.e2e
 @pytest.mark.filterwarnings("ignore::DeprecationWarning:websockets")
 @pytest.mark.filterwarnings("ignore::DeprecationWarning:uvicorn")
-def test_browser_run_creation(live_server: str) -> None:  # type: ignore[no-untyped-def]
+def test_browser_run_creation(live_server: str) -> None:  # type: ignore[no-untyped-def]  # pytest fixture typing is external to this test
     """POST /api/runs with typeface-classification returns 202 from a real
     uvicorn server."""
     import requests
@@ -257,7 +257,7 @@ def test_browser_run_creation(live_server: str) -> None:  # type: ignore[no-unty
 @pytest.mark.e2e
 @pytest.mark.filterwarnings("ignore::DeprecationWarning:websockets")
 @pytest.mark.filterwarnings("ignore::DeprecationWarning:uvicorn")
-def test_browser_typeface_subpath_direct_load(page, live_server: str) -> None:  # type: ignore[no-untyped-def]
+def test_browser_typeface_subpath_direct_load(page, live_server: str) -> None:  # type: ignore[no-untyped-def]  # Playwright page fixture is untyped
     """React Router sub-path /profiles/testprofile/datasets/typeface-classification
     renders via the SPA catch-all when loaded directly in a browser."""
     page.goto(f"{live_server}/profiles/testprofile/datasets/typeface-classification")

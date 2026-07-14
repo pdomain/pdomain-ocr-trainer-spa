@@ -5,7 +5,7 @@ coding agent can deliver it in one session, with the listed
 acceptance tests passing.
 
 > **Required reading before starting any milestone:**
-> [`00-overview.md`](00-overview.md), [`OPEN_QUESTIONS.md`](../OPEN_QUESTIONS.md),
+> [`00-overview.md`](00-overview.md), the [intent map](../docs/context/intent-map.md),
 > [`17-decisions.md`](17-decisions.md), the per-area specs listed in
 > the milestone.
 
@@ -388,7 +388,8 @@ typeface kanban variant.
   eval, publish.
 
 **Pre-conditions.** M11. The typeface-classification training task
-must exist in `pdomain-ocr-training` ([Q9](../OPEN_QUESTIONS.md)).
+must exist in `pdomain-ocr-training` (see the
+[blocked production round-trip](../docs/context/intent-map.md)).
 
 ---
 

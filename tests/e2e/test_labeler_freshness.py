@@ -94,10 +94,10 @@ def live_server(tmp_path_factory: pytest.TempPathFactory, export_tree: Path) -> 
     tmp = tmp_path_factory.mktemp("app")
     app_data_root = tmp / "app"
     s = Settings(
-        labeler_export_root=export_tree,  # type: ignore[arg-type]
-        app_data_root=app_data_root,  # type: ignore[arg-type]
-        runs_dir=tmp / "runs",  # type: ignore[arg-type]
-        jobs_db_path=tmp / "jobs.db",  # type: ignore[arg-type]
+        labeler_export_root=export_tree,  # type: ignore[arg-type]  # Settings accepts Path values at runtime
+        app_data_root=app_data_root,  # type: ignore[arg-type]  # Settings accepts Path values at runtime
+        runs_dir=tmp / "runs",  # type: ignore[arg-type]  # Settings accepts Path values at runtime
+        jobs_db_path=tmp / "jobs.db",  # type: ignore[arg-type]  # Settings accepts Path values at runtime
         job_runner_kind="fake",
         model_registry_kind="fake",
     )

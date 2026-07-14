@@ -176,7 +176,8 @@ recognition fields stay `None`.
   - "Custom path": filepicker. Validates existence on submit.
   - "Hugging Face dataset": dataset repo + revision; gated by
     `Settings.enable_hf_publish` flag (HF read path is enabled on
-    the same flag for v1; can split later — [Q15](../OPEN_QUESTIONS.md)).
+    the same flag for v1; can split later; see the
+    [migration decisions](../docs/context/decisions.md)).
 - Checkboxes:
   - `[ ] Slice by glyph annotations` (recognition only).
   - `[ ] Persist per-prediction details` (recognition only).
@@ -225,7 +226,7 @@ A regression-alert script (not part of the SPA itself) consumes
   `n_pos >= 30`.
 
 Spec for the webhook lives outside this repo
-([Q16](../OPEN_QUESTIONS.md)).
+(see the [deferred regression-alert work](../docs/context/intent-map.md)).
 
 ---
 

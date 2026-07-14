@@ -146,7 +146,8 @@ OS-aware fallbacks, same env var precedence. Prefix is
 legacy trainer. `job_runner_kind` selects which `pdomain-ocr-ops`
 `LongJobRunner` implementation backs long jobs (`local` is the only
 one wired for core parity; `modal` / `shared_container` are
-`pdomain-ocr-ops` concerns, not SPA adapters). ([Q7](../OPEN_QUESTIONS.md))
+`pdomain-ocr-ops` concerns, not SPA adapters). See the
+[trainer workflow architecture](../docs/architecture/trainer-workflows.md).
 
 ---
 
@@ -324,7 +325,8 @@ the value shape as opaque.
 legacy `PD_OCR_TRAINER_ML_TRAINING_DIR` / `..._ML_VALIDATION_DIR` env
 vars (not the SPA prefix). The `local` adapter must set those env
 vars from `Settings` before importing the module, and import it
-lazily. ([Q7](../OPEN_QUESTIONS.md))
+lazily. See the
+[trainer workflow architecture](../docs/architecture/trainer-workflows.md).
 
 `huggingface` impl is **deferred — post-core-parity** (D-T2); the
 file is `NotImplementedYet`.
@@ -341,7 +343,8 @@ class IModelRegistry(Protocol):
 
 `filesystem` impl manages `<shared-models>/<profile>/<task>/...`.
 `huggingface_hub` impl wraps `HfApi.upload_large_folder`; gated by
-`Settings.enable_hf_publish` (D-T2). ([Q8](../OPEN_QUESTIONS.md))
+`Settings.enable_hf_publish` (D-T2). See the
+[dataset-source decision](17-decisions.md#d-t2-dataset-sources--local-in-core-huggingface-deferred).
 
 ---
 
@@ -414,7 +417,8 @@ supervised subprocess stdout into `JobEvent`s exposed by
 > `@@PDEVENT@@` prefix. Until that lands, `stream_events()` yields
 > only terminal state and the SPA progress bar/log stream are blank
 > mid-run. Tracked as a `pdomain-ocr-ops` feature request — see
-> [Q27](../OPEN_QUESTIONS.md). The `@@PDEVENT@@` line format above is
+> The [trainer workflow architecture](../docs/architecture/trainer-workflows.md)
+> records the shipped worker boundary. The `@@PDEVENT@@` line format above is
 > the proposed contract for that parser.
 
 ### 5.3 Crash recovery

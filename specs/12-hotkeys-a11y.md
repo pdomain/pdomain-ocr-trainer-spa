@@ -34,7 +34,7 @@ operation.
 | `g m` | Go to Models | |
 | `g e` | Go to Eval | |
 | `g s` | Go to Settings | |
-| `Ctrl/Cmd+K` | Open command palette | v2 ([Q23](../OPEN_QUESTIONS.md)). |
+| `Ctrl/Cmd+K` | Open command palette | Deferred; see the [intent map](../docs/context/intent-map.md). |
 | `Esc` | Close active dialog / clear selection | Dialog wins over selection. |
 
 ---

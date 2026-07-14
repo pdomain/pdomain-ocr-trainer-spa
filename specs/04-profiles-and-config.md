@@ -69,7 +69,8 @@ Setting a field to `null` clears it on disk (the file is rewritten
 without the field; if both `language` and `typeface` end up null the
 `profile.toml` is deleted). Both the training-side and
 validation-side `profile.toml` are kept in sync (D-T5); a detected
-mismatch at load is `409` ([Q5](../OPEN_QUESTIONS.md)).
+mismatch at load is `409` (see the
+[migration decisions](../docs/context/decisions.md)).
 
 ### 1.5 Delete
 
@@ -215,7 +216,8 @@ not the legacy `100`, and the `vocab` substitution):
 ```
 
 **Typeface classification** (new task; the config model is a future
-`pdomain-ocr-training` addition — [Q9](../OPEN_QUESTIONS.md)):
+`pdomain-ocr-training` addition; see the
+[blocked production round-trip](../docs/context/intent-map.md)):
 
 ```json
 {
@@ -230,7 +232,7 @@ not the legacy `100`, and the `vocab` substitution):
 ```
 
 **Glyph classification** (new task; future `pdomain-ocr-training`
-addition — [Q10](../OPEN_QUESTIONS.md)):
+addition; see the [blocked glyph-classifier work](../docs/context/intent-map.md)):
 
 ```json
 {

@@ -66,7 +66,8 @@ class TypefaceEnum(str, Enum):
 The literal `typeface` value is **only** valid on classifier datasets
 and classifier models, and is rejected when set on a detection or
 recognition profile that's about to be published. The SPA validates
-this at publish time, never at profile-create time. ([Q4](../OPEN_QUESTIONS.md))
+this at publish time, never at profile-create time. See the
+[profile source-of-truth decision](17-decisions.md#d-t5-profiletoml-is-the-source-of-truth-for-language--typeface).
 
 ### 1.2 On-disk profile state
 
@@ -83,7 +84,8 @@ sidecar at `ml-training/<name>/profile.toml` (and mirrored in
 `ml-validation/<name>/profile.toml`). The legacy trainer doesn't
 write this file; the SPA introduces it. Both files must agree on
 load — disagreement is a 409 `profile.toml.conflict` error from the
-backend, surfaced as a toast with a "Resolve" link. ([Q5](../OPEN_QUESTIONS.md))
+backend, surfaced as a toast with a "Resolve" link. See the
+[profile source-of-truth decision](17-decisions.md#d-t5-profiletoml-is-the-source-of-truth-for-language--typeface).
 
 ```toml
 # ml-training/clogaelach/profile.toml
@@ -365,8 +367,8 @@ interface UserPrefs {
   drop the unknown row from list views.
 - Sidecar schema changes follow the same rule. The sidecar carries
   no version field by design — the schema is append-only.
-  ([Q6](../OPEN_QUESTIONS.md): do we add an explicit
-  `sidecar_schema: int` for safety?)
+  (see the [append-only sidecar decision](17-decisions.md#d-t16-sidecar-schema-is-append-only-by-convention): do we add an
+  explicit `sidecar_schema: int` for safety?)
 
 ---
 
