@@ -14,10 +14,7 @@ license = { text = "Unlicense" }
 requires-python = ">=3.13"
 dependencies = [
     "pdomain-book-tools>=0.18.3",
-    # Pin stays at 0.11.0: 0.11.1 hard-pins fastapi<0.137, incompatible with
-    # our resolved fastapi (0.139). Deferred until the pdomain-ops pin
-    # relaxes (ocr-container-meta#399).
-    "pdomain-ops>=0.11.0",
+    "pdomain-ops>=0.11.2",  # 0.11.2 loosened fastapi/starlette pins (device-display fix)
     # pdomain-ocr-training base install is torch-free: the FastAPI web process
     # imports only the typed config models + ITrainingRunner Protocol.
     # The training worker needs the heavy stack — see the `train` extra.
