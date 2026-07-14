@@ -63,7 +63,7 @@ export function NewRunPage(): React.JSX.Element {
         args,
         qualifier: qualifier || null,
       });
-      navigate(`/runs/${resp.run_id}`);
+      await navigate(`/runs/${resp.run_id}`);
     } catch (err) {
       setError(
         err instanceof ApiError

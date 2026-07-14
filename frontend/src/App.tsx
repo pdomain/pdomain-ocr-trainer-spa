@@ -88,7 +88,7 @@ function AppShellWithHeader(): React.JSX.Element {
   const navigate = useNavigate();
   useTrainerShortcuts();
   const env = getAppEnv();
-  const jobsProps = makeJobsProps(dock, (id) => navigate(`/runs/${id}`));
+  const jobsProps = makeJobsProps(dock, (id) => void navigate(`/runs/${id}`));
   return (
     <AppShell
       appId="pdomain-ocr-trainer-spa"

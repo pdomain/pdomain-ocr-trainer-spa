@@ -14,9 +14,5 @@
     "clsx"
   ],
   "ignoreExportsUsedInFile": true,
-  "ignore": [
-    "src/api/**",
-    "src/components/AppToaster.tsx",
-    "src/jsx-dev-runtime-shim.ts"
-  ]
+  "ignore": ["src/api/**", "src/components/AppToaster.tsx"]
 }

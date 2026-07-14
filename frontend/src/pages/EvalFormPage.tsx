@@ -62,7 +62,7 @@ export function EvalFormPage(): React.JSX.Element {
         slice_glyph_features: sliceGlyph,
         persist_predictions: persistPred,
       });
-      navigate(`/runs/${resp.run_id}`);
+      await navigate(`/runs/${resp.run_id}`);
     } catch (err) {
       setError(
         err instanceof ApiError

@@ -60,7 +60,9 @@ export function PublishDialog({
   const effectiveLicense =
     license === "__custom__" ? customLicense.trim() : license;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (
+    e: React.SyntheticEvent<HTMLFormElement, SubmitEvent>,
+  ) => {
     e.preventDefault();
     setError(null);
     setSubmitting(true);

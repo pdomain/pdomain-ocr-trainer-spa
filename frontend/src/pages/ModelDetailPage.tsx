@@ -45,7 +45,7 @@ export function ModelDetailPage(): React.JSX.Element {
     try {
       const updated = await renameModel(name, newName);
       setRenaming(false);
-      navigate(`/models/${encodeURIComponent(updated.model.name)}`);
+      await navigate(`/models/${encodeURIComponent(updated.model.name)}`);
     } catch (err) {
       setError(
         err instanceof ApiError
@@ -61,7 +61,7 @@ export function ModelDetailPage(): React.JSX.Element {
     if (!window.confirm(`Delete model ${name}?`)) return;
     try {
       await deleteModel(name);
-      navigate("/models");
+      await navigate("/models");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Delete failed");
     }
