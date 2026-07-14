@@ -1,0 +1,7 @@
+{
+  "app_id": "pdomain-ocr-trainer-spa",
+  "display_name": "OCR Trainer",
+  "package": "pdomain-ocr-trainer-spa",
+  "default_port": 8081,
+  "icon": "ocr-trainer"
+}
