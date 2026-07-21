@@ -74,6 +74,8 @@ merging.
   `TypefaceConfig` + real `train_typeface` / `evaluate_typeface` in
   `pdomain-ocr-training`. Local stub + FakeTrainingRunner remain until then.
   Plan: [M12 typeface classifier](plans/2026-06-10-m12-typeface-classifier.md).
+  Governed issue:
+  [M12 Typeface classifier](issues/2026-07-21-gh-014-m12-typeface-classifier.md).
 
 ## Next
 
@@ -81,6 +83,8 @@ merging.
   `GlyphAnnotations`-keyed slices and per-feature metrics rows. Acceptance from
   `specs/07-evaluation-and-metrics.md` §8. Depends on core HF / eval path
   stability (former #13 is closed).
+  Governed issue:
+  [M13 Glyph eval slicing](issues/2026-07-21-gh-015-m13-glyph-eval-slicing.md).
 
 ## Later
 
@@ -88,6 +92,15 @@ merging.
   `pdomain-ocr-training`, extend run form and eval pages, publish round-trip per
   ROADMAP (g2). Blocked on M13 and upstream glyph training contracts (see
   intent map).
+  Governed issue:
+  [M14 Glyph classifier](issues/2026-07-21-gh-016-m14-glyph-classifier.md).
+
+## Umbrella
+
+- **M0–M14 milestone program** (former GH #1). Parent provenance for the
+  program; open children are the issue files above.
+  Governed issue:
+  [milestone roadmap](issues/2026-07-21-gh-001-milestone-roadmap.md).
 
 ## Blocked / upstream
 
@@ -118,5 +131,6 @@ merging.
 | #21 | [nightly] slow tests 2026-05-23 | Transient CI; closed |
 | #24 | Re-enable downgraded ESLint rules | Closed 2026-06-10; residual may live under lint catalogue |
 
-Former GH #1 was the umbrella M0–M14 tracking issue. Open legs of that plan are
-the Now / Next / Later items above; closed legs are this ledger.
+Former GH #1 is the umbrella M0–M14 tracking issue
+([issue file](issues/2026-07-21-gh-001-milestone-roadmap.md)). Open legs are the
+Now / Next / Later items above; closed legs are this ledger.

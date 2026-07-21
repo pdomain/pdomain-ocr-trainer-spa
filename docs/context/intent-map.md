@@ -20,10 +20,11 @@ Kind: context
 - **Complete the typeface production round-trip.** Keep the existing dataset,
   SPA, and API seam aligned while upstream `TypefaceConfig`, `train_typeface`,
   and real evaluation remain unfinished. Evidence:
-  [partial M12 plan](../plans/2026-06-10-m12-typeface-classifier.md). Standing
-  backlog: [roadmap](../roadmap.md) (former GH #14 / M12).
-- **Unify jobs surfaces.** Resolve dual progress UI (SSE toasts vs AppShell
-  jobs dock). Governed issue:
+  [partial M12 plan](../plans/2026-06-10-m12-typeface-classifier.md). Issue:
+  [M12 Typeface classifier](../issues/2026-07-21-gh-014-m12-typeface-classifier.md)
+  (former GH #14).
+- **Unify jobs surfaces.** Resolve dual progress UI residual (SSE toasts vs
+  AppShell jobs dock). Issue:
   [unify jobs surfaces](../issues/2026-07-21-gh-025-unify-jobs-surfaces.md)
   (former GH #25).
 - **Keep lint exceptions auditable.** Any configured or inline suppression must
@@ -32,6 +33,14 @@ Kind: context
 
 ## Open issues
 
+- [pd-ocr-trainer-spa milestone roadmap (M0–M14)](../issues/2026-07-21-gh-001-milestone-roadmap.md)
+  (former GH #1; umbrella)
+- [M12 Typeface classifier](../issues/2026-07-21-gh-014-m12-typeface-classifier.md)
+  (former GH #14)
+- [M13 Glyph eval slicing](../issues/2026-07-21-gh-015-m13-glyph-eval-slicing.md)
+  (former GH #15)
+- [M14 Glyph classifier](../issues/2026-07-21-gh-016-m14-glyph-classifier.md)
+  (former GH #16)
 - [Unify jobs surfaces: SSE toasts vs AppShell jobs dock](../issues/2026-07-21-gh-025-unify-jobs-surfaces.md)
   (former GH #25)
 

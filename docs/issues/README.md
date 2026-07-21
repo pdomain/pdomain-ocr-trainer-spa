@@ -60,11 +60,11 @@ than in per-machine harness memory.
   it** from a governed doc — the link would dangle. Refer to it by path / inline
   code.
 
-Standing product and milestone backlog lives in
-[`docs/roadmap.md`](../roadmap.md), not as one file per former GitHub number.
-Use this folder for evidence-bearing bugs and investigations only. The GitHub
-Issues feature stays enabled, but the remote tracker is intended empty after
-cutover; see
+Standing product ordering still lives in [`docs/roadmap.md`](../roadmap.md).
+Every **open** former GitHub issue also has an individual report in this folder
+(cutover 2026-07-21). Closed issues stay in the git archive tombstone only. The
+GitHub Issues feature stays enabled, but the remote tracker is intended empty
+after cutover; see
 [`docs/decisions/2026-07-21-github-issues-cutover.md`](../decisions/2026-07-21-github-issues-cutover.md).
 
 ## Recommended structure
@@ -78,6 +78,14 @@ Lead with the **smallest decisive evidence**, separate **observation** from
 
 ## Open issues
 
+- [pd-ocr-trainer-spa milestone roadmap (M0–M14)](2026-07-21-gh-001-milestone-roadmap.md)
+  (former GH #1; umbrella)
+- [M12 Typeface classifier](2026-07-21-gh-014-m12-typeface-classifier.md)
+  (former GH #14; Now)
+- [M13 Glyph eval slicing](2026-07-21-gh-015-m13-glyph-eval-slicing.md)
+  (former GH #15; Next)
+- [M14 Glyph classifier](2026-07-21-gh-016-m14-glyph-classifier.md)
+  (former GH #16; Later)
 - [Unify jobs surfaces: SSE toasts vs AppShell jobs dock](2026-07-21-gh-025-unify-jobs-surfaces.md)
   (former GH #25; Now)
 

@@ -34,11 +34,11 @@ Open set:
 
 | Former GH | Title | Cutover destination |
 | --- | --- | --- |
-| #1 | M0–M14 umbrella roadmap | [`docs/roadmap.md`](../roadmap.md) (standing plan + shipped ledger) |
-| #14 | M12 Typeface classifier | Roadmap **Now** (SPA shipped; upstream gate) |
-| #15 | M13 Glyph eval slicing | Roadmap **Next** |
-| #16 | M14 Glyph classifier | Roadmap **Later** / intent map Blocked |
-| #25 | Unify jobs surfaces | Roadmap **Now** + governed issue report |
+| #1 | M0–M14 umbrella roadmap | [issue file](../issues/2026-07-21-gh-001-milestone-roadmap.md) + roadmap |
+| #14 | M12 Typeface classifier | [issue file](../issues/2026-07-21-gh-014-m12-typeface-classifier.md) + roadmap Now |
+| #15 | M13 Glyph eval slicing | [issue file](../issues/2026-07-21-gh-015-m13-glyph-eval-slicing.md) + roadmap Next |
+| #16 | M14 Glyph classifier | [issue file](../issues/2026-07-21-gh-016-m14-glyph-classifier.md) + roadmap Later |
+| #25 | Unify jobs surfaces | [issue file](../issues/2026-07-21-gh-025-unify-jobs-surfaces.md) + roadmap Now |
 
 Closed set (#2–#13, #17–#19, #21, #24): completed milestones, short-lived CI
 noise, and finished chores. Bodies were archived into
@@ -56,9 +56,11 @@ used by `pdomain-ocr-cli` and `pdomain-ocr-simple-gui`.
    to **zero** after the archive commit exists and a human approves deletion.
 2. **Treat `docs/roadmap.md` as the standing backlog** for open product and
    milestone work. Tags like `former GH #25` are provenance only.
-3. **Use `docs/issues/`** only for governed, evidence-bearing bug and
-   investigation reports (template: `docs/issues/TEMPLATE.md`). At cutover only
-   former #25 meets that bar among open items.
+3. **Use `docs/issues/`** for governed issue reports (template:
+   `docs/issues/TEMPLATE.md`). **Every open** former GitHub issue has an
+   individual file (#1, #14, #15, #16, #25). Closed issues are not recreated as
+   live files; they remain in the archive tombstone and the roadmap shipped
+   ledger.
 4. **Do not file routine backlog on GitHub Issues** for this repo. If one is
    filed by mistake, move it into the roadmap or a governed report and delete
    the GitHub issue—or keep it only after an owner decision to resume GitHub
@@ -92,5 +94,9 @@ supersede `docs/roadmap.md`, `specs/`, or architecture docs.
 
 | Former GH | State at cutover | Local destination |
 | --- | --- | --- |
-| #1, #14–#16, #25 | open | [`docs/roadmap.md`](../roadmap.md); #25 also [`docs/issues/2026-07-21-gh-025-unify-jobs-surfaces.md`](../issues/2026-07-21-gh-025-unify-jobs-surfaces.md) |
+| #1 | open | [gh-001](../issues/2026-07-21-gh-001-milestone-roadmap.md) + roadmap umbrella |
+| #14 | open | [gh-014](../issues/2026-07-21-gh-014-m12-typeface-classifier.md) + roadmap Now |
+| #15 | open | [gh-015](../issues/2026-07-21-gh-015-m13-glyph-eval-slicing.md) + roadmap Next |
+| #16 | open | [gh-016](../issues/2026-07-21-gh-016-m14-glyph-classifier.md) + roadmap Later |
+| #25 | open | [gh-025](../issues/2026-07-21-gh-025-unify-jobs-surfaces.md) + roadmap Now |
 | #2–#13, #17–#19, #21, #24 | closed | Shipped rows in roadmap + full bodies in archive tombstone |
