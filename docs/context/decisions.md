@@ -2,7 +2,7 @@
 Status: active
 Owner: CT
 Created: 2026-07-14
-Last verified: 2026-07-14
+Last verified: 2026-07-21
 Kind: context
 ---
 
@@ -15,6 +15,14 @@ Kind: context
 - **Read when:** investigating why current architecture differs from older
   plans.
 - **Search terms:** decisions, deviations, tombstones, retirement, rationale.
+
+## 2026-07-21: Cut over GitHub Issues into governed docs
+
+Planning moved out of the remote issue tracker. Standing backlog is
+`docs/roadmap.md`. Evidence-bearing defects use `docs/issues/`. Full issue
+bodies at cutover live in a Git history tombstone (archive add commit, then
+removed from the live tree). Full write-up:
+[GitHub Issues cutover](../decisions/2026-07-21-github-issues-cutover.md).
 
 ## 2026-07-14: Record shipped architecture instead of milestone projections
 

@@ -2,7 +2,7 @@
 Status: active
 Owner: CT
 Created: 2026-07-13
-Last verified: 2026-07-14
+Last verified: 2026-07-21
 Kind: context
 ---
 
@@ -20,10 +20,20 @@ Kind: context
 - **Complete the typeface production round-trip.** Keep the existing dataset,
   SPA, and API seam aligned while upstream `TypefaceConfig`, `train_typeface`,
   and real evaluation remain unfinished. Evidence:
-  [partial M12 plan](../plans/2026-06-10-m12-typeface-classifier.md).
+  [partial M12 plan](../plans/2026-06-10-m12-typeface-classifier.md). Standing
+  backlog: [roadmap](../roadmap.md) (former GH #14 / M12).
+- **Unify jobs surfaces.** Resolve dual progress UI (SSE toasts vs AppShell
+  jobs dock). Governed issue:
+  [unify jobs surfaces](../issues/2026-07-21-gh-025-unify-jobs-surfaces.md)
+  (former GH #25).
 - **Keep lint exceptions auditable.** Any configured or inline suppression must
   remain justified in the
   [lint deviations catalogue](../conventions/lint-deviations.md).
+
+## Open issues
+
+- [Unify jobs surfaces: SSE toasts vs AppShell jobs dock](../issues/2026-07-21-gh-025-unify-jobs-surfaces.md)
+  (former GH #25)
 
 ## Deferred
 
@@ -74,9 +84,15 @@ Kind: context
 
 ## Needs owner decision
 
-No unresolved repository evidence currently requires a product-direction
-decision. Deferred items should remain parked until their stated evidence
-appears.
+- **Jobs transport residual** (former GH #25): product direction already keeps
+  both toast and dock surfaces
+  ([decisions.md](decisions.md) 2026-07-14). Only reopen if that dual UX should
+  change. Until then, do not add a third progress surface; optional follow-up is
+  SSE-fed dock or quieter toasts.
+
+Other deferred items should remain parked until their stated evidence appears.
+
+Standing open work also lives in [docs/roadmap.md](../roadmap.md).
 
 ## Legacy-unverified sweep
 
