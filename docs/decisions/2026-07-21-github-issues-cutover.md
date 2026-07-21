@@ -52,8 +52,9 @@ used by `pdomain-ocr-cli` and `pdomain-ocr-simple-gui`.
 
 ## Decision
 
-1. **Keep the GitHub Issues feature enabled** and drive the remote issue count
-   to **zero** after the archive commit exists and a human approves deletion.
+1. **Keep the GitHub Issues feature enabled** and keep the remote issue count
+   at **zero**. On 2026-07-21, after archive + human approval, all 22 issues
+   were permanently deleted (`gh issue list --state all` → 0).
 2. **Treat `docs/roadmap.md` as the standing backlog** for open product and
    milestone work. Tags like `former GH #25` are provenance only.
 3. **Use `docs/issues/`** for governed issue reports (template:

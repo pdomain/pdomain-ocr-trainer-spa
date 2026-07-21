@@ -40,12 +40,9 @@ Clear this repo's GitHub issue tracker into governed docs (roadmap + archive +
   git show b1338d6973b84a5e36060958362fe38e83ba7222:docs/decisions/2026-07-21-github-issues-archive.md
   ```
 
-**Still requires human approval:** permanent `gh issue delete` for all 22
-issues (5 open + 17 closed). Do not run deletes until the archive commit is on
-the branch you trust.
+**Remote deletion complete (2026-07-21):** all 22 GitHub issues permanently
+deleted; `gh issue list --state all` reports count **0**.
 
 ## Resume steps (remaining)
 
-1. With explicit human go: delete GH issues that still exist for this repo
-   (`gh issue delete N --repo pdomain/pdomain-ocr-trainer-spa --yes`).
-2. Confirm remote open+closed count is zero.
+None. Tracker empty; planning lives in docs.
