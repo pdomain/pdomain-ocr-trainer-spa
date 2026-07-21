@@ -66,10 +66,10 @@ used by `pdomain-ocr-cli` and `pdomain-ocr-simple-gui`.
 5. **Recover archived text** with:
 
    ```bash
-   git show <archive-add-sha>:docs/decisions/2026-07-21-github-issues-archive.md
+   git show b1338d6973b84a5e36060958362fe38e83ba7222:docs/decisions/2026-07-21-github-issues-archive.md
    ```
 
-   Replace `<archive-add-sha>` with the commit that added the archive file
+   Replace `b1338d6973b84a5e36060958362fe38e83ba7222` with the commit that added the archive file
    (recorded in the tombstone commit message).
 
 ## Consequences

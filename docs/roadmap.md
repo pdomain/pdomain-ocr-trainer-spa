@@ -29,7 +29,7 @@ Verbatim former issue bodies (Git history tombstone after the archive is
 removed from the live tree):
 
 ```bash
-git show <archive-add-sha>:docs/decisions/2026-07-21-github-issues-archive.md
+git show b1338d6973b84a5e36060958362fe38e83ba7222:docs/decisions/2026-07-21-github-issues-archive.md
 ```
 
 Authoritative design for milestones remains in `specs/00-19` (especially
