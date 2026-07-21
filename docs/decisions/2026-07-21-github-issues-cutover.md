@@ -78,8 +78,8 @@ used by `pdomain-ocr-cli` and `pdomain-ocr-simple-gui`.
 ## Consequences
 
 - Former issue URLs under
-  `github.com/pdomain/pdomain-ocr-trainer-spa/issues/N` will stop resolving once
-  issues are deleted (not merely closed).
+  `github.com/pdomain/pdomain-ocr-trainer-spa/issues/N` no longer resolve
+  (issues were deleted, not merely closed).
 - Agents and humans plan from the roadmap, intent map, architecture docs, and
   governed issue reports.
 - Milestone design remains in `specs/` and plans; the cutover does not rewrite
