@@ -29,20 +29,23 @@ Clear this repo's GitHub issue tracker into governed docs (roadmap + archive +
 
 ## Status
 
-**Done on 2026-07-21** (in-tree migration). Live destinations:
+**Done on 2026-07-21** (in-tree migration + archive tombstone). Live destinations:
 
 - [docs/roadmap.md](../roadmap.md)
 - [docs/issues/](../issues/README.md)
 - [cutover decision](../decisions/2026-07-21-github-issues-cutover.md)
-- Archive body file (temporary in tree, then git tombstone):
-  `docs/decisions/2026-07-21-github-issues-archive.md`
+- Archive recovery (not in live tree):
+
+  ```bash
+  git show b1338d6973b84a5e36060958362fe38e83ba7222:docs/decisions/2026-07-21-github-issues-archive.md
+  ```
 
 **Still requires human approval:** permanent `gh issue delete` for all 22
-issues after the archive commit is on the branch you trust.
+issues (5 open + 17 closed). Do not run deletes until the archive commit is on
+the branch you trust.
 
 ## Resume steps (remaining)
 
-1. Confirm archive add commit SHA is recorded.
-2. `git rm` the archive file; commit tombstone with `git show <sha>:...` pointer.
-3. With explicit human go: delete GH issues 1–25 that exist for this repo.
-4. Optionally re-enable Issues with empty tracker if the feature was disabled.
+1. With explicit human go: delete GH issues that still exist for this repo
+   (`gh issue delete N --repo pdomain/pdomain-ocr-trainer-spa --yes`).
+2. Confirm remote open+closed count is zero.

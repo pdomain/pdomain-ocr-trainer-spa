@@ -69,8 +69,8 @@ used by `pdomain-ocr-cli` and `pdomain-ocr-simple-gui`.
    git show b1338d6973b84a5e36060958362fe38e83ba7222:docs/decisions/2026-07-21-github-issues-archive.md
    ```
 
-   Replace `b1338d6973b84a5e36060958362fe38e83ba7222` with the commit that added the archive file
-   (recorded in the tombstone commit message).
+   That SHA is the archive-add commit (also named in the tombstone commit
+   message).
 
 ## Consequences
 
