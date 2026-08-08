@@ -44,8 +44,12 @@ than in per-machine harness memory.
   `Won't fix` / `Duplicate`) and a final `## Resolution` section. Map the governed
   `Status:`:
   - **Open** → `Status: active`.
-  - **Resolved / Won't fix / Duplicate** → `Status: retired`, routed through
-    `doc-retirer`, with the resolving commit/spec linked in `## Resolution`.
+  - **Resolved / Won't fix / Duplicate** → route through `doc-retirer`, which
+    **deletes** the report. Promote any specific a reader still needs into the
+    architecture or process doc that owns it, repoint inbound references at the
+    resolving commit, drop the pointer below, and append a tombstone to
+    `docs/context/decisions.md`. Git history keeps the report, so no resolved
+    file stays in the tree and there is no resolved index to maintain.
 - **Link it (no orphans):** reference every new issue from a governed doc — by
   default an **Open issues** bullet in
   [`docs/context/intent-map.md`](../context/intent-map.md), a Risk in
@@ -89,6 +93,6 @@ Lead with the **smallest decisive evidence**, separate **observation** from
 - [Unify jobs surfaces: SSE toasts vs AppShell jobs dock](2026-07-21-gh-025-unify-jobs-surfaces.md)
   (former GH #25; Now)
 
-## Resolved issues
-
-- *None yet.*
+Resolved reports are deleted, so this index tracks open work only. Past
+resolutions live in the `docs/context/decisions.md` tombstones and in git
+history.
