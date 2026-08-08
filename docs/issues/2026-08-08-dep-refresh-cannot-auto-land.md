@@ -217,16 +217,80 @@ The last CI run against `main` was 2026-05-26; branch protection and
 `master` branch rename that commit `7772cad` (which also last touched
 `dep-refresh.yml`) appears to correspond to.
 
+### 6. GitHub Actions is disabled repository-wide — the reason nothing has run
+
+```text
+$ gh api repos/pdomain/pdomain-ocr-trainer-spa/actions/permissions --jq '.enabled'
+false
+
+$ gh run list --repo pdomain/pdomain-ocr-trainer-spa --limit 1 --json createdAt,workflowName
+[{"createdAt":"2026-07-12T10:09:06Z","workflowName":"Dependency Graph"}]
+
+$ gh api repos/pdomain/pdomain-book-tools/actions/permissions --jq '.enabled'
+true
+
+$ gh run list --repo pdomain/pdomain-book-tools --workflow dep-refresh.yml --limit 5 \
+    --json createdAt,conclusion,status
+[{"conclusion":"success","createdAt":"2026-08-02T05:11:59Z","status":"completed"},
+ {"conclusion":"success","createdAt":"2026-07-26T05:16:13Z","status":"completed"},
+ {"conclusion":"success","createdAt":"2026-07-19T04:56:46Z","status":"completed"},
+ {"conclusion":"success","createdAt":"2026-07-12T05:01:07Z","status":"completed"},
+ {"conclusion":"success","createdAt":"2026-07-05T05:50:24Z","status":"completed"}]
+```
+
+GitHub Actions is disabled for this entire repository (`enabled: false`), and
+the last run recorded by the API — of any workflow, not only `dep-refresh` —
+is the 2026-07-12 `Dependency Graph` run, the same date as the `main` →
+`master` rename (evidence §5). A peer repo with Actions still enabled,
+`pdomain-book-tools`, shows its `dep-refresh` workflow running weekly and
+green through 2026-08-02. This is not a scheduling or workflow-authoring
+problem: with Actions off, no trigger — cron, `workflow_dispatch`, or
+`pull_request` — can fire for any workflow. It fully explains evidence §1
+(`dep-refresh` shows zero runs) and, by the identical mechanism, why the gate
+in evidence §4 is untested — `ci.yml` cannot run either. The `dep-refresh.yml`
+cron itself is unchanged and correct: it is identical to the seven repos
+still running weekly, so no workflow file needs editing to restore the
+schedule once Actions is back on.
+
+This is one data point in a wider pattern. Five repos —
+`pdomain-ocr-labeler-spa`, `pdomain-ocr-synth`, `pdomain-ocr-trainer-spa`,
+`pdomain-ocr-training`, and `pdomain-prep-for-pgdp` — all stopped running
+workflows on 2026-07-12, while the other seven repos in the workspace kept
+running weekly through 2026-08-02. One date across five repos points to a
+single deliberate action rather than five independent coincidences. Whether
+that action was intentional and temporary, or an unintended side effect of
+that day's other work (the same day this repo's `main` → `master` rename
+landed — evidence §5), **cannot be determined from data available inside
+this repository**. If it was deliberate, the resolution should say so
+explicitly, and the recommendations below that depend on Actions being back
+on become dormant rather than wrong.
+
+Cross-referencing evidence §5, this repo now has three distinct events
+converging on 2026-07-12: the `main` → `master` default-branch rename, the
+last GitHub Actions run of any kind, and the start of the CI gap that has
+run unbroken since. Concretely: **this repository has had no CI of any kind
+for nearly a month; anything merged since 2026-07-12 merged without any
+check running**, `dep-refresh` included.
+
 ## Root-cause hypotheses
 
-1. **(Confirmed) Per-run dated branch name + `delete_branch_on_merge: false`**
-   — `.github/workflows/dep-refresh.yml` names each run's branch with the
+1. **(Confirmed) GitHub Actions is disabled repository-wide** —
+   `gh api repos/pdomain/pdomain-ocr-trainer-spa/actions/permissions --jq
+   '.enabled'` returns `false`. With Actions off, no trigger — cron,
+   `workflow_dispatch`, or `pull_request` — can fire for any workflow,
+   `dep-refresh.yml` included. This fully explains evidence §1 (zero
+   `dep-refresh` runs) and the untested gate in evidence §4 (`ci.yml` cannot
+   run either). Directly verified (evidence §6); see evidence §6 for the
+   wider five-repo pattern this sits inside.
+2. **Per-run dated branch name + `delete_branch_on_merge: false`** —
+   `.github/workflows/dep-refresh.yml` names each run's branch with the
    date and run id and never reuses or deletes it; the repo setting means
-   even successful auto-merges leave branches behind. This is a design
-   defect, directly verified by reading the workflow file and the repo
-   setting (evidence §3). It has not yet produced any branches only because
-   the workflow has never run (evidence §1–2).
-2. **Not a factor here: stale required-check context from the rename** — the
+   even successful auto-merges leave branches behind. This remains a real
+   structural defect, directly verified by reading the workflow file and the
+   repo setting (evidence §3), and it is still latent: it has not yet
+   produced any branches, now doubly so — the workflow has never run
+   (evidence §1–2) and cannot run while Actions is disabled (evidence §6).
+3. **Not a factor here: stale required-check context from the rename** — the
    pattern that blocks every PR in `pdomain-ops` and `pdomain-ocr-training`.
    Verified absent in this repo: the single required context (`ci`) is
    produced by the single job that exists (evidence §4).
@@ -245,6 +309,14 @@ The last CI run against `main` was 2026-05-26; branch protection and
 
 ## Next steps
 
+0. **Decide whether to re-enable GitHub Actions.** This is a workspace-level
+   decision covering all five affected repos together
+   (`pdomain-ocr-labeler-spa`, `pdomain-ocr-synth`, `pdomain-ocr-trainer-spa`,
+   `pdomain-ocr-training`, `pdomain-prep-for-pgdp`), not a per-repo choice —
+   they went dark on the same date via what looks like one action, not five.
+   Nothing below is testable until this is answered: `dep-refresh` cannot run,
+   the `ci` gate cannot be exercised by a live PR, and no workflow-level fix
+   can be observed to work while Actions stays off (evidence §6).
 1. Apply the `pdomain-ui` dep-refresh auto-land design
    (`pdomain-ui` repo, `docs/specs/2026-07-16-dep-refresh-auto-land-design.md`)
    to this repo: reusable `dep-refresh` branch (force-pushed from fresh
