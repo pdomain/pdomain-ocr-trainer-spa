@@ -92,6 +92,9 @@ Lead with the **smallest decisive evidence**, separate **observation** from
   (former GH #16; Later)
 - [Unify jobs surfaces: SSE toasts vs AppShell jobs dock](2026-07-21-gh-025-unify-jobs-surfaces.md)
   (former GH #25; Now)
+- [dep-refresh cannot auto-land: dated branches will accumulate once the
+  workflow runs](2026-08-08-dep-refresh-cannot-auto-land.md) (preventive;
+  workflow has not yet run)
 
 Resolved reports are deleted, so this index tracks open work only. Past
 resolutions live in the `docs/context/decisions.md` tombstones and in git
