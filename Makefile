@@ -35,7 +35,7 @@ define _pnpm
 	fi
 endef
 
-.PHONY: help setup install uninstall remove-venv reset lint format format-check typecheck \
+.PHONY: help setup install-hooks install uninstall remove-venv reset lint format format-check typecheck \
         pre-commit-check test test-slow e2e e2e-browser playwright-install frontend-install \
         frontend-typecheck frontend-test frontend-build frontend-lint \
         frontend-format frontend-format-check frontend-knip \
@@ -69,10 +69,24 @@ setup: ## Sync Python deps + install pre-commit hooks
 	@echo "📦 Installing dependencies..."
 	uv sync --group dev
 	@echo "🪝 Setting up pre-commit hooks..."
-	uv run pre-commit install || true
+	@$(MAKE) --no-print-directory install-hooks
 	@echo "🎭 Installing Playwright browsers (e2e)..."
 	uv run --group e2e playwright install chromium
 	@echo "✅ Setup complete!"
+
+install-hooks: ## (Re)install pre-commit hooks (repairs a stale interpreter path)
+	@# `pre-commit install` bakes an absolute interpreter path into .git/hooks.
+	@# A hook written against a different environment name, or against a worktree
+	@# that has since been deleted, keeps failing until it is rewritten — and a
+	@# "skip if the file exists" guard never rewrites it. Rewriting costs ~0.2s,
+	@# so do it every time this repo owns its hooks directory.
+	@if [ -f .git ]; then \
+	  echo "hooks: worktree checkout — the canonical repo owns them, skipping"; \
+	elif [ -n "$$(git config --get core.hooksPath 2>/dev/null)" ]; then \
+	  echo "hooks: core.hooksPath is set — leaving it alone, skipping"; \
+	else \
+	  uv run pre-commit install --hook-type pre-commit --hook-type commit-msg; \
+	fi
 
 install: setup ## Alias for setup
 
