@@ -548,6 +548,7 @@ def _apply_one(
     task: TaskEnum,
     key: str,
     target_split: str,
+    *,
     on_disk: dict[str, LabelMap],
 ) -> None:
     """Commit one chip's staged move to disk (copy / move / delete).
@@ -635,7 +636,7 @@ def apply_assignments(
             continue
         attempted += 1
         try:
-            _apply_one(settings, normalized, task, entry.key, entry.target_split, on_disk)
+            _apply_one(settings, normalized, task, entry.key, entry.target_split, on_disk=on_disk)
         except (AppError, OSError, ValueError) as exc:
             errors.append({"key": entry.key, "error": str(exc)})
 

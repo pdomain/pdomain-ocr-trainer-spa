@@ -37,6 +37,7 @@ def validate_spdx_license(license_id: str) -> None:
 
 
 def submit_publish_dataset_job(
+    *,
     settings: object,
     token: str,
     profile: str,
@@ -65,6 +66,7 @@ def submit_publish_dataset_job(
 
 
 def submit_publish_model_job(
+    *,
     settings: object,
     token: str,
     model_name: str,
