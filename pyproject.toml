@@ -54,7 +54,7 @@ dev = [
     "httpx2>=2.12",
 ]
 e2e = [
-    "pytest-playwright>=0.5",
+    "pytest-playwright>=0.9",
 ]
 
 [[tool.uv.index]]
