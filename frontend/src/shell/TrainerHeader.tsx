@@ -9,7 +9,6 @@ import {
 import type { ActiveJob } from "@pdomain/pdomain-ui/shell";
 
 export interface TrainerHeaderProps {
-  // eslint-disable-next-line @typescript-eslint/no-deprecated -- upstream JSDoc falsely marks ActiveJob deprecated
   activeJobs: ActiveJob[];
   appVersion: string;
 }
