@@ -33,17 +33,18 @@ export function RunListPage(): React.JSX.Element {
   const [profileFilter, setProfileFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    try {
-      const resp = await fetchRuns();
-      setRuns(resp.runs);
-      setError(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load runs");
-    } finally {
-      setLoading(false);
-    }
+  const load = useCallback(() => {
+    return fetchRuns()
+      .then((resp) => {
+        setRuns(resp.runs);
+        setError(null);
+      })
+      .catch((err: unknown) => {
+        setError(err instanceof Error ? err.message : "Failed to load runs");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
   useEffect(() => {
@@ -67,7 +68,10 @@ export function RunListPage(): React.JSX.Element {
         <Button
           data-testid="run-list-refresh"
           variant="ghost"
-          onClick={() => void load()}
+          onClick={() => {
+            setLoading(true);
+            void load();
+          }}
         >
           Refresh
         </Button>

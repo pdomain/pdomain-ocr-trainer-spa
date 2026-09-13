@@ -79,7 +79,9 @@ export function useNotificationStream(
   const seenRef = useRef<Set<string>>(new Set());
   // Keep `emit` current without re-subscribing every render.
   const emitRef = useRef(emit);
-  emitRef.current = emit;
+  useEffect(() => {
+    emitRef.current = emit;
+  }, [emit]);
 
   // Stable signature so we only re-subscribe when the watched set changes.
   const signature = jobs

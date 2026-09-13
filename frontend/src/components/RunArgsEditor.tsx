@@ -9,7 +9,7 @@
 // `value` but not in the field spec are preserved verbatim on change
 // (forward-compatible).
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Input } from "@pdomain/pdomain-ui/primitives";
 import type { TrainingArgs } from "../api/profiles";
 import { fieldSpecForTask } from "./runArgsEditorConfig";
@@ -33,9 +33,13 @@ function StringListField({
   const committed = Array.isArray(value) ? (value as string[]).join(", ") : "";
   const [text, setText] = useState(committed);
   // Re-sync when the committed value changes from outside (task switch, reset).
-  useEffect(() => {
+  // Adjusted during render (not an effect) to avoid an extra commit; see
+  // https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
+  const [prevCommitted, setPrevCommitted] = useState(committed);
+  if (committed !== prevCommitted) {
+    setPrevCommitted(committed);
     setText(committed);
-  }, [committed]);
+  }
   return (
     <label style={{ display: "block" }}>
       {label}

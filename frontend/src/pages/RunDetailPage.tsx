@@ -26,32 +26,35 @@ export function RunDetailPage(): React.JSX.Element {
   });
   const stepRef = useRef(0);
 
-  const load = useCallback(async () => {
-    try {
-      const r = await fetchRun(runId);
-      setRun(r);
-      setError(null);
-      // Replay persisted progress for a finished or reloaded run (spec 06 §4).
-      const replay = await fetchRunProgress(runId);
-      const pts: MetricPoint[] = [];
-      for (const rec of replay.records) {
-        if (rec.type === "metric" && typeof rec.value === "number") {
-          pts.push({ step: pts.length + 1, value: rec.value });
+  const load = useCallback(() => {
+    return fetchRun(runId)
+      .then((r) => {
+        setRun(r);
+        setError(null);
+        // Replay persisted progress for a finished or reloaded run (spec 06 §4).
+        return fetchRunProgress(runId);
+      })
+      .then((replay) => {
+        const pts: MetricPoint[] = [];
+        for (const rec of replay.records) {
+          if (rec.type === "metric" && typeof rec.value === "number") {
+            pts.push({ step: pts.length + 1, value: rec.value });
+          }
+          if (rec.type === "progress") {
+            setProgress({
+              current: Number(rec.current ?? 0),
+              total: Number(rec.total ?? 0),
+            });
+          }
         }
-        if (rec.type === "progress") {
-          setProgress({
-            current: Number(rec.current ?? 0),
-            total: Number(rec.total ?? 0),
-          });
+        if (pts.length > 0) {
+          setMetrics(pts);
+          stepRef.current = pts.length;
         }
-      }
-      if (pts.length > 0) {
-        setMetrics(pts);
-        stepRef.current = pts.length;
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load run");
-    }
+      })
+      .catch((err: unknown) => {
+        setError(err instanceof Error ? err.message : "Failed to load run");
+      });
   }, [runId]);
 
   useEffect(() => {

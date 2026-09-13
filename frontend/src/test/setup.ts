@@ -1,4 +1,4 @@
-import "@testing-library/jest-dom";
+import "@testing-library/jest-dom/vitest";
 
 // jsdom has no matchMedia; sonner's <Toaster> reads it for `theme="system"`.
 if (typeof window !== "undefined" && window.matchMedia === undefined) {

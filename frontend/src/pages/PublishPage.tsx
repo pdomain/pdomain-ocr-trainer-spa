@@ -21,21 +21,18 @@ export function PublishPage(): React.JSX.Element {
   const [target, setTarget] = useState<PublishTarget | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const [profilesResp, modelsResp] = await Promise.all([
-        fetchProfiles(),
-        fetchModels({ includeLegacy: false }),
-      ]);
-      setProfiles(profilesResp.profiles);
-      setModels(modelsResp.models);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load");
-    } finally {
-      setLoading(false);
-    }
+  const load = useCallback(() => {
+    return Promise.all([fetchProfiles(), fetchModels({ includeLegacy: false })])
+      .then(([profilesResp, modelsResp]) => {
+        setProfiles(profilesResp.profiles);
+        setModels(modelsResp.models);
+      })
+      .catch((err: unknown) => {
+        setError(err instanceof Error ? err.message : "Failed to load");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
   useEffect(() => {
@@ -59,7 +56,11 @@ export function PublishPage(): React.JSX.Element {
         <Button
           data-testid="publish-refresh"
           variant="ghost"
-          onClick={() => void load()}
+          onClick={() => {
+            setLoading(true);
+            setError(null);
+            void load();
+          }}
         >
           Refresh
         </Button>

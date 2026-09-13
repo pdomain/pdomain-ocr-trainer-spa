@@ -37,13 +37,14 @@ export function EvalFormPage(): React.JSX.Element {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- fetch once; profile initialization is intentionally mount-only
   }, []);
 
-  const loadModels = useCallback(async () => {
-    try {
-      const resp = await fetchModels(showAll ? {} : { profile, task });
-      setModels(resp.models);
-    } catch {
-      setModels([]);
-    }
+  const loadModels = useCallback(() => {
+    return fetchModels(showAll ? {} : { profile, task })
+      .then((resp) => {
+        setModels(resp.models);
+      })
+      .catch(() => {
+        setModels([]);
+      });
   }, [profile, task, showAll]);
 
   useEffect(() => {

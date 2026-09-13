@@ -20,13 +20,15 @@ export function ModelDetailPage(): React.JSX.Element {
   const [renaming, setRenaming] = useState(false);
   const [newName, setNewName] = useState("");
 
-  const load = useCallback(async () => {
-    try {
-      setItem(await fetchModel(name));
-      setError(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load model");
-    }
+  const load = useCallback(() => {
+    return fetchModel(name)
+      .then((resolved) => {
+        setItem(resolved);
+        setError(null);
+      })
+      .catch((err: unknown) => {
+        setError(err instanceof Error ? err.message : "Failed to load model");
+      });
   }, [name]);
 
   useEffect(() => {

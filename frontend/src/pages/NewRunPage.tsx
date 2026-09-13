@@ -36,17 +36,15 @@ export function NewRunPage(): React.JSX.Element {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- fetch once; profile initialization is intentionally mount-only
   }, []);
 
-  const loadArgs = useCallback(async () => {
-    if (profile === "") return;
-    try {
-      const { args: resolved } = await fetchTrainingDefaultsOrSeed(
-        profile,
-        task,
-      );
-      setArgs(resolved);
-    } catch {
-      setArgs({});
-    }
+  const loadArgs = useCallback(() => {
+    if (profile === "") return Promise.resolve();
+    return fetchTrainingDefaultsOrSeed(profile, task)
+      .then(({ args: resolved }) => {
+        setArgs(resolved);
+      })
+      .catch(() => {
+        setArgs({});
+      });
   }, [profile, task]);
 
   useEffect(() => {

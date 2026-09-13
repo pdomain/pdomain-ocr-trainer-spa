@@ -14,23 +14,27 @@ export function EvalResultPage(): React.JSX.Element {
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
-  const load = useCallback(async () => {
-    try {
-      setResult(await fetchEvalResult(runId));
-      setError(null);
-      setPending(false);
-    } catch (err) {
-      const code =
-        err && typeof err === "object" && "status" in err
-          ? (err as { status: number }).status
-          : 0;
-      if (code === 404) {
-        setPending(true);
+  const load = useCallback(() => {
+    return fetchEvalResult(runId)
+      .then((resolved) => {
+        setResult(resolved);
         setError(null);
-      } else {
-        setError(err instanceof Error ? err.message : "Failed to load result");
-      }
-    }
+        setPending(false);
+      })
+      .catch((err: unknown) => {
+        const code =
+          err && typeof err === "object" && "status" in err
+            ? (err as { status: number }).status
+            : 0;
+        if (code === 404) {
+          setPending(true);
+          setError(null);
+        } else {
+          setError(
+            err instanceof Error ? err.message : "Failed to load result",
+          );
+        }
+      });
   }, [runId]);
 
   useEffect(() => {

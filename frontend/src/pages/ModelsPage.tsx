@@ -13,19 +13,18 @@ export function ModelsPage(): React.JSX.Element {
   const [taskFilter, setTaskFilter] = useState("");
   const [legacyFilter, setLegacyFilter] = useState("both");
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    try {
-      const resp = await fetchModels({
-        includeLegacy: legacyFilter !== "no",
+  const load = useCallback(() => {
+    return fetchModels({ includeLegacy: legacyFilter !== "no" })
+      .then((resp) => {
+        setModels(resp.models);
+        setError(null);
+      })
+      .catch((err: unknown) => {
+        setError(err instanceof Error ? err.message : "Failed to load models");
+      })
+      .finally(() => {
+        setLoading(false);
       });
-      setModels(resp.models);
-      setError(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load models");
-    } finally {
-      setLoading(false);
-    }
   }, [legacyFilter]);
 
   useEffect(() => {
@@ -49,6 +48,7 @@ export function ModelsPage(): React.JSX.Element {
     if (!window.confirm(`Delete model ${name}?`)) return;
     try {
       await deleteModel(name);
+      setLoading(true);
       await load();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Delete failed");
@@ -62,7 +62,10 @@ export function ModelsPage(): React.JSX.Element {
         <Button
           data-testid="models-refresh"
           variant="ghost"
-          onClick={() => void load()}
+          onClick={() => {
+            setLoading(true);
+            void load();
+          }}
         >
           Refresh
         </Button>

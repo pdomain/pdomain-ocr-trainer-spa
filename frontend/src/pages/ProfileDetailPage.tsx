@@ -41,22 +41,38 @@ export function ProfileDetailPage(): React.JSX.Element {
   const [error, setError] = useState<string | null>(null);
 
   const loadDefaults = useCallback(
-    async (forTask: DefaultsTask) => {
-      setLoading(true);
-      setError(null);
-      try {
-        const { args: loaded, saved: wasSaved } =
-          await fetchTrainingDefaultsOrSeed(profile, forTask);
-        setArgs(loaded);
-        setSaved(wasSaved);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : String(err));
-      } finally {
-        setLoading(false);
-      }
+    (forTask: DefaultsTask) => {
+      return fetchTrainingDefaultsOrSeed(profile, forTask)
+        .then(({ args: loaded, saved: wasSaved }) => {
+          setArgs(loaded);
+          setSaved(wasSaved);
+        })
+        .catch((err: unknown) => {
+          setError(err instanceof Error ? err.message : String(err));
+        })
+        .finally(() => {
+          setLoading(false);
+        });
     },
     [profile],
   );
+
+  // Mirror the effect's own dependency comparison (tab/task/profile) during
+  // render, so the loading spinner + stale-error reset land in the SAME
+  // commit as the tab/task switch that triggers a refetch below, instead of
+  // one extra render later via a synchronous setState inside the effect.
+  const [prevLoadDeps, setPrevLoadDeps] = useState({ tab, task, profile });
+  if (
+    prevLoadDeps.tab !== tab ||
+    prevLoadDeps.task !== task ||
+    prevLoadDeps.profile !== profile
+  ) {
+    setPrevLoadDeps({ tab, task, profile });
+    if (tab === "defaults") {
+      setLoading(true);
+      setError(null);
+    }
+  }
 
   useEffect(() => {
     if (tab === "defaults") void loadDefaults(task);
@@ -83,6 +99,7 @@ export function ProfileDetailPage(): React.JSX.Element {
     try {
       await deleteTrainingDefaults(profile, task);
       setStatus(`Reset ${task} defaults to the seed.`);
+      setLoading(true);
       await loadDefaults(task);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
