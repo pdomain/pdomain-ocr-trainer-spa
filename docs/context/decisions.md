@@ -127,7 +127,7 @@ consumed.
 - Outcome: superseded
 - Superseded by: [DEVELOPMENT.md](../../DEVELOPMENT.md) section "Cut a release
   locally" and `scripts/do-release.sh`
-- Removal commit: (fill after commit)
+- Removal commit: `d9fb2ffbccbba063d11f96181b69815b2fd367a1`
 - Rationale kept: the 2026-11-06 decision above. Owner commit
   `f5437b31f3d44fddbfc8cf66f44fc3d0e7c6a6b8` removed `.github/workflows`.
 - Remaining work: none
