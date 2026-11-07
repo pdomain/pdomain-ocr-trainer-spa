@@ -44,7 +44,7 @@ endef
         release-patch release-minor release-major _do-release ci-slow \
         local-setup local-dev local-check local-upgrade-deps local-run \
         local-setup-py local-frontend-install local-frontend-build \
-        update-pdomain-deps ci-against-master
+        update-pdomain-deps update-hooks ci-against-master
 
 help: ## Show this help message
 	@echo "Available commands:"
@@ -73,6 +73,9 @@ setup: ## Sync Python deps + install pre-commit hooks
 	@echo "🎭 Installing Playwright browsers (e2e)..."
 	uv run --group e2e playwright install chromium
 	@echo "✅ Setup complete!"
+
+update-hooks: ## Bump hooks to their latest releases, frozen to commit SHAs
+	uv run pre-commit autoupdate --freeze
 
 install-hooks: ## (Re)install pre-commit hooks (repairs a stale interpreter path)
 	@# `pre-commit install` bakes an absolute interpreter path into .git/hooks.
