@@ -2,7 +2,7 @@
 Status: active
 Owner: CT
 Created: 2026-07-14
-Last verified: 2026-11-06
+Last verified: 2026-11-07
 Kind: architecture
 ---
 
@@ -36,11 +36,13 @@ The jobs surface requires `GET /api/jobs`.
 
 Each mapped job carries its `progress` and associated `run_id` so the shared dock can open the run.
 
-Detection and recognition training call `LocalTrainingRunner`. Typeface training does not.
+The production worker builds `LocalTrainingRunner`. Detection and recognition
+dispatch call its typed methods.
 
 The worker builds a local `TypefaceConfig` and calls `train_typeface` through a cast.
 
-The real runner does not provide `train_typeface`.
+The SPA does not verify that the production runner provides `train_typeface`;
+its typed runner interface covers only detection and recognition.
 
 `FakeTrainingRunner` covers that seam in tests.
 
@@ -52,7 +54,7 @@ Tests inject a stub runner.
 
 ## Shared application shell
 
-The frontend uses `@pdomain/pdomain-ui ^0.11.0` with React 19.
+The frontend uses `@pdomain/pdomain-ui ^0.12.1` with React 19.
 
 `AppShell` provides the rail and utility dock.
 
@@ -88,4 +90,5 @@ The single [lint deviations catalogue](../conventions/lint-deviations.md) record
   `frontend/src/shell/*.test.tsx`
 - Configuration: `pyproject.toml`, `frontend/eslint.config.js`, and
   `frontend/package.json`
-- Verified: 2026-11-06 by reading the worker, config, and named tests
+- Verified: 2026-11-07 by reading the worker, config, and named tests;
+  application tests were not rerun for this documentation check

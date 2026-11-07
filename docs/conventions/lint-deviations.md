@@ -2,7 +2,7 @@
 Status: active
 Owner: CT
 Created: 2026-06-10
-Last verified: 2026-07-14
+Last verified: 2026-11-07
 Kind: process
 ---
 
@@ -52,6 +52,9 @@ Per-file groups narrow noisy rules at established boundaries:
 - `I001` and basedpyright optional-import exceptions in
   `domain/labeler_export.py` preserve boot compatibility with older
   `pdomain-ops` wheels while providing typed fallbacks.
+  `reportMissingImports`, `reportRedeclaration`, `reportAssignmentType`,
+  `reportReturnType`, and `reportIncompatibleMethodOverride` cover guarded
+  imports, reused fallback names, and the permissive fallback parser.
 - `reportReturnType` in `adapters/builders.py` and `reportGeneralTypeIssues` in
   `api/jobs.py` cover the upstream `LongJobRunner.stream_events` Protocol shape:
   implementations are async generators although the Protocol presents the call
@@ -60,7 +63,8 @@ Per-file groups narrow noisy rules at established boundaries:
   `reportMissingImports`; startup remains valid without that optional surface.
 - Test `type: ignore[arg-type]` annotations in `tests/conftest.py`,
   `tests/test_ui_prefs.py`, `tests/test_routes_root.py`,
-  `tests/unit/test_settings.py`, `tests/unit/api/test_datasets_diagnostics.py`,
+  `tests/unit/test_settings.py`, `tests/unit/test_bootstrap_suite_app.py`,
+  `tests/unit/api/test_datasets_diagnostics.py`,
   `tests/unit/domain/test_labeler_export.py`,
   `tests/unit/training/test_worker_dispatch.py`,
   `tests/e2e/test_labeler_freshness.py`, and
@@ -98,8 +102,6 @@ callbacks, and distinguishes some falsy values explicitly.
   pass record headers, never a `Headers` instance.
 - `no-dynamic-delete` in `stores/datasetsStore.ts`: the key comes from the
   store's own staged-record key set and deletion performs cache invalidation.
-- `no-deprecated` in `shell/TrainerHeader.tsx` and `shell/useTrainerJobs.ts`:
-  upstream declaration JSDoc falsely marks `ActiveJob` deprecated.
 - `no-empty-function` in `shell/useTrainerShortcuts.ts`: the callback exists
   only to register a display-only shortcut.
 - `react-hooks/exhaustive-deps` in `pages/NewRunPage.tsx`,
@@ -110,6 +112,11 @@ callbacks, and distinguishes some falsy values explicitly.
   `emitToast` is a public driver-contract helper colocated with its renderer.
 
 ## Audit method
+
+The 2026-11-07 recheck compared this catalogue with inline suppressions in
+`src/`, `tests/`, and `frontend/src/`, plus `pyproject.toml` and
+`frontend/eslint.config.js`. The `ActiveJob` deprecation suppressions are gone.
+The hook-dependency and toaster export suppressions remain.
 
 The 2026-07-14 audit searched Python, TypeScript, TSX, `pyproject.toml`, and
 `frontend/eslint.config.js` for `noqa`, type/basedpyright ignores, ESLint

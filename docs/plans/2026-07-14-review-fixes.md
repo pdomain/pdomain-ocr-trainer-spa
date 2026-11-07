@@ -1,8 +1,8 @@
 ---
-Status: draft
+Status: partial
 Owner: CT
 Created: 2026-07-14
-Last verified: 2026-07-14
+Last verified: 2026-11-07
 Kind: plan
 ---
 
@@ -11,29 +11,69 @@ Kind: plan
 ## Agent Index
 
 - **Kind:** plan
-- **Status:** draft
-- **Read when:** fixing the app_id="unknown" suite mount, dead /settings nav,
-  dead chord shortcuts, or stale specs 03/13.
+- **Status:** partial
+- **Read when:** deciding the remaining run-form device mapping or tracing
+  completed suite mount, settings navigation, and shortcut fixes.
 - **Search terms:** app_id unknown, suite mount, InstalledApp, TrainerRail,
   useTrainerShortcuts, driver contract, pin deferral.
 
 ## Goal
 
-Fix four confirmed bugs; file issues for feature-scope gaps; defer the blocked pin bump. No auth is added (this app is no-auth by v1 design).
+Resolve the remaining run-form device mapping. The suite mount, dead settings
+link, shortcut registrations, and driver-contract corrections are implemented.
+The dependency block is resolved. No auth is added; this app is no-auth by v1
+design.
 
 ## Architecture
 
-Port the proven `_build_suite_app()` + `_migrate_unknown_app_prefs()` pattern from the now-merged `pdomain-prep-for-pgdp/src/pdomain_prep_for_pgdp/bootstrap.py`. Frontend fixes are deletions in `frontend/src/shell/`. Docs + e2e updated together because `tests/e2e/test_driver_contract.py` parses spec 13's tables.
+`bootstrap.py` builds the suite app and migrates old preferences before mounting
+routes under the real app ID. The rail omits `/settings`, and the shortcut hook
+registers only `?`. `tests/e2e/test_driver_contract.py` parses spec 13's tables.
+The original implementation used the pattern from
+`pdomain-prep-for-pgdp/src/pdomain_prep_for_pgdp/bootstrap.py`.
 
 ## Tech Stack
 
-Python 3.13, FastAPI 0.139.0, `pdomain-ops==0.11.0` (pin stays — 0.11.1 hard-pins fastapi<0.137, incompatible; see ocr-container-meta#399), React 19 + TS, Vitest, docgraph.
+Current dependency floors are Python 3.13, FastAPI 0.141, and
+`pdomain-ops>=0.11.2`. The frontend uses React 19, TypeScript, and Vitest.
+Documentation uses docgraph. The old 0.11.1 FastAPI constraint no longer blocks
+this repository; `pyproject.toml` records that 0.11.2 loosened the pins.
 
 ## Global Constraints
 
-- No auth added (v1 no-auth design). No new SettingsPage/route (that's a feature). No NewRunPage device wiring (feature → issue). No pin bump (blocked → #399).
+- No auth added (v1 no-auth design). No new SettingsPage/route. Do not wire
+  NewRunPage to the device preference until string-to-index and CPU semantics
+  are decided. The former dependency pin restriction is obsolete.
 - TDD: failing test first for code tasks. `make ci AI=1` before each commit. Never bare pytest. Worktree isolation. Conventional commits. Nothing pushed.
 - After spec edits: docgraph reindex + check same-turn.
+
+## Verified outcomes
+
+Checked on 2026-11-07 by reading the following source and tests. This check
+does not claim a fresh test run.
+
+- Task 1 is implemented in `src/pdomain_ocr_trainer_spa/bootstrap.py` and
+  `src/pdomain_ocr_trainer_spa/pdomain-suite.json`.
+  `tests/unit/test_bootstrap_suite_app.py` covers the app ID, preference
+  migration, and device persistence. Existing real-app preferences win; in
+  that case, the old `unknown` value is retained.
+- Tasks 2 and 3 are implemented in `frontend/src/shell/TrainerRail.tsx` and
+  `frontend/src/shell/useTrainerShortcuts.ts`. Their colocated tests cover
+  the missing settings link and the single `?` binding.
+- Task 4 remains unresolved. `frontend/src/pages/NewRunPage.tsx` sends no
+  device. `CreateRunRequest.device` in
+  `src/pdomain_ocr_trainer_spa/api/runs.py` is `int | None`, while suite
+  preferences store a string. Track the decision in
+  [the intent map](../context/intent-map.md#needs-owner-decision).
+- Task 5 is implemented in `specs/03-frontend.md`,
+  `specs/13-driver-contract.md`, and `tests/e2e/test_driver_contract.py`.
+  Settings are dock-only, `/publish` is stable, and `_DEFERRED_URLS` is empty.
+  Spec 03 still describes wider projected routes; its drift note remains.
+- Task 6 is superseded by the dependency floors in `pyproject.toml`.
+
+Tasks 1–6 and Sequencing below preserve the July implementation instructions.
+They describe the original defects and proposed work, not the current task
+list. Do not repeat the completed fixes or restore the old dependency floor.
 
 ## Task 1 — Fix app_id="unknown" suite mount (D-T21)
 

@@ -2,7 +2,7 @@
 Status: active
 Owner: CT
 Created: 2026-07-21
-Last verified: 2026-07-21
+Last verified: 2026-11-07
 Kind: decision
 ---
 
@@ -76,6 +76,12 @@ used by `pdomain-ocr-cli` and `pdomain-ocr-simple-gui`.
    message).
 
 ## Consequences
+
+Rechecked on 2026-11-07: Git history contains the archive-add commit below
+and removal commit `8c0e781`. GitHub reports the Issues feature enabled and
+zero issues. All five local reports remain. The roadmap now lists remaining
+work without the former Now, Next, Later, or shipped sections; those labels
+in the cutover tables describe the layout at cutover.
 
 - Former issue URLs under
   `github.com/pdomain/pdomain-ocr-trainer-spa/issues/N` no longer resolve

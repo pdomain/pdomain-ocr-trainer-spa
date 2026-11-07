@@ -2,7 +2,7 @@
 Status: active
 Owner: CT
 Created: 2026-07-13
-Last verified: 2026-07-14
+Last verified: 2026-11-07
 Kind: architecture
 ---
 
@@ -63,4 +63,6 @@ field on `Settings`.
   `src/pdomain_ocr_trainer_spa/domain/banners.py`
 - Tests: `tests/unit/domain/test_labeler_export.py`,
   `tests/e2e/test_labeler_freshness.py`
-- Verified: 2026-07-13 against the current source and tests
+- Frontend: `frontend/src/components/BannerStack.tsx` and its test file
+- Verified: 2026-11-07 by reading the current source and tests; tests were not
+  rerun for this documentation check

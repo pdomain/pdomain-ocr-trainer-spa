@@ -2,7 +2,7 @@
 Status: active
 Owner: CT
 Created: 2026-07-14
-Last verified: 2026-07-14
+Last verified: 2026-11-07
 Kind: process
 ---
 
@@ -75,8 +75,10 @@ any step below.
    `plans/` (the work plan), `specs/` (design specs — follow any `Spec:` pointer
    from the issue), `research/` (prior investigations), `decisions/` (ADRs /
    constraints), `architecture/` (shipped design).
-4. **Check live issue status.** `gh issue view <N> --repo <owner/repo>` —
-   confirm it isn't already closed; note its milestone.
+4. **Check local issue status.** Read `docs/roadmap.md` and the matching
+   report in `docs/issues/`. Former GitHub issue numbers are provenance only;
+   the remote issues were deleted. See the
+   [tracker cutover](docs/decisions/2026-07-21-github-issues-cutover.md).
 5. **Check for in-flight work.** Open PRs and existing branches touching the
    same area, to avoid colliding with work-in-progress.
 6. **Consult agent memory.** `.claude/agent-memory/<repo>/feedback_*.md` for

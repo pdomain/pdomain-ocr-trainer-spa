@@ -2,7 +2,7 @@
 Status: active
 Owner: CT
 Created: 2026-07-13
-Last verified: 2026-11-06
+Last verified: 2026-11-07
 Kind: context
 ---
 
@@ -106,19 +106,21 @@ Standing open work also lives in [docs/roadmap.md](../roadmap.md).
 
 ## Legacy-unverified sweep
 
-- `AGENTS.md`, `CLAUDE.md`, `CONVENTIONS.md`, `DEVELOPMENT.md`, and
-  `docs/process/writing-style.md`: still active; verified against current
-  commands and conventions on 2026-07-14.
+- `AGENTS.md`, `CLAUDE.md`, `CODEX.md`, `CONVENTIONS.md`, `DOCGRAPH.md`,
+  `README.md`, `DEVELOPMENT.md`, and `docs/process/writing-style.md`: still
+  active; rechecked against current commands, configuration, and repository
+  structure on 2026-11-07. The documentation check did not run application tests.
 - The retired root-level open-question ledger was superseded. Durable unresolved
   items are preserved above, and shipped outcomes are recorded in
   [decisions](decisions.md).
 - Shipped behavior is [trainer workflows](../architecture/trainer-workflows.md)
   and [labeler import and freshness](../architecture/labeler-import-and-freshness.md).
   Tombstones for the removed plans are in [decisions](decisions.md).
-- `docs/plans/2026-06-10-m12-typeface-classifier.md`: partial on 2026-11-06.
+- `docs/plans/2026-06-10-m12-typeface-classifier.md`: partial on 2026-11-07.
   Keep it until production typeface training is implemented or abandoned.
 - `docs/plans/2026-07-14-review-fixes.md`: the suite mount, settings link, and
-  chord shortcuts are in the code. The device-index decision is not. Keep the
-  plan.
+  chord shortcuts are in the code. Dependency floors have advanced past the
+  former pin restriction. Marked partial on 2026-11-07; keep the plan for the
+  remaining device-index decision.
 - The dep-refresh issue was retired on 2026-11-06. The workflow file is gone.
   See [decisions](decisions.md).

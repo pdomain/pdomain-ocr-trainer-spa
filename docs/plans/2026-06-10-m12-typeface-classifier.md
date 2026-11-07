@@ -2,7 +2,7 @@
 Status: partial
 Owner: CT
 Created: 2026-06-10
-Last verified: 2026-07-14
+Last verified: 2026-11-07
 Kind: plan
 repo: pdomain/pdomain-ocr-trainer-spa
 milestone: M12
@@ -50,8 +50,15 @@ The planned stack is Python 3.13, FastAPI, Pydantic v2, `pdomain-ocr-training`
 `TypefaceEvalResult` — cross-repo gate), `pdomain-ui` `KanbanBoard` (crop
 thumbnail strip mode for classifier kanbans), React 18 + TypeScript, Vite,
 Vitest, and `pytest-playwright` for browser verification. The current frontend
-uses React 19 and `@pdomain/pdomain-ui ^0.11.0`; older versions in execution
+uses React 19 and `@pdomain/pdomain-ui ^0.12.1`; older versions in execution
 steps are historical projections.
+
+Verified on 2026-11-07 against `frontend/package.json`,
+`training/config_build.py`, `worker/train.py`, `worker/evaluate.py`, and
+`tests/unit/training/test_worker_dispatch.py`. Paths for Python modules are
+relative to `src/pdomain_ocr_trainer_spa/`. The local config and cast runner
+call remain; the production evaluation worker still raises. Existing fake-runner
+and browser tests establish the SPA interface, not production training.
 
 ## Global Constraints
 
@@ -352,14 +359,14 @@ def test_iter_events_typeface_calls_train_typeface(tmp_path) -> None:
     """Worker _iter_events routes typeface-classification to train_typeface."""
     from pdomain_ocr_trainer_spa.training.fake_runner import FakeTrainingRunner
     from pdomain_ocr_trainer_spa.worker.train import _iter_events
+
     runner = FakeTrainingRunner()
     args: dict = {
         "train_path": str(tmp_path / "train"),
         "val_path": str(tmp_path / "val"),
         "output_dir": str(tmp_path / "out"),
     }
-    events = list(_iter_events(runner, task="typeface-classification",
-        profile="test", args=args))
+    events = list(_iter_events(runner, task="typeface-classification", profile="test", args=args))
     kinds = [e.kind if hasattr(e, "kind") else e.get("kind") for e in events]
     assert "done" in kinds
 ```
@@ -380,18 +387,17 @@ Read the existing `FakeTrainingRunner` implementation, then add:
 ```python
 # In training/fake_runner.py — add train_typeface alongside existing methods
 
-def train_typeface(
-    self, profile: str, config: "TypefaceConfig"
-) -> "Iterator[TrainingEvent]":
+
+def train_typeface(self, profile: str, config: "TypefaceConfig") -> "Iterator[TrainingEvent]":
     """Fake typeface training: emits progress then done, no torch required."""
     from pdomain_ocr_training.protocols import TrainingEvent
+
     for epoch in range(1, 4):
         yield TrainingEvent(
             kind="metric",
             message=f"epoch {epoch}",
             progress=epoch / 3,
-            data={"accuracy": 0.80 + epoch * 0.05, "f1_macro": 0.78 + epoch *
-                0.05},
+            data={"accuracy": 0.80 + epoch * 0.05, "f1_macro": 0.78 + epoch * 0.05},
         )
     yield TrainingEvent(kind="done", message="training complete", progress=1.0)
 ```
@@ -400,6 +406,7 @@ def train_typeface(
 
 ```python
 # In worker/train.py — extend _iter_events
+
 
 def _iter_events(
     runner: _TrainingRunner, *, task: str, profile: str, args: dict[str, object]
@@ -433,12 +440,9 @@ The `_TrainingRunner` Protocol stub in `worker/train.py` also needs
 
 ```python
 class _TrainingRunner(Protocol):
-    def train_detection(self, profile: str,
-        config: DetectionConfig) -> Iterator[object]: ...
-    def train_recognition(self, profile: str,
-        config: RecognitionConfig) -> Iterator[object]: ...
-    def train_typeface(self, profile: str,
-        config: "TypefaceConfig") -> Iterator[object]: ...
+    def train_detection(self, profile: str, config: DetectionConfig) -> Iterator[object]: ...
+    def train_recognition(self, profile: str, config: RecognitionConfig) -> Iterator[object]: ...
+    def train_typeface(self, profile: str, config: "TypefaceConfig") -> Iterator[object]: ...
 ```
 
 Add `TypefaceConfig` to the `TYPE_CHECKING` block imports:
@@ -496,6 +500,7 @@ The typeface dataset layout on disk:
 ```python
 # Add to tests/unit/domain/test_datasets.py
 
+
 def test_typeface_kanban_builds(tmp_path: Path, settings: Settings) -> None:
     """Typeface kanban assembles from metadata.jsonl crop rows."""
     import json
@@ -509,23 +514,20 @@ def test_typeface_kanban_builds(tmp_path: Path, settings: Settings) -> None:
         crop_name = f"crop_{i:04d}.png"
         (task_dir / "images" / crop_name).write_bytes(b"png")
         with (task_dir / "metadata.jsonl").open("a", encoding="utf-8") as fh:
-            fh.write(json.dumps({"file_name": crop_name,
-                "typeface": tf}) + "\n")
+            fh.write(json.dumps({"file_name": crop_name, "typeface": tf}) + "\n")
 
-    view = dom.build_kanban(settings, profile="all",
-        task=TaskEnum.typeface_classification)
+    view = dom.build_kanban(settings, profile="all", task=TaskEnum.typeface_classification)
     train_rows = view.columns["train"].rows
     assert len(train_rows) >= 1
 
 
-def test_typeface_kanban_no_longer_raises_501(tmp_path: Path,
-    settings: Settings) -> None:
+def test_typeface_kanban_no_longer_raises_501(tmp_path: Path, settings: Settings) -> None:
     """typeface-classification must not raise AppError 501 any more."""
     from pdomain_ocr_trainer_spa.core.enums import TaskEnum
     from pdomain_ocr_trainer_spa.domain import datasets as dom
+
     # Should not raise
-    view = dom.build_kanban(settings, profile="all",
-        task=TaskEnum.typeface_classification)
+    view = dom.build_kanban(settings, profile="all", task=TaskEnum.typeface_classification)
     assert view.task == TaskEnum.typeface_classification
 ```
 
@@ -553,7 +555,7 @@ Extend `_SUPPORTED_TASKS` and add the `metadata.jsonl` reader:
 _SUPPORTED_TASKS = (
     TaskEnum.recognition,
     TaskEnum.detection,
-    TaskEnum.typeface_classification,   # M12
+    TaskEnum.typeface_classification,  # M12
 )
 
 
@@ -581,8 +583,7 @@ def _read_metadata_jsonl(task_dir: Path) -> LabelMap:
 
 def _read_task_labels(task_dir: Path, task: TaskEnum) -> LabelMap:
     """Read labels for any supported task layout."""
-    if task in (TaskEnum.typeface_classification,
-        TaskEnum.glyph_classification):
+    if task in (TaskEnum.typeface_classification, TaskEnum.glyph_classification):
         return _read_metadata_jsonl(task_dir)
     return _read_labels(task_dir)
 ```
@@ -590,8 +591,7 @@ def _read_task_labels(task_dir: Path, task: TaskEnum) -> LabelMap:
 Replace calls to `_read_labels` within `_on_disk_labels`:
 
 ```python
-def _on_disk_labels(settings: Settings, split: str, profile: str,
-    task: TaskEnum) -> LabelMap:
+def _on_disk_labels(settings: Settings, split: str, profile: str, task: TaskEnum) -> LabelMap:
     return _read_task_labels(_task_dir(settings, split, profile, task), task)
 ```
 
@@ -603,7 +603,7 @@ def _chip_label(task: TaskEnum, value: object) -> str:
     if task is TaskEnum.recognition:
         return str(value)
     if task is TaskEnum.typeface_classification:
-        return str(value)   # the typeface enum value string
+        return str(value)  # the typeface enum value string
     count = _bbox_count(value)
     return f"{count} bbox" if count == 1 else f"{count} bboxes"
 
@@ -810,6 +810,7 @@ Following the existing pattern, add a `TypefaceEvalConfig` build path and a
 ```python
 # In worker/evaluate.py
 
+
 def _iter_eval_events(
     runner: _EvalRunner, *, task: str, profile: str, args: dict[str, object]
 ) -> Iterator[object]:
@@ -817,12 +818,14 @@ def _iter_eval_events(
 
     if task == "typeface-classification":
         from pdomain_ocr_training.protocols import TypefaceEvalConfig
-        cfg = TypefaceEvalConfig.model_validate({
-            "val_path": args.get("val_path", ""),
-            "model_path": args.get("model_path", ""),
-            **{k: v for k, v in args.items()
-                if k in frozenset(TypefaceEvalConfig.model_fields)},
-        })
+
+        cfg = TypefaceEvalConfig.model_validate(
+            {
+                "val_path": args.get("val_path", ""),
+                "model_path": args.get("model_path", ""),
+                **{k: v for k, v in args.items() if k in frozenset(TypefaceEvalConfig.model_fields)},
+            }
+        )
         result = runner.evaluate_typeface(profile, cfg)
         yield _typeface_result_to_event(result)
         return

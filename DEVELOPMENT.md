@@ -2,7 +2,7 @@
 Status: active
 Owner: CT
 Created: 2026-05-21
-Last verified: 2026-11-06
+Last verified: 2026-11-07
 Kind: process
 ---
 
@@ -15,9 +15,10 @@ Kind: process
 - **Read when:** setting up, running, testing, or packaging the application.
 - **Search terms:** development, setup, dynamic port, build, coexistence.
 
-FastAPI + React/Vite SPA that replaces the legacy `pdomain-ocr-training` NiceGUI
-UI for OCR model training (detection + recognition + typeface + glyph
-classifiers).
+FastAPI + React/Vite SPA that replaces the legacy `pdomain-ocr-training`
+NiceGUI UI. Detection and recognition training use the production runner.
+Typeface UI and test support exist, but production typeface training and
+evaluation remain unfinished. Glyph-classifier training is not implemented.
 
 ---
 
@@ -36,10 +37,10 @@ classifiers).
 # Install toolchain versions (requires mise)
 make mise-setup
 
-# Install Python + frontend deps, set up pre-commit hooks
+# Install Python deps, hooks, and the Chromium browser
 make setup
 
-# Build the React frontend (optional for backend-only work)
+# Install frontend deps and build React (optional for backend-only work)
 make frontend-build
 ```
 
@@ -54,8 +55,9 @@ make dev-backend   # application entry point with --reload and dynamic port
 make dev-frontend  # vite dev on :5174
 ```
 
-Open <http://localhost:5174/>. Vite proxies API requests to the backend URL
-selected for the development process.
+Open <http://localhost:5174/>. Vite proxies `/api` and `/env.js` to
+`http://localhost:8081`, as configured in `frontend/vite.config.ts`. If the
+backend selects another port, update both proxy targets before using Vite.
 
 ### Run tests
 
@@ -83,10 +85,11 @@ All variables use the `PD_OCR_TRAINER_SPA_` prefix.
 | Variable                               | Default           | Description              |
 | -------------------------------------- | ----------------- | ------------------------ |
 | `PD_OCR_TRAINER_SPA_PORT`              | `8081`            | Backend port             |
-| `PD_OCR_TRAINER_SPA_HOST`              | `127.0.0.1`       | Backend host             |
+| `PD_OCR_TRAINER_SPA_HOST`              | `127.0.0.1`       | Settings host; CLI overrides it with `--host` |
 | `PD_OCR_TRAINER_SPA_ML_TRAINING_DIR`   | `~/ml-training`   | Training dataset root    |
 | `PD_OCR_TRAINER_SPA_ML_VALIDATION_DIR` | `~/ml-validation` | Validation dataset root  |
-| `PD_OCR_TRAINER_SPA_MATCHED_OCR_DIR`   | `~/matched-ocr`   | Labeler export root      |
+| `PD_OCR_TRAINER_SPA_MATCHED_OCR_DIR`   | `~/matched-ocr`   | Legacy setting; does not select the export root |
+| `PD_OCR_TRAINER_SPA_LABELER_EXPORT_ROOT` | unset           | Explicit export root; otherwise discovered through shared paths |
 | `PD_OCR_TRAINER_SPA_APP_DATA_ROOT`     | OS-specific       | App data root            |
 | `PD_OCR_TRAINER_SPA_SHARED_MODELS_DIR` | `~/shared-models` | Trained model output     |
 | `PD_OCR_TRAINER_SPA_ENABLE_HF_PUBLISH` | `false`           | Enable HF publish routes |
@@ -103,26 +106,29 @@ See `src/pdomain_ocr_trainer_spa/settings.py` for the full list.
 FastAPI process (torch-free)
   ├── /api/*         API routes
   ├── /env.js        Build version + feature flags for SPA
-  ├── /healthz       Owned by pdomain-ocr-ops mount_routes
+  ├── /healthz       Owned by pdomain-ops mount_routes
   └── /*             React SPA catch-all (serves index.html)
 
-Worker subprocess (torch + DocTR, launched by pdomain-ocr-ops LongJobRunner)
+Worker subprocess (torch + DocTR, launched by pdomain-ops LongJobRunner)
   └── pdomain_ocr_trainer_spa.worker.train
         └── pdomain_ocr_training.LocalTrainingRunner (ITrainingRunner)
 ```
 
 The FastAPI process **never imports torch**. Training is isolated to a worker
 subprocess whose lifecycle (start, supervise, cancel) is managed by the
-`pdomain-ocr-ops` `LongJobRunner`.
+`pdomain-ops` `LongJobRunner`.
 
 ---
 
 ## Ports
 
 - Backend: dynamically selected from the configured/default port
-- Frontend dev: `127.0.0.1:5174` (differs from pgdp-prep :5173)
+- Frontend dev: Vite port `5174`, set in `frontend/vite.config.ts`
 
-Both ports are configurable via environment variables.
+Set the backend's preferred port with `--port` or
+`PD_OCR_TRAINER_SPA_PORT`. Set its host with `--host`; the CLI passes that
+value into Settings even when a host environment variable is present.
+Change Vite's port and proxy targets in `frontend/vite.config.ts`.
 
 ---
 
