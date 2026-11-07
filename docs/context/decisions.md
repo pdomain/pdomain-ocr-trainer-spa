@@ -2,7 +2,7 @@
 Status: active
 Owner: CT
 Created: 2026-07-14
-Last verified: 2026-07-21
+Last verified: 2026-11-06
 Kind: context
 ---
 
@@ -15,6 +15,14 @@ Kind: context
 - **Read when:** investigating why current architecture differs from older
   plans.
 - **Search terms:** decisions, deviations, tombstones, retirement, rationale.
+
+## 2026-11-06: GitHub workflows removed; release is local
+
+Commit `f5437b31f3d44fddbfc8cf66f44fc3d0e7c6a6b8` deleted every GitHub Actions
+workflow, including dep-refresh, nightly, CI, and the old release workflow.
+Branch protection is off. `scripts/do-release.sh` tags `master` and creates the
+GitHub Release on this machine. The dated dep-refresh branch cannot accumulate
+here, because that workflow file is gone.
 
 ## 2026-07-21: Cut over GitHub Issues into governed docs
 
@@ -111,4 +119,15 @@ consumed.
 - Removal commit: `13758cc375fb06d83359a1e3407c41c6474eb2f9`
 - Rationale kept: builder and jobs Protocol suppressions in the unified
   catalogue
+- Remaining work: none
+
+### 2026-11-06 Retired: dep-refresh cannot auto-land
+
+- Old path: `docs/issues/2026-08-08-dep-refresh-cannot-auto-land.md`
+- Outcome: superseded
+- Superseded by: [DEVELOPMENT.md](../../DEVELOPMENT.md) section "Cut a release
+  locally" and `scripts/do-release.sh`
+- Removal commit: (fill after commit)
+- Rationale kept: the 2026-11-06 decision above. Owner commit
+  `f5437b31f3d44fddbfc8cf66f44fc3d0e7c6a6b8` removed `.github/workflows`.
 - Remaining work: none

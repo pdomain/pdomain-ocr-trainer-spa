@@ -2,7 +2,7 @@
 Status: active
 Owner: CT
 Created: 2026-07-13
-Last verified: 2026-07-21
+Last verified: 2026-11-06
 Kind: context
 ---
 
@@ -17,16 +17,13 @@ Kind: context
 
 ## Active
 
-- **Complete the typeface production round-trip.** Keep the existing dataset,
-  SPA, and API seam aligned while upstream `TypefaceConfig`, `train_typeface`,
-  and real evaluation remain unfinished. Evidence:
-  [partial M12 plan](../plans/2026-06-10-m12-typeface-classifier.md). Issue:
-  [M12 Typeface classifier](../issues/2026-07-21-gh-014-m12-typeface-classifier.md)
-  (former GH #14).
-- **Unify jobs surfaces.** Resolve dual progress UI residual (SSE toasts vs
-  AppShell jobs dock). Issue:
-  [unify jobs surfaces](../issues/2026-07-21-gh-025-unify-jobs-surfaces.md)
-  (former GH #25).
+- **Finish production typeface training.** The worker still uses a local
+  `TypefaceConfig` and a cast `train_typeface` call. The dataset and API seam
+  exist.
+  [M12 plan](../plans/2026-06-10-m12-typeface-classifier.md).
+  [M12 issue](../issues/2026-07-21-gh-014-m12-typeface-classifier.md).
+- **Wire production eval, including glyph slices.** `_build_runner` in
+  `worker/evaluate.py` raises. [M13 issue](../issues/2026-07-21-gh-015-m13-glyph-eval-slicing.md).
 - **Keep lint exceptions auditable.** Any configured or inline suppression must
   remain justified in the
   [lint deviations catalogue](../conventions/lint-deviations.md).
@@ -93,13 +90,17 @@ Kind: context
 
 ## Needs owner decision
 
-- **Jobs transport residual** (former GH #25): product direction already keeps
-  both toast and dock surfaces
-  ([decisions.md](decisions.md) 2026-07-14). Only reopen if that dual UX should
-  change. Until then, do not add a third progress surface; optional follow-up is
-  SSE-fed dock or quieter toasts.
+- **Jobs transport residual.** Product direction already keeps both toast and
+  dock surfaces. See [decisions.md](decisions.md), 2026-07-14. Only reopen if
+  keeping both surfaces should change. Until then, do not add a third progress
+  surface. Optional follow-up is an SSE-fed dock or quieter toasts.
+  [Jobs issue](../issues/2026-07-21-gh-025-unify-jobs-surfaces.md).
+- **Run-form device index.** The string-to-index mapping, including CPU, is
+  undecided. Do not invent it. The suite stores a device string.
+  `CreateRunRequest.device` is `int | None`. `NewRunPage` does not send it.
+  [Review-fixes plan](../plans/2026-07-14-review-fixes.md).
 
-Other deferred items should remain parked until their stated evidence appears.
+Other deferred items should wait until their stated evidence appears.
 
 Standing open work also lives in [docs/roadmap.md](../roadmap.md).
 
@@ -111,11 +112,13 @@ Standing open work also lives in [docs/roadmap.md](../roadmap.md).
 - The retired root-level open-question ledger was superseded. Durable unresolved
   items are preserved above, and shipped outcomes are recorded in
   [decisions](decisions.md).
-- The implemented milestone, ESLint, labeler-import, and pdomain-ui plans were
-  retired and removed in this staged migration. Their shipped behavior now
-  lives in [trainer workflows](../architecture/trainer-workflows.md) and
-  [labeler import and freshness](../architecture/labeler-import-and-freshness.md);
-  durable rationale and readable tombstones live in
-  [decisions](decisions.md), with remaining work preserved in this intent map.
-- `docs/plans/2026-06-10-m12-typeface-classifier.md`: partial; keep until the
-  upstream production round-trip is implemented or deliberately abandoned.
+- Shipped behavior is [trainer workflows](../architecture/trainer-workflows.md)
+  and [labeler import and freshness](../architecture/labeler-import-and-freshness.md).
+  Tombstones for the removed plans are in [decisions](decisions.md).
+- `docs/plans/2026-06-10-m12-typeface-classifier.md`: partial on 2026-11-06.
+  Keep it until production typeface training is implemented or abandoned.
+- `docs/plans/2026-07-14-review-fixes.md`: the suite mount, settings link, and
+  chord shortcuts are in the code. The device-index decision is not. Keep the
+  plan.
+- The dep-refresh issue was retired on 2026-11-06. The workflow file is gone.
+  See [decisions](decisions.md).

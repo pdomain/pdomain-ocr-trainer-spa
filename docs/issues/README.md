@@ -2,7 +2,7 @@
 Status: active
 Owner: CT
 Created: 2026-07-21
-Last verified: 2026-07-21
+Last verified: 2026-11-06
 Kind: process
 Level: I1
 ---
@@ -14,7 +14,7 @@ Level: I1
 - **Kind:** process
 - **Status:** active
 - **Level:** I1
-- **Last verified:** 2026-07-21
+- **Last verified:** 2026-11-06
 - **Read when:** filing a bug / defect / investigation report, or looking up an
   open issue's status, evidence, or resolution.
 - **Search terms:** issues folder, bug report, defect report, issue template,
@@ -64,11 +64,9 @@ than in per-machine harness memory.
   it** from a governed doc — the link would dangle. Refer to it by path / inline
   code.
 
-Standing product ordering still lives in [`docs/roadmap.md`](../roadmap.md).
-Every **open** former GitHub issue also has an individual report in this folder
-(cutover 2026-07-21). Closed issues stay in the git archive tombstone only. The
-GitHub Issues feature stays enabled, but the remote tracker is intended empty
-after cutover; see
+The remaining-work list lives in [`docs/roadmap.md`](../roadmap.md).
+
+The 2026-07-21 cutover decision is
 [`docs/decisions/2026-07-21-github-issues-cutover.md`](../decisions/2026-07-21-github-issues-cutover.md).
 
 ## Recommended structure
@@ -82,20 +80,13 @@ Lead with the **smallest decisive evidence**, separate **observation** from
 
 ## Open issues
 
-- [pd-ocr-trainer-spa milestone roadmap (M0–M14)](2026-07-21-gh-001-milestone-roadmap.md)
-  (former GH #1; umbrella)
-- [M12 Typeface classifier](2026-07-21-gh-014-m12-typeface-classifier.md)
-  (former GH #14; Now)
-- [M13 Glyph eval slicing](2026-07-21-gh-015-m13-glyph-eval-slicing.md)
-  (former GH #15; Next)
-- [M14 Glyph classifier](2026-07-21-gh-016-m14-glyph-classifier.md)
-  (former GH #16; Later)
-- [Unify jobs surfaces: SSE toasts vs AppShell jobs dock](2026-07-21-gh-025-unify-jobs-surfaces.md)
-  (former GH #25; Now)
-- [dep-refresh cannot auto-land: dated branches will accumulate once the
-  workflow runs](2026-08-08-dep-refresh-cannot-auto-land.md) (preventive;
-  workflow has not yet run)
+- Production typeface training builds a local `TypefaceConfig` and calls `train_typeface` through a cast. `FakeTrainingRunner` covers tests only. [M12 Typeface classifier](2026-07-21-gh-014-m12-typeface-classifier.md). Plan: [M12 plan](../plans/2026-06-10-m12-typeface-classifier.md).
+- The production eval worker raises `RuntimeError`. The message names missing glyph-annotation input and hard-coded `slices=[]`. [M13 Glyph eval slicing](2026-07-21-gh-015-m13-glyph-eval-slicing.md).
+- Glyph-classifier kanban still returns `dataset.task_unsupported`. [M14 Glyph classifier](2026-07-21-gh-016-m14-glyph-classifier.md).
+- The milestone umbrella stays open until M12–M14 close. [M0–M14 umbrella](2026-07-21-gh-001-milestone-roadmap.md).
+- Toasts and the jobs dock both stay. An SSE-fed dock and quieter toasts are not built. [Unify jobs surfaces](2026-07-21-gh-025-unify-jobs-surfaces.md).
+- `NewRunPage` does not send `device`. The string-to-index mapping is undecided. Plan: [2026-07-14 review fixes](../plans/2026-07-14-review-fixes.md).
 
-Resolved reports are deleted, so this index tracks open work only. Past
-resolutions live in the `docs/context/decisions.md` tombstones and in git
-history.
+Resolved reports are deleted.
+
+Tombstones live in [`docs/context/decisions.md`](../context/decisions.md).

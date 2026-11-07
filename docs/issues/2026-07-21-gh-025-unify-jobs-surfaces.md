@@ -2,7 +2,7 @@
 Status: active
 Owner: CT
 Created: 2026-07-21
-Last verified: 2026-07-21
+Last verified: 2026-11-06
 Kind: issue
 Level: I1
 ---
@@ -14,7 +14,7 @@ Level: I1
 - **Kind:** issue
 - **Status:** active
 - **Level:** I1
-- **Last verified:** 2026-07-21
+- **Last verified:** 2026-11-06
 - **Resolution:** Open
 - **Severity:** Medium — dual job-progress surfaces confuse operators
 - **Affected version:** pdomain-ocr-trainer-spa master @ cutover 2026-07-21
@@ -37,7 +37,10 @@ dock because they serve different interaction needs. Residual open work is the
 **implementation split** (poll vs push for the dock) and whether any toast
 noise should still be trimmed.
 
-Provenance: former GH #25. Roadmap priority: **Now**.
+Provenance: former GH #25. Still open on the
+[remaining-work list](../roadmap.md). The dual surfaces are already described
+in [trainer workflows](../architecture/trainer-workflows.md). What is not built
+is an SSE-fed dock or quieter toasts.
 
 ## Impact
 
@@ -64,7 +67,8 @@ not a regression of the AppShell migration itself.
 ### 2. Current code still splits channels
 
 `useNotificationStream` remains the toast path. `useTrainerJobs` remains the
-dock path. No single ownership decision is recorded in context docs.
+dock path. The 2026-07-14 decision keeps both. Trainer workflows already
+records that split.
 
 ## Root-cause hypotheses
 
@@ -78,17 +82,14 @@ dock path. No single ownership decision is recorded in context docs.
 
 ## Defects to fix
 
-1. **Confirm dual UX in architecture docs** — align trainer-workflows with
-   decisions.md so agents do not “unify away” the dock or toasts by accident.
-2. **Optional: feed dock from SSE** — if poll lag or double transport cost
-   matters, share the notification stream into the dock without retiring toasts.
+1. **Optional: feed dock from SSE, or quiet the toasts.** Architecture already
+   records the split. This follow-up is not built. It needs an owner decision
+   before anyone removes either surface.
 
 ## Next steps
 
-1. Treat dual surfaces as intentional unless owner reopens product direction.
-2. Document toast vs dock roles in
-   [trainer workflows](../architecture/trainer-workflows.md).
-3. Only then consider SSE-fed dock or toast quieting as a tech follow-up.
+1. Treat dual surfaces as intentional unless the owner reopens that decision.
+2. Build an SSE-fed dock or quieter toasts only after that decision.
 
 ## What is NOT broken (to scope the fix)
 

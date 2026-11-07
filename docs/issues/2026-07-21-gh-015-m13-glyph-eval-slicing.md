@@ -2,7 +2,7 @@
 Status: active
 Owner: CT
 Created: 2026-07-21
-Last verified: 2026-07-21
+Last verified: 2026-11-06
 Kind: issue
 Level: I1
 ---
@@ -14,7 +14,7 @@ Level: I1
 - **Kind:** issue
 - **Status:** active
 - **Level:** I1
-- **Last verified:** 2026-07-21
+- **Last verified:** 2026-11-06
 - **Resolution:** Open
 - **Severity:** Medium — glyph eval metrics lack annotation-keyed slices
 - **Affected version:** pdomain-ocr-trainer-spa master @ cutover 2026-07-21
@@ -34,7 +34,8 @@ and adds per-feature rows to the eval metrics table.
 Acceptance is defined in `specs/07-evaluation-and-metrics.md` §8. Former
 blocker #13 (HF publish path) is closed. M14 depends on this work.
 
-Provenance: former GH #15. Tracks former GH #1. Roadmap priority: **Next**.
+Provenance: former GH #15. Tracks former GH #1. Still open on the
+[remaining-work list](../roadmap.md).
 
 ## Impact
 
@@ -59,8 +60,10 @@ blocks: former GH #16 / M14
 
 ### 2. Roadmap placement
 
-Standing [roadmap](../roadmap.md) lists M13 under **Next**, after typeface
-residual and jobs-surface residual.
+The [remaining-work list](../roadmap.md) still includes M13. On 2026-11-06,
+`worker/evaluate.py` `_build_runner` still raises `RuntimeError` and names this
+slice gap. `tests/unit/worker/test_evaluate.py`
+`test_build_runner_surfaces_upstream_gap` locks that raise.
 
 ### 3. Spec authority
 

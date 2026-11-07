@@ -2,7 +2,7 @@
 Status: active
 Owner: CT
 Created: 2026-07-21
-Last verified: 2026-07-21
+Last verified: 2026-11-06
 Kind: issue
 Level: I1
 ---
@@ -14,7 +14,7 @@ Level: I1
 - **Kind:** issue
 - **Status:** active
 - **Level:** I1
-- **Last verified:** 2026-07-21
+- **Last verified:** 2026-11-06
 - **Resolution:** Open
 - **Severity:** Medium — umbrella tracker for remaining post-core milestones
 - **Affected version:** pdomain-ocr-trainer-spa master @ cutover 2026-07-21
@@ -56,8 +56,9 @@ retired plan path: docs/plans/2026-05-21-pd-ocr-trainer-spa-milestones.md
 
 ### 1. Shipped core milestones
 
-Roadmap shipped ledger lists former GH #2–#13 (M0–M11) as closed. Architecture
-is recorded in [trainer workflows](../architecture/trainer-workflows.md).
+M0–M11 behavior is recorded in
+[trainer workflows](../architecture/trainer-workflows.md). The old shipped
+ledger is not the remaining-work list.
 
 ### 2. Open children
 
@@ -87,7 +88,7 @@ into architecture + intent map).
 
 ## Next steps
 
-1. Work open children from [roadmap](../roadmap.md) Now / Next / Later.
+1. Work open children from the [remaining-work list](../roadmap.md).
 2. Do not recreate the retired multi-milestone plan file unless owners ask.
 3. When all children are resolved or deferred, retire this issue report.
 

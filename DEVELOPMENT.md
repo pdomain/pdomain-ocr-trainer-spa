@@ -2,7 +2,7 @@
 Status: active
 Owner: CT
 Created: 2026-05-21
-Last verified: 2026-07-14
+Last verified: 2026-11-06
 Kind: process
 ---
 
@@ -143,6 +143,19 @@ uv run python -m zipfile -l dist/pdomain_ocr_trainer_spa-*.whl | grep static/ind
 uv tool install ./dist/pdomain_ocr_trainer_spa-*.whl
 pdomain-ocr-trainer-ui --port 8081
 ```
+
+## Cut a release locally
+
+This repo has no GitHub Actions workflows.
+
+Cut a release on this machine with `scripts/do-release.sh`. That script calls
+`scripts/release-common.sh`.
+
+`scripts/release-common.sh` tags `master` and creates the GitHub Release after
+`make ci-slow`, unless `RELEASE_PREFLIGHT` overrides the preflight.
+
+Commit `f5437b31f3d44fddbfc8cf66f44fc3d0e7c6a6b8` removed `.github/workflows`,
+including the dated `dep-refresh` workflow.
 
 ---
 
