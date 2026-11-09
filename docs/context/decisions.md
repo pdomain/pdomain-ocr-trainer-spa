@@ -131,3 +131,13 @@ consumed.
 - Rationale kept: the 2026-11-06 decision above. Owner commit
   `f5437b31f3d44fddbfc8cf66f44fc3d0e7c6a6b8` removed `.github/workflows`.
 - Remaining work: none
+
+### 2026-11-09 Retired: issue-tracker migration handoff and the empty archive folder
+
+- Old paths: `docs/handoff/2026-07-17-issue-tracker-migration.md` and `docs/archive/.gitkeep`
+- Outcome: deleted; retired docs live in Git history, not the live tree or an archive folder
+- Superseded by: [GitHub issues cutover](../decisions/2026-07-21-github-issues-cutover.md)
+- Removal commit: (fill after commit)
+- Rationale kept: The handoff was already retired on 2026-07-21 when the cutover ran. Read it with
+  `git show c94d3de:docs/handoff/2026-07-17-issue-tracker-migration.md`.
+- Remaining work: none

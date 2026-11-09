@@ -46,7 +46,7 @@ noise, and finished chores. Bodies were archived into
 tombstone, then removed from the live tree in a follow-up commit.
 
 A 2026-07-17 handoff
-([issue-tracker-migration](../handoff/2026-07-17-issue-tracker-migration.md))
+(`docs/handoff/2026-07-17-issue-tracker-migration.md`, now in Git history at `c94d3de`)
 described the procedure; this cutover executes it against the sibling pattern
 used by `pdomain-ocr-cli` and `pdomain-ocr-simple-gui`.
 
