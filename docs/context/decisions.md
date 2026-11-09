@@ -137,7 +137,7 @@ consumed.
 - Old paths: `docs/handoff/2026-07-17-issue-tracker-migration.md` and `docs/archive/.gitkeep`
 - Outcome: deleted; retired docs live in Git history, not the live tree or an archive folder
 - Superseded by: [GitHub issues cutover](../decisions/2026-07-21-github-issues-cutover.md)
-- Removal commit: (fill after commit)
+- Removal commit: `79aca57d`
 - Rationale kept: The handoff was already retired on 2026-07-21 when the cutover ran. Read it with
   `git show c94d3de:docs/handoff/2026-07-17-issue-tracker-migration.md`.
 - Remaining work: none
