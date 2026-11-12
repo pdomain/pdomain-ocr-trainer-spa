@@ -174,7 +174,7 @@ bodies are in git history.
   `specs/README.md`
 - Outcome: superseded
 - Superseded by: `docs/architecture/` and `docs/roadmap.md`
-- Removal commit: (fill after commit)
+- Removal commit: `3a0115613fda814b989c566a52c1d8f2aa4cce5b`
 - Rationale kept: architecture pages for shipped behavior; roadmap for open,
   deferred, and dropped work
 - Remaining work: the roadmap. `specs/13-driver-contract.md` is not part of
