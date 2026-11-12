@@ -21,7 +21,8 @@ The backlog text lives in [docs/roadmap.md](../roadmap.md). These are the
 active classes:
 
 - **Production typeface training, production eval, and the glyph classifier.**
-  Blocked on sibling repositories named on the roadmap.
+  See the blocked section and the roadmap. A classifier package waits on
+  an owner decision.
 - **Publish upload, the unmounted toast hook, the dock row target, the
   `/settings` banner link, and the unused `/env.js` flags.** Open in this
   repository.
