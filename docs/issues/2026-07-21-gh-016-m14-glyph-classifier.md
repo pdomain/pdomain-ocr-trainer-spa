@@ -94,10 +94,11 @@ dependency.
 
 ## What is NOT broken (to scope the fix)
 
-- Core recognition/detection train/eval/publish paths.
-- M12 typeface SPA seam (separate task family).
-- Spec deferred notes in `specs/19-deferred-glyph-classifier.md` remain design
-  context, not proof of implementation.
+- Detection and recognition training call `LocalTrainingRunner`.
+- M12 typeface SPA seam (separate task family). Production typeface training
+  is still the cast described on the roadmap.
+- The old `specs/19` body is a superseded stub. This issue and the roadmap are
+  the glyph-classifier record.
 
 ## Resolution
 

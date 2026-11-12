@@ -2,7 +2,7 @@
 Status: active
 Owner: CT
 Created: 2026-07-14
-Last verified: 2026-11-06
+Last verified: 2026-11-12
 Kind: context
 ---
 
@@ -45,6 +45,10 @@ The notification stream drives transient notices. A separate `GET /api/jobs`
 adapter supplies `progress` and `run_id` to the pdomain-ui jobs dock. Both
 surfaces remain because they serve different interaction needs.
 
+Corrected 2026-11-12: `useNotificationStream` is not mounted, so those toasts
+do not fire. The dock poll and the run-detail SSE stream are the live
+surfaces. See the 2026-11-12 entry below.
+
 ## 2026-07-14: Use dependency-free SVG charts
 
 The implemented loss visualization uses an SVG component instead of the proposed
@@ -55,6 +59,10 @@ runtime dependency.
 
 Reading remote datasets does not authorize writes. Publish routes remain behind
 their explicit setting so users cannot upload merely by enabling a read path.
+
+Corrected 2026-11-12: preview is implemented. Publish helpers raise
+`AdapterNotImplementedError`. `enable_hf_publish` is not checked by the
+routes or the React app. See the 2026-11-12 entry below.
 
 ## 2026-07-14: Keep banner dismissal local to a tab
 
@@ -141,3 +149,33 @@ consumed.
 - Rationale kept: The handoff was already retired on 2026-07-21 when the cutover ran. Read it with
   `git show c94d3de:docs/handoff/2026-07-17-issue-tracker-migration.md`.
 - Remaining work: none
+
+## 2026-11-12: Root design specs are not current truth
+
+The numbered files in `specs/` still said they were the source of truth after
+architecture notes had become the shipped record. A review against the code
+on this date found the drift recorded in the architecture pages and the
+roadmap: charts are SVG, there is no generated client and no GitHub
+workflows, publish does not upload, and the toast hook is not mounted.
+
+Shipped behavior now lives under `docs/architecture/`. Remaining work lives
+only in `docs/roadmap.md`. Unbuilt routes from those specs (settings page,
+vocab scan, runtime device list, S3, source list, ndjson log) are dropped,
+not queued.
+
+`specs/13-driver-contract.md` stays in full. `tests/e2e/test_driver_contract.py`
+parses its tables. The other numbered specs are superseded stubs. Their old
+bodies are in git history.
+
+### 2026-11-12 Retired: root design specs
+
+- Old path: `specs/00-overview.md` through `specs/12-hotkeys-a11y.md`, and
+  `specs/14-testing.md` through `specs/19-deferred-glyph-classifier.md`, plus
+  `specs/README.md`
+- Outcome: superseded
+- Superseded by: `docs/architecture/` and `docs/roadmap.md`
+- Removal commit: (fill after commit)
+- Rationale kept: architecture pages for shipped behavior; roadmap for open,
+  deferred, and dropped work
+- Remaining work: the roadmap. `specs/13-driver-contract.md` is not part of
+  this retirement.

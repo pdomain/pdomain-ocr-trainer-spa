@@ -2,7 +2,7 @@
 Status: active
 Owner: CT
 Created: 2026-05-21
-Last verified: 2026-11-07
+Last verified: 2026-11-12
 Kind: architecture
 ---
 
@@ -21,17 +21,19 @@ replaces the NiceGUI user interface from
 continuing to use that package's training contracts.
 
 The shipped application manages profiles, dataset kanbans, detection and
-recognition runs, evaluation, models, and Hugging Face read and publish flows.
-The typeface dataset and browser workflow are present, but production typeface
-training and evaluation still depend on upstream contracts. Glyph-classifier
-training is not implemented.
+recognition runs, the model registry, and Hugging Face dataset preview.
+Production typeface training, production evaluation, and the publish worker
+are not wired. Glyph-classifier training is not implemented. Open work is
+[docs/roadmap.md](docs/roadmap.md).
 
 ## Current documentation
 
-- [Trainer workflows](docs/architecture/trainer-workflows.md) records shipped
-  architecture and evidence.
-- [Labeler import and freshness](docs/architecture/labeler-import-and-freshness.md)
-  records the labeler export boundary.
+- [Trainer workflows](docs/architecture/trainer-workflows.md) is the short map.
+  Topic pages next to it cover profiles and models, runs and evaluation, the
+  shell and jobs, Hugging Face, and labeler import.
+- Numbered files under `specs/` are superseded stubs, except
+  [specs/13-driver-contract.md](specs/13-driver-contract.md), which the driver
+  conformance test still parses. They are not the source of truth.
 - [Current state](docs/context/current-state.md),
   [intent map](docs/context/intent-map.md), and
   [decisions](docs/context/decisions.md) separate present truth, remaining work,

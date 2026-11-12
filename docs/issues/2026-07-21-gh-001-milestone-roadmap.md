@@ -21,12 +21,14 @@ Level: I1
 - **Read when:** orienting to M0–M14 status or former GH #1
 - **Search terms:** former GH #1, M0-M14, milestone roadmap, trainer SPA
 - **Relates to:** [roadmap](../roadmap.md),
-  [specs/16-milestones](../../specs/16-milestones.md)
+  [trainer workflows](../architecture/trainer-workflows.md)
 
 ## Summary
 
 Umbrella tracking issue for the FastAPI + React/Vite/TS trainer SPA that
-replaced the legacy NiceGUI `pd-ocr-trainer` UI. Design lives in `specs/00-19`.
+replaced the legacy NiceGUI `pd-ocr-trainer` UI. Shipped design lives in
+`docs/architecture/`. The numbered `specs/` files are superseded stubs, except
+the driver-contract inventory.
 Fifteen milestones (M0–M14): infrastructure M0–M3, core vertical slices M4–M9,
 post-core roadmap M10–M14.
 
@@ -46,7 +48,7 @@ Provenance: former GH #1.
 
 ```text
 repo: pdomain/pdomain-ocr-trainer-spa
-design: specs/00-19 (esp. specs/16-milestones.md)
+design: docs/architecture/ and docs/roadmap.md
 standing backlog: docs/roadmap.md
 retired plan path: docs/plans/2026-05-21-pd-ocr-trainer-spa-milestones.md
   (retired 2026-07-14; see docs/context/decisions.md)
@@ -94,8 +96,8 @@ into architecture + intent map).
 
 ## What is NOT broken (to scope the fix)
 
-- Core M0–M11 product paths already shipped.
-- Spec set `specs/00-19` remains the design authority.
+- Core M0–M11 product paths already shipped, with the exceptions on the
+  roadmap: production eval raises, and publish does not upload.
 
 ## Resolution
 

@@ -2,12 +2,12 @@
 Status: partial
 Owner: CT
 Created: 2026-06-10
-Last verified: 2026-11-07
+Last verified: 2026-11-12
 Kind: plan
 repo: pdomain/pdomain-ocr-trainer-spa
 milestone: M12
 track: E
-spec: specs/16-milestones.md §M12
+spec: docs/roadmap.md
 ---
 
 # M12 — Typeface Classifier Implementation Plan
@@ -30,6 +30,14 @@ spec: specs/16-milestones.md §M12
 Ship typeface-classification training, evaluation, and publishing inside the
 SPA, gated on `pdomain-ocr-training` growing a `TypefaceConfig` and
 `train_typeface` method behind `ITrainingRunner`.
+
+Checked on 2026-11-12: the local `TypefaceConfig` in
+`training/config_build.py` reads `<profile>/typeface-classification/`. Paths
+in the tasks below that say `<profile>/typeface/` are stale. Use the local
+class as the field list. On the same date, `pdomain-ocr-training`
+`docs/ROADMAP.md` keeps a typeface or glyph classifier out of that package
+until the owner confirms the scope. If it is built, it is a separate model
+package.
 
 ## Architecture
 

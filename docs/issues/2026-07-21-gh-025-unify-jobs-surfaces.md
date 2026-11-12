@@ -2,7 +2,7 @@
 Status: active
 Owner: CT
 Created: 2026-07-21
-Last verified: 2026-11-06
+Last verified: 2026-11-12
 Kind: issue
 Level: I1
 ---
@@ -14,9 +14,9 @@ Level: I1
 - **Kind:** issue
 - **Status:** active
 - **Level:** I1
-- **Last verified:** 2026-11-06
+- **Last verified:** 2026-11-12
 - **Resolution:** Open
-- **Severity:** Medium — dual job-progress surfaces confuse operators
+- **Severity:** Medium — the toast hook is unmounted while the dock polls
 - **Affected version:** pdomain-ocr-trainer-spa master @ cutover 2026-07-21
 - **Read when:** working on former GH #25, jobs dock, SSE notifications, or
   AppShell job progress
@@ -26,21 +26,20 @@ Level: I1
 
 ## Summary
 
-After the AppShell migration, two job-progress surfaces coexist. SSE-driven
-toasts come from `useNotificationStream`. The AppShell jobs dock is fed by
-`useTrainerJobs` polling.
+The jobs dock polls `GET /api/jobs` from `useTrainerJobs`. Run detail opens
+the job SSE stream. `useNotificationStream` would toast terminal events, and
+its unit test covers that, but `App.tsx` does not mount the hook and nothing
+calls `emitToast`. Terminal toasts do not fire.
 
-Product direction already leans toward **keeping both**:
-[decisions.md](../context/decisions.md) (2026-07-14) records that the
-notification stream drives transient notices and `GET /api/jobs` supplies the
-dock because they serve different interaction needs. Residual open work is the
-**implementation split** (poll vs push for the dock) and whether any toast
-noise should still be trimmed.
+The 2026-07-14 decision said the notification stream drives transient notices.
+That claim was corrected on 2026-11-12 in
+[decisions.md](../context/decisions.md). Do not add a third progress surface.
+The open choice is to mount the existing hook or delete it. An SSE-fed dock
+is not required.
 
 Provenance: former GH #25. Still open on the
-[remaining-work list](../roadmap.md). The dual surfaces are already described
-in [trainer workflows](../architecture/trainer-workflows.md). What is not built
-is an SSE-fed dock or quieter toasts.
+[remaining-work list](../roadmap.md). Current behavior is in
+[shell, jobs, and the client contract](../architecture/shell-and-jobs.md).
 
 ## Impact
 

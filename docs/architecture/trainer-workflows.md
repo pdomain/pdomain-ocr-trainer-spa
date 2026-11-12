@@ -2,7 +2,7 @@
 Status: active
 Owner: CT
 Created: 2026-07-14
-Last verified: 2026-11-07
+Last verified: 2026-11-12
 Kind: architecture
 ---
 
@@ -22,7 +22,7 @@ It builds typed run configuration.
 
 It delegates long work to worker subprocesses through `pdomain-ops`.
 
-The React application provides profile, dataset, run, evaluation, model, and publishing screens over those APIs.
+The React application provides profile, dataset, run, evaluation, model, and publish screens over those APIs. Publish screens do not upload yet. See [Hugging Face read and publish](huggingface.md).
 
 ## Dataset, training, and evaluation flow
 
@@ -34,7 +34,7 @@ Training and evaluation create run records, submit jobs, and expose progress and
 
 The jobs surface requires `GET /api/jobs`.
 
-Each mapped job carries its `progress` and associated `run_id` so the shared dock can open the run.
+Each mapped job carries `progress` (0–1) and `run_id`. The dock opens `/runs/` with the job id, not `run_id`.
 
 The production worker builds `LocalTrainingRunner`. Detection and recognition
 dispatch call its typed methods.
@@ -48,7 +48,7 @@ its typed runner interface covers only detection and recognition.
 
 The production eval worker does not call `LocalEvalRunner`.
 
-`worker/evaluate.py` `_build_runner` raises `RuntimeError` until upstream eval accepts glyph annotations and fills slices.
+`worker/evaluate.py` `_build_runner` raises `RuntimeError`. The text inside that raise is stale against `pdomain-ocr-training` 0.2.1, which already has the glyph-slice fields. Details are in [runs and evaluation](runs-and-evaluation.md).
 
 Tests inject a stub runner.
 
@@ -60,11 +60,21 @@ The frontend uses `@pdomain/pdomain-ui ^0.12.1` with React 19.
 
 Trainer-owned adapters supply header, shortcut, compute-target, and jobs content.
 
-The two surfaces coexist by design. The notification SSE stream still drives transient notices while the polling jobs adapter supplies durable dock state.
+The jobs dock polls `GET /api/jobs`. Run detail opens the job SSE stream.
+
+Terminal toasts do not fire. `App.tsx` does not call `useNotificationStream`. A sonner toaster is mounted, and `useNotificationStream` can toast terminal events. Details are in [shell, jobs, and the client contract](shell-and-jobs.md).
+
+## Where to read the rest
+
+- [Profiles, datasets, and models](profiles-datasets-and-models.md)
+- [Runs and evaluation](runs-and-evaluation.md)
+- [Shell, jobs, and the client contract](shell-and-jobs.md)
+- [Hugging Face read and publish](huggingface.md)
+- [Labeler import and freshness](labeler-import-and-freshness.md)
 
 ## Hugging Face boundaries
 
-Read and publish capabilities are gated separately. Dataset-source reads do not imply permission to publish models or datasets. Publishing remains an explicitly enabled write path.
+Dataset preview uses the token file. Publish routes validate the token and the license, then the domain helper raises `AdapterNotImplementedError`. `enable_hf_publish` is copied onto `/env.js` and does not gate those routes. A successful preview does not upload.
 
 ## Lint and type gates
 
