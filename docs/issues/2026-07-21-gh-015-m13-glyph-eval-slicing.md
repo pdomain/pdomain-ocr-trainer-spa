@@ -58,7 +58,7 @@ blocks: former GH #16 / M14
 ### 1. Original acceptance
 
 - Acceptance now recorded on the roadmap (formerly specs/07 §8)
-- Verification: `make ci` green; eval slicing acceptance tests pass
+- Verification: `just ci` green; eval slicing acceptance tests pass
 
 ### 2. Roadmap placement
 

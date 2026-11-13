@@ -61,7 +61,7 @@ blocked_by_at_file: former GH #13 (now closed / shipped)
 ### 1. Original acceptance
 
 - Round-trip: ingest a typeface-classification/v1 dataset, train, eval, publish
-- Verification: `make ci` green; round-trip for typeface-classification/v1
+- Verification: `just ci` green; round-trip for typeface-classification/v1
 
 ### 2. SPA-side progress (former GH comment, 2026-06-10)
 

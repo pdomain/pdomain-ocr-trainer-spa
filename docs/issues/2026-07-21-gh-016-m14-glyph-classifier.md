@@ -60,7 +60,7 @@ ship_criterion: ROADMAP (g2)
 ### 1. Original acceptance
 
 - Round-trip per the ROADMAP (g2) ship criterion
-- Verification: `make ci` green; full glyph-classifier round-trip
+- Verification: `just ci` green; full glyph-classifier round-trip
 
 ### 2. Intent map Blocked
 
