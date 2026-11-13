@@ -74,7 +74,7 @@ the partial plans, the roadmap, or the retained driver contract. The historical
 - Old path: `specs/00-overview.md`
 - Outcome: superseded; reviewed stub deleted after promotion.
 - Superseded by: [trainer-workflows](../architecture/trainer-workflows.md).
-- Removal commit: RETIREMENT_COMMIT.
+- Removal commit: dd323cd1399ab75dfb83f81eb918fe391c987b02.
 - Rationale kept: replacement architecture and the 2026-11-12 decision log.
 - Remaining work: the roadmap and partial plans remain authoritative.
 
@@ -83,7 +83,7 @@ the partial plans, the roadmap, or the retained driver contract. The historical
 - Old path: `specs/01-data-models.md`
 - Outcome: superseded; reviewed stub deleted after promotion.
 - Superseded by: [profiles-datasets-and-models](../architecture/profiles-datasets-and-models.md).
-- Removal commit: RETIREMENT_COMMIT.
+- Removal commit: dd323cd1399ab75dfb83f81eb918fe391c987b02.
 - Rationale kept: replacement architecture and the 2026-11-12 decision log.
 - Remaining work: the roadmap and partial plans remain authoritative.
 
@@ -92,7 +92,7 @@ the partial plans, the roadmap, or the retained driver contract. The historical
 - Old path: `specs/02-backend.md`
 - Outcome: superseded; reviewed stub deleted after promotion.
 - Superseded by: [trainer-workflows](../architecture/trainer-workflows.md).
-- Removal commit: RETIREMENT_COMMIT.
+- Removal commit: dd323cd1399ab75dfb83f81eb918fe391c987b02.
 - Rationale kept: replacement architecture and the 2026-11-12 decision log.
 - Remaining work: the roadmap and partial plans remain authoritative.
 
@@ -101,7 +101,7 @@ the partial plans, the roadmap, or the retained driver contract. The historical
 - Old path: `specs/03-frontend.md`
 - Outcome: superseded; reviewed stub deleted after promotion.
 - Superseded by: [shell-and-jobs](../architecture/shell-and-jobs.md).
-- Removal commit: RETIREMENT_COMMIT.
+- Removal commit: dd323cd1399ab75dfb83f81eb918fe391c987b02.
 - Rationale kept: replacement architecture and the 2026-11-12 decision log.
 - Remaining work: the roadmap and partial plans remain authoritative.
 
@@ -110,7 +110,7 @@ the partial plans, the roadmap, or the retained driver contract. The historical
 - Old path: `specs/04-profiles-and-config.md`
 - Outcome: superseded; reviewed stub deleted after promotion.
 - Superseded by: [profiles-datasets-and-models](../architecture/profiles-datasets-and-models.md).
-- Removal commit: RETIREMENT_COMMIT.
+- Removal commit: dd323cd1399ab75dfb83f81eb918fe391c987b02.
 - Rationale kept: replacement architecture and the 2026-11-12 decision log.
 - Remaining work: the roadmap and partial plans remain authoritative.
 
@@ -119,7 +119,7 @@ the partial plans, the roadmap, or the retained driver contract. The historical
 - Old path: `specs/05-dataset-kanban.md`
 - Outcome: superseded; reviewed stub deleted after promotion.
 - Superseded by: [profiles-datasets-and-models](../architecture/profiles-datasets-and-models.md).
-- Removal commit: RETIREMENT_COMMIT.
+- Removal commit: dd323cd1399ab75dfb83f81eb918fe391c987b02.
 - Rationale kept: replacement architecture and the 2026-11-12 decision log.
 - Remaining work: the roadmap and partial plans remain authoritative.
 
@@ -128,7 +128,7 @@ the partial plans, the roadmap, or the retained driver contract. The historical
 - Old path: `specs/06-training-runs.md`
 - Outcome: superseded; reviewed stub deleted after promotion.
 - Superseded by: [runs-and-evaluation](../architecture/runs-and-evaluation.md).
-- Removal commit: RETIREMENT_COMMIT.
+- Removal commit: dd323cd1399ab75dfb83f81eb918fe391c987b02.
 - Rationale kept: replacement architecture and the 2026-11-12 decision log.
 - Remaining work: the roadmap and partial plans remain authoritative.
 
@@ -137,7 +137,7 @@ the partial plans, the roadmap, or the retained driver contract. The historical
 - Old path: `specs/07-evaluation-and-metrics.md`
 - Outcome: superseded; reviewed stub deleted after promotion.
 - Superseded by: [runs-and-evaluation](../architecture/runs-and-evaluation.md).
-- Removal commit: RETIREMENT_COMMIT.
+- Removal commit: dd323cd1399ab75dfb83f81eb918fe391c987b02.
 - Rationale kept: replacement architecture and the 2026-11-12 decision log.
 - Remaining work: the roadmap and partial plans remain authoritative.
 
@@ -146,7 +146,7 @@ the partial plans, the roadmap, or the retained driver contract. The historical
 - Old path: `specs/08-models.md`
 - Outcome: superseded; reviewed stub deleted after promotion.
 - Superseded by: [profiles-datasets-and-models](../architecture/profiles-datasets-and-models.md).
-- Removal commit: RETIREMENT_COMMIT.
+- Removal commit: dd323cd1399ab75dfb83f81eb918fe391c987b02.
 - Rationale kept: replacement architecture and the 2026-11-12 decision log.
 - Remaining work: the roadmap and partial plans remain authoritative.
 
@@ -155,7 +155,7 @@ the partial plans, the roadmap, or the retained driver contract. The historical
 - Old path: `specs/09-hf-integration.md`
 - Outcome: superseded; reviewed stub deleted after promotion.
 - Superseded by: [huggingface](../architecture/huggingface.md).
-- Removal commit: RETIREMENT_COMMIT.
+- Removal commit: dd323cd1399ab75dfb83f81eb918fe391c987b02.
 - Rationale kept: replacement architecture and the 2026-11-12 decision log.
 - Remaining work: the roadmap and partial plans remain authoritative.
 
@@ -164,7 +164,7 @@ the partial plans, the roadmap, or the retained driver contract. The historical
 - Old path: `specs/10-jobs-and-sse.md`
 - Outcome: superseded; reviewed stub deleted after promotion.
 - Superseded by: [shell-and-jobs](../architecture/shell-and-jobs.md).
-- Removal commit: RETIREMENT_COMMIT.
+- Removal commit: dd323cd1399ab75dfb83f81eb918fe391c987b02.
 - Rationale kept: replacement architecture and the 2026-11-12 decision log.
 - Remaining work: the roadmap and partial plans remain authoritative.
 
@@ -173,7 +173,7 @@ the partial plans, the roadmap, or the retained driver contract. The historical
 - Old path: `specs/11-notifications.md`
 - Outcome: superseded; reviewed stub deleted after promotion.
 - Superseded by: [shell-and-jobs](../architecture/shell-and-jobs.md).
-- Removal commit: RETIREMENT_COMMIT.
+- Removal commit: dd323cd1399ab75dfb83f81eb918fe391c987b02.
 - Rationale kept: replacement architecture and the 2026-11-12 decision log.
 - Remaining work: the roadmap and partial plans remain authoritative.
 
@@ -182,7 +182,7 @@ the partial plans, the roadmap, or the retained driver contract. The historical
 - Old path: `specs/12-hotkeys-a11y.md`
 - Outcome: superseded; reviewed stub deleted after promotion.
 - Superseded by: [shell-and-jobs](../architecture/shell-and-jobs.md).
-- Removal commit: RETIREMENT_COMMIT.
+- Removal commit: dd323cd1399ab75dfb83f81eb918fe391c987b02.
 - Rationale kept: replacement architecture and the 2026-11-12 decision log.
 - Remaining work: the roadmap and partial plans remain authoritative.
 
@@ -191,7 +191,7 @@ the partial plans, the roadmap, or the retained driver contract. The historical
 - Old path: `specs/14-testing.md`
 - Outcome: superseded; reviewed stub deleted after promotion.
 - Superseded by: [trainer-workflows](../architecture/trainer-workflows.md).
-- Removal commit: RETIREMENT_COMMIT.
+- Removal commit: dd323cd1399ab75dfb83f81eb918fe391c987b02.
 - Rationale kept: replacement architecture and the 2026-11-12 decision log.
 - Remaining work: the roadmap and partial plans remain authoritative.
 
@@ -200,7 +200,7 @@ the partial plans, the roadmap, or the retained driver contract. The historical
 - Old path: `specs/15-deployment-dev.md`
 - Outcome: superseded; reviewed stub deleted after promotion.
 - Superseded by: [trainer-workflows](../architecture/trainer-workflows.md).
-- Removal commit: RETIREMENT_COMMIT.
+- Removal commit: dd323cd1399ab75dfb83f81eb918fe391c987b02.
 - Rationale kept: replacement architecture and the 2026-11-12 decision log.
 - Remaining work: the roadmap and partial plans remain authoritative.
 
@@ -209,7 +209,7 @@ the partial plans, the roadmap, or the retained driver contract. The historical
 - Old path: `specs/16-milestones.md`
 - Outcome: superseded; reviewed stub deleted after promotion.
 - Superseded by: [trainer-workflows](../architecture/trainer-workflows.md).
-- Removal commit: RETIREMENT_COMMIT.
+- Removal commit: dd323cd1399ab75dfb83f81eb918fe391c987b02.
 - Rationale kept: replacement architecture and the 2026-11-12 decision log.
 - Remaining work: the roadmap and partial plans remain authoritative.
 
@@ -218,7 +218,7 @@ the partial plans, the roadmap, or the retained driver contract. The historical
 - Old path: `specs/17-decisions.md`
 - Outcome: superseded; reviewed stub deleted after promotion.
 - Superseded by: [trainer-workflows](../architecture/trainer-workflows.md).
-- Removal commit: RETIREMENT_COMMIT.
+- Removal commit: dd323cd1399ab75dfb83f81eb918fe391c987b02.
 - Rationale kept: replacement architecture and the 2026-11-12 decision log.
 - Remaining work: the roadmap and partial plans remain authoritative.
 
@@ -227,7 +227,7 @@ the partial plans, the roadmap, or the retained driver contract. The historical
 - Old path: `specs/18-deferred-hf-datasets.md`
 - Outcome: superseded; reviewed stub deleted after promotion.
 - Superseded by: [huggingface](../architecture/huggingface.md).
-- Removal commit: RETIREMENT_COMMIT.
+- Removal commit: dd323cd1399ab75dfb83f81eb918fe391c987b02.
 - Rationale kept: replacement architecture and the 2026-11-12 decision log.
 - Remaining work: the roadmap and partial plans remain authoritative.
 
@@ -236,7 +236,7 @@ the partial plans, the roadmap, or the retained driver contract. The historical
 - Old path: `specs/19-deferred-glyph-classifier.md`
 - Outcome: superseded; reviewed stub deleted after promotion.
 - Superseded by: [profiles-datasets-and-models](../architecture/profiles-datasets-and-models.md).
-- Removal commit: RETIREMENT_COMMIT.
+- Removal commit: dd323cd1399ab75dfb83f81eb918fe391c987b02.
 - Rationale kept: replacement architecture and the 2026-11-12 decision log.
 - Remaining work: the roadmap and partial plans remain authoritative.
 
@@ -245,6 +245,6 @@ the partial plans, the roadmap, or the retained driver contract. The historical
 - Old path: `specs/README.md`
 - Outcome: superseded; reviewed stub deleted after promotion.
 - Superseded by: [trainer-workflows](../architecture/trainer-workflows.md).
-- Removal commit: RETIREMENT_COMMIT.
+- Removal commit: dd323cd1399ab75dfb83f81eb918fe391c987b02.
 - Rationale kept: replacement architecture and the 2026-11-12 decision log.
 - Remaining work: the roadmap and partial plans remain authoritative.
