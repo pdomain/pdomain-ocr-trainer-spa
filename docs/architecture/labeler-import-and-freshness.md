@@ -2,7 +2,7 @@
 Status: active
 Owner: CT
 Created: 2026-07-13
-Last verified: 2026-11-07
+Last verified: 2026-11-13
 Kind: architecture
 ---
 
@@ -18,8 +18,9 @@ Kind: architecture
 
 The trainer discovers labeler exports through the shared pdomain-ops path
 registry, reads their export manifest, and shows newly exported projects as
-fresh work. This behavior is optional. The SPA still starts when pdomain-ops or
-the export is unavailable.
+fresh work. Missing optional shared-path or manifest APIs fall back locally;
+an absent export does not prevent kanban construction. Other modules still
+require the `pdomain-ops` package.
 
 ## Export root selection
 
@@ -37,9 +38,10 @@ bounded by the shared path contract.
 
 The trainer consumes `pdomain.doctr-export-manifest` through
 `pdomain_ops.schemas.doctr_export`. The manifest is a compatibility bridge
-between the labeler export tree and trainer datasets. Missing, corrupt, or
-unreadable manifests behave as absent exports instead of failing the kanban
-request.
+between the labeler export tree and trainer datasets. The real reader treats
+`OSError` and `ValueError` as absent exports. The fallback treats file and JSON
+read errors as absence, but model validation after successful JSON parsing can
+still propagate an error.
 
 The bridge carries export metadata, not operational page lifecycle. A future
 PageRecord integration must preserve that ownership boundary.
@@ -53,6 +55,11 @@ that state without mutating the manifest. Freshness is acknowledged only after a
 successful kanban build. Banner dismissal is separate browser-tab state held in
 `sessionStorage`; dismissing a banner does not acknowledge the export.
 
+Timestamps are normalized to UTC. Acknowledgement is profile-wide: after a
+successful board build it records every fresh project in the manifest, not
+only projects visible for the selected task.
+
+`GET /api/labeler-export-diagnostics` reports the resolved export boundary.
 The export-root mode is returned dynamically by discovery. It is not a static
 field on `Settings`.
 

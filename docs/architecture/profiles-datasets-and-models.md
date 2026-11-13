@@ -2,7 +2,7 @@
 Status: active
 Owner: CT
 Created: 2026-11-12
-Last verified: 2026-11-12
+Last verified: 2026-11-13
 Kind: architecture
 ---
 
@@ -38,8 +38,9 @@ Each profile may have a `profile.toml` in the training directory and another
 in the validation directory. Known keys are `display_name`, `language`,
 `typeface`, and `notes`.
 
-A conflict is 409 `profile.toml.conflict` only when both files exist and the
-parsed dicts differ. A missing file is not a conflict.
+A conflict is 409 `profile.toml.conflict` only when both parsed dictionaries
+are nonempty and differ. A missing or empty file does not conflict with a
+populated one.
 
 `GET /api/profiles` loads every discovered profile, so one conflict fails the
 whole list.
@@ -53,7 +54,12 @@ Delete also returns 409 `profile.has_data` when
 `labels.json` or `metadata.jsonl`. It returns 409 `profile.has_data` when
 `<shared_models_dir>/<name>/` is not empty.
 
-Files under `typeface-classification/` do not block delete.
+Files under `typeface-classification/` alone do not block delete. An accepted
+delete removes the profile directory recursively.
+
+Profile summaries count classifier data under `typeface/` and `glyph/`, while
+the typeface workflow uses `typeface-classification/`. The summary's has-data
+flags cover detection and recognition only.
 
 ## How legacy layout is detected and moved
 

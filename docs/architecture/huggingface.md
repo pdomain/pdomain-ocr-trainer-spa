@@ -2,7 +2,7 @@
 Status: active
 Owner: CT
 Created: 2026-11-12
-Last verified: 2026-11-12
+Last verified: 2026-11-13
 Kind: architecture
 ---
 
@@ -43,7 +43,10 @@ itself.
 ## Preview reads a remote dataset and does not publish
 
 `GET /api/sources/huggingface/preview` reads a remote dataset preview. A
-successful read does not publish anything.
+successful read does not publish anything. Preview reads at most 50 rows of
+`metadata.jsonl`; `total` is the number returned, not a remote dataset count.
+Task and split do not select different remote files. Missing optional Hub
+support and remote/read failures can return an empty preview.
 
 Publish is a different router.
 
@@ -57,7 +60,7 @@ Dataset publish checks the token, then checks the license with
 `pdomain_book_tools.licenses`. An unknown SPDX id returns 409
 `publish.license_missing`.
 
-Model publish calls `get_model` first. An unknown name is 404
+After checking the token, model publish calls `get_model`. An unknown name is 404
 `model.unknown`. A stored legacy name then returns 422
 `publish.legacy_name`.
 

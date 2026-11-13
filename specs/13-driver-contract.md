@@ -1,13 +1,28 @@
+---
+Status: active
+Owner: CT
+Created: 2026-05-06
+Last verified: 2026-11-13
+Kind: spec
+---
+
 # 13 — Driver contract
+
+## Agent Index
+
+- **Kind:** spec
+- **Status:** active
+- **Read when:** changing the machine-parsed URL and testid inventories.
+- **Search terms:** driver contract, testid, route inventory, static conformance.
 
 `data-testid` and URL invariants for any future Playwright driver
 agent (analogous to `pd-ocr-labeler-driver`). The trainer-spa does
 not yet have a peer driver, but we lock the contract here so one
 can be built later without renames.
 
-> Required reading: [`03-frontend.md`](03-frontend.md),
-> [`05-dataset-kanban.md`](05-dataset-kanban.md),
-> [`06-training-runs.md`](06-training-runs.md).
+> Required reading: [shell and jobs](../docs/architecture/shell-and-jobs.md),
+> [profiles and datasets](../docs/architecture/profiles-datasets-and-models.md),
+> [runs and evaluation](../docs/architecture/runs-and-evaluation.md).
 
 ---
 
@@ -57,8 +72,13 @@ Query params:
 - `?profile=&task=&status=` filters on `/runs` — stable; new
   filters can be added but never silently rename.
 
+These query parameters are reserved by the contract, not implemented URL
+behavior. The result page does not consume `compare`. The run-list page does
+not read URL query filters and has no task filter. A static route check does
+not prove query behavior.
+
 URL changes outside this contract require an ADR in
-[`17-decisions.md`](17-decisions.md).
+[the decision log](../docs/context/decisions.md).
 
 ---
 
@@ -76,8 +96,9 @@ URL changes outside this contract require an ADR in
   labels, decorative icons. (But headings that anchor a section
   do get testids if a driver might wait on the section.)
 
-A linter rule (`eslint-plugin-testing-library` custom rule) flags
-buttons / inputs / `<a>` without a `data-testid`.
+Static conformance checks inspect the inventory below, with explicit waivers
+for unbuilt elements. ESLint does not require a testid on every interactive
+element.
 
 ---
 
@@ -268,9 +289,14 @@ regardless of the underlying pdomain-ui markup.
 
 ## 5. Conformance test
 
-A single Playwright spec, `tests/e2e/test_driver_contract.py`,
-exercises every URL above and asserts the listed testids exist.
-The driver contract is **what the conformance test passes**.
+`tests/e2e/test_driver_contract.py` parses these tables and checks frontend
+source for route declarations, static testids, and dynamic template prefixes.
+It does not launch Playwright or exercise a browser. Explicit waivers cover
+unbuilt profile selection, model publish, comparison, and kanban controls;
+sonner owns the toast DOM.
+
+The driver contract is **what the conformance test passes**. Passing static
+checks does not prove waived behavior or a runtime driver handshake.
 
 If a code change forces a testid rename, the spec change is part
 of the same PR; CI fails on diff otherwise.
@@ -281,7 +307,7 @@ of the same PR; CI fails on diff otherwise.
 
 The contract is versioned via `__APP_ENV__.driverContractVersion`,
 exposed in `/env.js`. Bumping is a breaking change requiring a
-notice in `17-decisions.md`. Drivers that pin a contract version
+notice in `docs/context/decisions.md`. Drivers that pin a contract version
 can refuse to operate against a newer SPA until the driver is
 updated.
 
@@ -294,3 +320,17 @@ Initial version: `1`.
 - Contract pattern: `pdomain-ocr-labeler-spa/specs/13-driver-contract.md`.
 - Driver agent precedent: `pd-ocr-labeler-driver` (Playwright MCP-
   driven mechanical pre-pass agent).
+
+## Adversarial Review
+
+- Stage: post-implementation source and contract review, 2026-11-13.
+- Source: fresh independent analyzer `ar_specs_runtime`, checked against
+  `tests/e2e/test_driver_contract.py`, `frontend/src/App.tsx`,
+  `frontend/src/pages/EvalResultPage.tsx`, and `frontend/eslint.config.js`.
+- Accepted findings: retain the parser's numbered headings and tables; replace
+  superseded required-reading links; correct the browser-test and linter
+  claims; distinguish reserved compare and run-list query filters from
+  implemented behavior.
+- Residual limits: static checks waive the inventories listed in the test.
+  They do not verify a browser, live API behavior, or version negotiation.
+  A peer driver remains deferred on the roadmap.

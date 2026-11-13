@@ -2,7 +2,7 @@
 Status: active
 Owner: CT
 Created: 2026-11-12
-Last verified: 2026-11-12
+Last verified: 2026-11-13
 Kind: architecture
 ---
 
@@ -28,6 +28,35 @@ stores `NoneAuth`. `NoneAuth.current_user` would return
 
 Hugging Face preview and publish return 400 `hf.auth_missing` when the token
 path is missing. They do not consult that user.
+
+## Suite identity and preference migration
+
+The app registers as `pdomain-ocr-trainer-spa`, using the bundled
+`pdomain-suite.json` descriptor. `_build_suite_app` adds the current interpreter
+and installed package version. A missing package version falls back to `0.0.0`.
+
+Before mounting suite routes, bootstrap recovers a nonempty `compute_device`
+preference stored under `apps["unknown"]`. If the real app already has a
+nonempty device preference, it preserves both values. Otherwise it copies the
+old device to the real app and removes only that key from `unknown`. Other
+preferences in both sections survive.
+
+Suite mounting is best-effort. This does not make the `pdomain-ops` package
+optional: the jobs router imports its local-jobs API directly. The stored device
+remains a string; this migration does not define its mapping to a run's integer
+device field or CPU behavior.
+
+## Evidence for suite identity
+
+- Code: `src/pdomain_ocr_trainer_spa/bootstrap.py` (`_build_suite_app`,
+  `_migrate_unknown_app_prefs`, `build_app`) and bundled `pdomain-suite.json`.
+- Tests: `tests/unit/test_bootstrap_suite_app.py`
+  (`test_build_suite_app_uses_real_app_id_and_this_interpreter`,
+  `test_migrate_moves_stray_compute_device_to_real_app_id`,
+  `test_migrate_does_not_clobber_existing_real_app_value`).
+- Commit: `b629fcb` implemented the registration and migration.
+- Verified: 2026-11-13 by source and test inspection; the isolated baseline
+  Python suite passed 323 tests.
 
 ## Routes, dock settings, and env.js flags
 

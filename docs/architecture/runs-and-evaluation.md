@@ -2,7 +2,7 @@
 Status: active
 Owner: CT
 Created: 2026-11-12
-Last verified: 2026-11-12
+Last verified: 2026-11-13
 Kind: architecture
 ---
 
@@ -114,7 +114,13 @@ The form at `/eval` includes a glyph-annotation slice control.
 
 The result page is `/eval/:runId/result`.
 
-It renders `result.slices`.
+It renders `result.slices`, sorts rows by absolute `delta_cer`, and styles
+rows using the supplied `low_support` flag. The table does not calculate
+whether `n_pos` is below 30.
+
+The worker's current result tuple carries aggregate metrics and sample count,
+not slices. The eval request exposes the slicing toggle but no annotation path.
+Production slice transport and a real-data round trip remain unfinished.
 
 It does not read query parameters.
 
@@ -125,9 +131,10 @@ The production worker does not score a model.
 In `worker/evaluate.py`, `_build_runner` raises `RuntimeError` and never
 calls `LocalEvalRunner`.
 
-The text inside that raise is stale against installed
-`pdomain-ocr-training` 0.2.1. It says `RecognitionEvalConfig` has no glyph
-input and that recognition eval hard-codes `slices=[]`.
+The lock resolves `pdomain-ocr-training` 0.3.0. Its installed source already
+has the glyph inputs and recognition slice support described below, so the
+worker's error explanation is stale. The error says `RecognitionEvalConfig`
+has no glyph input and that recognition eval hard-codes `slices=[]`.
 
 `RecognitionEvalConfig` in that package has
 `glyph_annotations_path: Path | None = None` and
@@ -161,9 +168,34 @@ Slicing math stays in `pdomain-ocr-training`.
 
 The remaining acceptance is on the [roadmap](../roadmap.md):
 
-- Every labelled feature writes `slices[]`.
-- The table sorts by absolute CER delta.
-- `n_pos` under 30 is low support.
+- Real evaluation writes populated `slices[]` for labelled features.
+- Worker results carry slices and excluded counts through to the API.
+- Supplied support flags correctly mark `n_pos` under 30.
+
+The table's sorting and supplied-flag rendering already exist. They do not
+prove the missing production data path.
+
+## Classification result schema
+
+`EvalMetrics` stores aggregate accuracy and macro F1. Its `per_class` map
+holds `ClassMetrics` entries with count, precision, recall, and F1. The result
+JSON round-trip preserves those fields. The result table shows
+aggregate accuracy and F1, plus generic slice rows; it does not render
+`overall.per_class` as a class table.
+
+The typeface result tests write a result file themselves. They verify schema
+serialization and API reading, not production classification scoring.
+
+## Evidence for result handling
+
+- Code: `src/pdomain_ocr_trainer_spa/core/models.py`,
+  `src/pdomain_ocr_trainer_spa/worker/evaluate.py`,
+  `frontend/src/components/EvalMetricsTable.tsx`, and
+  `frontend/src/pages/EvalResultPage.tsx`.
+- Tests: `tests/unit/domain/test_eval.py` (typeface result round-trip) and
+  `frontend/src/pages/EvalResultPage.test.tsx` (slice sorting).
+- Verified: 2026-11-13 by source and test inspection; the isolated baseline
+  Python suite passed 323 tests. This does not prove production evaluation.
 
 ## Code, tests, and the 2026-11-12 read
 

@@ -2,7 +2,7 @@
 Status: active
 Owner: CT
 Created: 2026-07-14
-Last verified: 2026-11-12
+Last verified: 2026-11-13
 Kind: architecture
 ---
 
@@ -48,17 +48,22 @@ its typed runner interface covers only detection and recognition.
 
 The production eval worker does not call `LocalEvalRunner`.
 
-`worker/evaluate.py` `_build_runner` raises `RuntimeError`. The text inside that raise is stale against `pdomain-ocr-training` 0.2.1, which already has the glyph-slice fields. Details are in [runs and evaluation](runs-and-evaluation.md).
+`worker/evaluate.py` `_build_runner` raises `RuntimeError`. The lock resolves
+`pdomain-ocr-training` 0.3.0, whose installed source already has the glyph-slice
+fields. The error explanation is stale. Details are in [runs and evaluation](runs-and-evaluation.md).
 
 Tests inject a stub runner.
 
 ## Shared application shell
 
-The frontend uses `@pdomain/pdomain-ui ^0.12.1` with React 19.
+The frontend uses `@pdomain/pdomain-ui ^0.13.0` with React 19.
 
 `AppShell` provides the rail and utility dock.
 
 Trainer-owned adapters supply header, shortcut, compute-target, and jobs content.
+The suite uses the real app identity and migrates stranded device preferences
+before mounting. See [shell, jobs, and the client contract](shell-and-jobs.md)
+for the copy-and-clear rules and the remaining device-mapping decision.
 
 The jobs dock polls `GET /api/jobs`. Run detail opens the job SSE stream.
 
@@ -74,7 +79,11 @@ Terminal toasts do not fire. `App.tsx` does not call `useNotificationStream`. A 
 
 ## Hugging Face boundaries
 
-Dataset preview uses the token file. Publish routes validate the token and the license, then the domain helper raises `AdapterNotImplementedError`. `enable_hf_publish` is copied onto `/env.js` and does not gate those routes. A successful preview does not upload.
+Dataset preview uses the token file. Dataset publish validates the token and
+license. Model publish validates the token, model existence, and legacy naming.
+Both domain helpers raise `AdapterNotImplementedError` before job submission.
+`enable_hf_publish` is copied onto `/env.js` and does not gate those routes.
+A successful preview does not upload.
 
 ## Lint and type gates
 
@@ -83,6 +92,27 @@ The Python gate uses Ruff and basedpyright.
 The frontend package's `lint` script runs ESLint with `--max-warnings 0`. This gate lives in the frontend package rather than a repository-global ESLint command.
 
 The single [lint deviations catalogue](../conventions/lint-deviations.md) records configured rule exceptions and inline suppressions.
+
+## Quality and packaging boundaries
+
+`just ci` runs locked setup, pre-commit, Python static checks and tests,
+frontend typecheck, tests, format and lint checks, knip, and strict docgraph.
+It deliberately skips frontend build, browser e2e, and wheel packaging.
+`ci-full` and `ci-slow` retain those release checks.
+
+The public build runs frontend-build, then `uv build --sdist`, then
+`uv build --wheel`. Both artifacts are built from the source tree. The
+separate commands avoid relying on a wheel rebuilt from an sdist. The global
+Hatch artifacts setting includes the generated static directory in both
+artifacts. These settings preserve the bundle that Hatch normally ignores.
+
+### Evidence for the build boundary
+
+- Code: `justfile`, `pyproject.toml`, and `build_hooks/spa_check.py`.
+- Tests: `tests/test_packaging.py`
+  (`test_just_build_uses_explicit_sdist_and_wheel`).
+- Verified: 2026-11-13 by command and source inspection; the isolated baseline
+  Python suite passed 323 tests. Release recipes were inspected, not run.
 
 ## Checked code, tests, and configuration
 

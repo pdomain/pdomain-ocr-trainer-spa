@@ -6,7 +6,7 @@ roots = ['.']
 mode = "git"
 convention = "agent-index"
 freshness_days = 30
-include = ['*.md', 'docs/**/*.md']
+include = ['*.md', 'docs/*.md', 'docs/**/*.md', 'specs/*.md', 'specs/**/*.md']
 exclude = ['agent/**', 'agents/**', 'skills/**', 'prompts/**', '.claude/**', '.codex/**', '.cursor/**', '.docgraph/**']
 
 # Non-md files scanned for reverse references to indexed markdown docs.
