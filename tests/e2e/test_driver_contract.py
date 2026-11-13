@@ -9,11 +9,11 @@ Playwright driver agent:
 
 Spec 13 §5 names this file and says "the driver contract is what the
 conformance test passes". A live Playwright run needs a browser, which
-`make ci` does not provide. Spec 13 §3 makes the testids "machine-grep-
+`just ci` does not provide. Spec 13 §3 makes the testids "machine-grep-
 able" precisely so the contract can be verified statically — so this
 test parses spec 13's own inventory tables and asserts the frontend
 source declares every static testid and the router defines every URL.
-It runs pure-Python in `make ci`; no browser, no Playwright, no marker.
+It runs pure-Python in `just ci`; no browser, no Playwright, no marker.
 
 If a code change renames a testid, this test fails until both the spec
 table and the source are updated in the same PR (spec 13 §5).

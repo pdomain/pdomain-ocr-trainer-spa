@@ -178,9 +178,9 @@ No React module reads the flags `/env.js` emits. The flags are
 
 Publish routes do not read `enable_hf_publish` either.
 
-#### `make openapi-export` is not a gate
+#### `just openapi-export` is not a gate
 
-`make openapi-export` calls `pdomain_ocr_trainer_spa.scripts.export_openapi`.
+`just openapi-export` calls `pdomain_ocr_trainer_spa.scripts.export_openapi`.
 That module is not in the tree.
 
 There is no generated TypeScript client.

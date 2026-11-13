@@ -33,7 +33,7 @@ Glyph-classifier kanban returns `dataset.task_unsupported`.
 
 Publish routes validate a request, then raise `AdapterNotImplementedError`.
 
-Quality gates run through the Make targets in
+Quality gates run through the just recipes in
 [DEVELOPMENT.md](../../DEVELOPMENT.md).
 
 Releases are local (`scripts/do-release.sh`).

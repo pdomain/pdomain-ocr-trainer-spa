@@ -207,6 +207,6 @@ filterwarnings = [
     "ignore::ResourceWarning:coverage.*",
 ]
 markers = [
-    "slow: marks tests as slow (excluded from default make test run)",
+    "slow: marks tests as slow (excluded from default just test run)",
     "e2e: marks tests as end-to-end (requires a running server)",
 ]

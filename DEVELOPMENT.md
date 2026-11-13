@@ -35,24 +35,27 @@ evaluation remain unfinished. Glyph-classifier training is not implemented.
 
 ```bash
 # Install toolchain versions (requires mise)
-make mise-setup
+just mise-setup
 
-# Install Python deps, hooks, and the Chromium browser
-make setup
+# Install locked Python deps and hooks
+just setup
+
+# Install Chromium for browser tests
+just playwright-install
 
 # Install frontend deps and build React (optional for backend-only work)
-make frontend-build
+just frontend-build
 ```
 
 ### Run in dev mode
 
 ```bash
 # Start the backend on a dynamically selected port and Vite on port 5174
-make dev
+just dev
 
 # Or individually
-make dev-backend   # application entry point with --reload and dynamic port
-make dev-frontend  # vite dev on :5174
+just dev-backend   # application entry point with --reload and dynamic port
+just dev-frontend  # vite dev on :5174
 ```
 
 Open <http://localhost:5174/>. Vite proxies `/api` and `/env.js` to
@@ -62,16 +65,16 @@ backend selects another port, update both proxy targets before using Vite.
 ### Run tests
 
 ```bash
-make test            # pytest (backend, excludes slow)
-make frontend-test   # vitest
-make test-slow       # slow tests (real subprocess + HF mocks)
+just test            # pytest (backend, excludes slow)
+just frontend-test   # vitest
+just test-slow       # slow tests (real subprocess + HF mocks)
 ```
 
 ### Lint + typecheck
 
 ```bash
-make lint
-make typecheck
+just lint
+just typecheck
 ```
 
 ---
@@ -135,7 +138,7 @@ Change Vite's port and proxy targets in `frontend/vite.config.ts`.
 ## Building a wheel
 
 ```bash
-make frontend-build   # build SPA → src/pdomain_ocr_trainer_spa/static/
+just frontend-build   # build SPA → src/pdomain_ocr_trainer_spa/static/
 uv build --sdist      # source distribution from the source tree
 uv build --wheel      # wheel from the source tree
 
@@ -158,7 +161,7 @@ Cut a release on this machine with `scripts/do-release.sh`. That script calls
 `scripts/release-common.sh`.
 
 `scripts/release-common.sh` tags `master` and creates the GitHub Release after
-`make ci-slow`, unless `RELEASE_PREFLIGHT` overrides the preflight.
+`just ci-slow`, unless `RELEASE_PREFLIGHT` overrides the preflight.
 
 Commit `f5437b31f3d44fddbfc8cf66f44fc3d0e7c6a6b8` removed `.github/workflows`,
 including the dated `dep-refresh` workflow.
@@ -168,7 +171,7 @@ including the dated `dep-refresh` workflow.
 ## Diagnostics
 
 ```bash
-make doctor   # prints Python/Node versions, CUDA/MPS availability, HF token status
+just doctor   # prints Python/Node versions, CUDA/MPS availability, HF token status
 ```
 
 ---
@@ -200,7 +203,7 @@ isolated from each other by two separate namespaces: **ports** and
 Because the env-var prefixes differ by the `_SPA` segment, a variable set for
 one app is **never** read by the other — there is no shared key. A stray
 `PD_OCR_TRAINER_PORT=8000` does not move the SPA off `8081`, and vice versa. The
-two default ports (`8000` vs `8081`) also differ, so the bare `make dev` /
+two default ports (`8000` vs `8081`) also differ, so the bare `just dev` /
 `pdomain-ocr-trainer-ui` invocations bind distinct sockets with zero
 configuration.
 

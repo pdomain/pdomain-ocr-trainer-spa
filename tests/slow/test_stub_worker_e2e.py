@@ -3,8 +3,8 @@
 Exercises the actual subprocess plumbing — env var passing, line buffering,
 exit-code -> job state — without CUDA or DocTR (spec 14-testing §5.3).
 
-Marked ``slow``: excluded from the default ``make test`` run, executed by
-``make test-slow``.
+Marked ``slow``: excluded from the default ``just test`` run, executed by
+``just test-slow``.
 """
 
 from __future__ import annotations

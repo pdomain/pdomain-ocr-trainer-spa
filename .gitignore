@@ -57,7 +57,7 @@ Thumbs.db
 # ship-issue bot temp cache
 .ship-issue-tmp/
 
-# AI=1 make output capture log
+# AI=1 just output capture log
 .ci-ai.log
 .worktrees/
 .worktrees/**/.venv

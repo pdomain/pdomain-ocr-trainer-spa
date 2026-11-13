@@ -22,7 +22,7 @@ def check() -> None:
     index = STATIC_DIR / "index.html"
     if not index.exists():
         print(
-            f"ERROR: {index} not found.\nRun `make frontend-build` before `make build`.",
+            f"ERROR: {index} not found.\nRun `just frontend-build` before `just build`.",
             file=sys.stderr,
         )
         sys.exit(1)
@@ -38,14 +38,14 @@ def check() -> None:
 
     if not js_files:
         print(
-            f"ERROR: No assets/*.js found in {STATIC_DIR}.\nRun `make frontend-build` before `make build`.",
+            f"ERROR: No assets/*.js found in {STATIC_DIR}.\nRun `just frontend-build` before `just build`.",
             file=sys.stderr,
         )
         sys.exit(1)
 
     if not css_files:
         print(
-            f"ERROR: No assets/*.css found in {STATIC_DIR}.\nRun `make frontend-build` before `make build`.",
+            f"ERROR: No assets/*.css found in {STATIC_DIR}.\nRun `just frontend-build` before `just build`.",
             file=sys.stderr,
         )
         sys.exit(1)

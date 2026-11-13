@@ -1,10 +1,10 @@
 """Browser smoke tests verifying AppShell migration — runs against the real server.
 
-Requires: make e2e-browser (frontend must be built + server must be running on
+Requires: just e2e-browser (frontend must be built + server must be running on
 --base-url, defaulting to http://localhost:8081).
 
-These tests are marked ``e2e`` so they are excluded from ``make test`` (which
-runs pure-Python unit tests only) and only execute under ``make e2e-browser``.
+These tests are marked ``e2e`` so they are excluded from ``just test`` (which
+runs pure-Python unit tests only) and only execute under ``just e2e-browser``.
 """
 
 import pytest

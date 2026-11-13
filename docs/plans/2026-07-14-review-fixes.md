@@ -44,7 +44,7 @@ this repository; `pyproject.toml` records that 0.11.2 loosened the pins.
 - No auth added (v1 no-auth design). No new SettingsPage/route. Do not wire
   NewRunPage to the device preference until string-to-index and CPU semantics
   are decided. The former dependency pin restriction is obsolete.
-- TDD: failing test first for code tasks. `make ci AI=1` before each commit. Never bare pytest. Worktree isolation. Conventional commits. Nothing pushed.
+- TDD: failing test first for code tasks. `AI=1 just ci` before each commit. Never bare pytest. Worktree isolation. Conventional commits. Nothing pushed.
 - After spec edits: docgraph reindex + check same-turn.
 
 ## Verified outcomes

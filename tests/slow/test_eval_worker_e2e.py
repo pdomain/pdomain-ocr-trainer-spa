@@ -4,7 +4,7 @@ Exercises the eval round-trip end-to-end (spec 07 §8 acceptance): an eval run
 submitted to a real subprocess produces ``runs/<id>/result.json`` on disk,
 which the eval API then reads back.
 
-Marked ``slow``: excluded from the default ``make test`` run.
+Marked ``slow``: excluded from the default ``just test`` run.
 """
 
 from __future__ import annotations

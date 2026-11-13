@@ -14,7 +14,7 @@ Two test tiers:
 
 Run with::
 
-    make e2e-browser      # browser tier runs (requires playwright-install)
+    just e2e-browser      # browser tier runs (requires playwright-install)
     uv run pytest tests/e2e/ -m e2e --no-cov  # both tiers
 """
 

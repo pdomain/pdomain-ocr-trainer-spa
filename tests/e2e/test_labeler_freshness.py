@@ -1,10 +1,10 @@
 """Browser verification: kanban renders fresh-flagged projects + banner visible.
 
 Uses a fixture export tree + manifest so the test is fully self-contained.
-Requires ``make playwright-install`` (runs chromium).
+Requires ``just playwright-install`` (runs chromium).
 
-Marked ``@pytest.mark.e2e`` so they are excluded from ``make test``
-(pure-Python unit tests only) and execute under ``make e2e-browser``.
+Marked ``@pytest.mark.e2e`` so they are excluded from ``just test``
+(pure-Python unit tests only) and execute under ``just e2e-browser``.
 
 Ordering note: ``test_banners_api_returns_fresh_banner`` and
 ``test_kanban_api_returns_fresh_row`` each independently arrange a fresh

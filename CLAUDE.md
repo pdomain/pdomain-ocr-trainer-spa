@@ -23,19 +23,19 @@ Agent guidance for the `pdomain-ocr-trainer-spa` repo.
 
 | target                        | does                                                                                                        |
 | ----------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| `make local-setup`            | clone any missing sibling pdomain repos (pdomain-book-tools, pdomain-ops, pdomain-ocr-training, pdomain-ui) |
-| `make local-dev`              | switch to local-dev mode (3 Python siblings editable + pdomain-ui linked + marker)                          |
-| `make local-check`            | print local-dev mode + per-sibling resolution                                                               |
-| `make local-upgrade-deps`     | upgrade deps then restore editables (local-mode only)                                                       |
-| `make local-run`              | run the SPA against local-dev workspace (local-mode only)                                                   |
-| `make local-setup-py`         | re-apply editable Python siblings (idempotent; called by local-run)                                         |
-| `make local-frontend-install` | pnpm install + restore pnpm link overlay for pdomain-ui                                                     |
-| `make local-frontend-build`   | Vite build via local-linked siblings (called by local-run)                                                  |
-| `make update-pdomain-deps`    | bump pdomain sibling deps to registry latest; leaves diff for review                                        |
+| `just local-setup`            | clone any missing sibling pdomain repos (pdomain-book-tools, pdomain-ops, pdomain-ocr-training, pdomain-ui) |
+| `just local-dev`              | switch to local-dev mode (3 Python siblings editable + pdomain-ui linked + marker)                          |
+| `just local-check`            | print local-dev mode + per-sibling resolution                                                               |
+| `just local-upgrade-deps`     | upgrade deps then restore editables (local-mode only)                                                       |
+| `just local-run`              | run the SPA against local-dev workspace (local-mode only)                                                   |
+| `just local-setup-py`         | re-apply editable Python siblings (idempotent; called by local-run)                                         |
+| `just local-frontend-install` | pnpm install + restore pnpm link overlay for pdomain-ui                                                     |
+| `just local-frontend-build`   | Vite build via local-linked siblings (called by local-run)                                                  |
+| `just update-pdomain-deps`    | bump pdomain sibling deps to registry latest; leaves diff for review                                        |
 
 <!-- markdownlint-enable MD013 -->
 
-The repository-backed local workflow is defined by the `local-*` Make targets
+The repository-backed local workflow is defined by the `local-*` just recipes
 above and their scripts under `scripts/`. See [DEVELOPMENT.md](DEVELOPMENT.md)
 for setup and runtime guidance, [CONVENTIONS.md](CONVENTIONS.md) for coding
 rules, and [DOCGRAPH.md](DOCGRAPH.md) for documentation governance.
@@ -93,7 +93,7 @@ any step below.
    branch, use the `finishing-a-development-branch` skill to decide how to
    integrate.
 9. **TDD.** Write the failing test first where the plan calls for it.
-10. **Verify before committing.** Focused verification plus `make ci`.
+10. **Verify before committing.** Focused verification plus `just ci`.
 11. **Commit locally; do not push** without explicit say-so.
 
 <!-- workspace-process:end -->

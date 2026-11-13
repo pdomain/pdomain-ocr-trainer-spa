@@ -53,7 +53,7 @@ if TYPE_CHECKING:
 
 _PACKAGE = "pdomain_ocr_trainer_spa"
 
-# The compiled SPA lives here (populated by make frontend-build)
+# The compiled SPA lives here (populated by just frontend-build)
 _STATIC_DIR = Path(__file__).parent / "static"
 
 # Module-level task set — keeps fire-and-forget tasks alive until they complete
@@ -224,7 +224,7 @@ def build_app(settings: Settings) -> FastAPI:
         if not index.exists():
             raise HTTPException(
                 status_code=503,
-                detail="Frontend not built — run make frontend-build",
+                detail="Frontend not built — run just frontend-build",
             )
         return FileResponse(index)
 

@@ -1026,13 +1026,13 @@ git commit -m "chore(m12): add data-testid contract to NewRunPage for e2e tests"
 
 ---
 
-## Task 8: Run `make ci` green + full integration
+## Task 8: Run `just ci` green + full integration
 
 - [ ] **Step 1: Run full CI**
 
 ```bash
 cd /workspaces/ocr-container/pdomain-ocr-trainer-spa
-make ci 2>&1 | tail -40
+just ci 2>&1 | tail -40
 ```
 
 Fix any lint/typecheck issues before proceeding. Common issues:
@@ -1059,7 +1059,7 @@ git commit -m "chore(m12): lint + typecheck fixes for typeface-classification"
 **Files:**
 
 - Create: `tests/e2e/test_m12_typeface.py`
-- Modify: `Makefile` (add `e2e-browser` if not already present from Track D)
+- Modify: `justfile` (add `e2e-browser` if not already present from Track D)
 
 This task assumes `pytest-playwright` is already in the
 `[dependency-groups] e2e` group (added by Track D Task 5). If Track D has not
@@ -1191,7 +1191,7 @@ def test_typeface_kanban_subpath_renders(page, typeface_server: str) -> None:
 
 ```bash
 cd /workspaces/ocr-container/pdomain-ocr-trainer-spa
-make e2e-browser 2>&1 | tail -30
+just e2e-browser 2>&1 | tail -30
 ```
 
 Expected: all 4 tests PASS
@@ -1200,7 +1200,7 @@ Expected: all 4 tests PASS
 
 ```bash
 cd /workspaces/ocr-container/pdomain-ocr-trainer-spa
-make ci 2>&1 | tail -20
+just ci 2>&1 | tail -20
 ```
 
 Expected: GREEN
@@ -1227,7 +1227,7 @@ git commit -m "feat(m12): Playwright browser verification for \
 - [ ] `POST /api/eval` with `task=typeface-classification` → 202;
       `GET /api/eval/{id}/result` → per-class accuracy/F1.
 - [ ] Typeface kanban route renders in browser.
-- [ ] `make ci` green.
+- [ ] `just ci` green.
 
 ---
 
