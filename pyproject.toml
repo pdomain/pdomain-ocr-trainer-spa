@@ -54,7 +54,9 @@ dev = [
     "httpx2>=2.12",
 ]
 e2e = [
+    "pytest-base-url>=2.1.0",
     "pytest-playwright>=0.9",
+    "requests[socks]>=2.34.2",
 ]
 
 [[tool.uv.index]]
@@ -91,6 +93,34 @@ artifacts = ["src/pdomain_ocr_trainer_spa/static/**/*"]
 packages = ["src/pdomain_ocr_trainer_spa"]
 # The global `artifacts` above also covers this target; no additional per-wheel
 # artifacts entry needed (duplication would be harmless but confusing).
+
+[tool.hatch.build.targets.sdist]
+# Linked worktrees cannot rely on Hatch's Git ignore discovery.
+exclude = [
+    "/.git",
+    "/.docgraph",
+    "/.superpowers",
+    "/.claude",
+    "/.worktrees",
+    "**/node_modules",
+    "**/.venv*",
+    "**/venv",
+    "**/env",
+    "**/__pycache__",
+    "**/.cache",
+    "**/.pytest_cache",
+    "**/.ruff_cache",
+    "**/.mypy_cache",
+    "**/.uv-cache",
+    "**/.vite",
+    "**/.coverage*",
+    "**/.ci-ai.log",
+    "/dist",
+    "/build",
+    "/htmlcov",
+    "/frontend/dist",
+    "/frontend/coverage",
+]
 
 [tool.ruff]
 line-length = 110
