@@ -2,7 +2,7 @@
 Status: active
 Owner: CT
 Created: 2026-07-21
-Last verified: 2026-11-12
+Last verified: 2026-11-13
 Kind: plan
 ---
 
@@ -64,9 +64,9 @@ calls `LocalEvalRunner`.
 The text inside the raise is stale. It says `RecognitionEvalConfig` lacks
 glyph input. It also says recognition eval hard-codes `slices=[]`.
 
-Installed `pdomain-ocr-training` 0.2.1 already has `glyph_annotations_path`
-and `slice_glyph_features`. `evaluate_recognition_impl` fills slices when both
-are set.
+The lock resolves `pdomain-ocr-training` 0.3.0. Its installed source has
+`glyph_annotations_path` and `slice_glyph_features`.
+`evaluate_recognition_impl` fills slices when both are set.
 
 The eval form already shows a glyph-slice control.
 

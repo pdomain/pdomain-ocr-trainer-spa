@@ -2,7 +2,7 @@
 Status: active
 Owner: CT
 Created: 2026-06-10
-Last verified: 2026-11-07
+Last verified: 2026-11-13
 Kind: process
 ---
 
@@ -124,3 +124,16 @@ disable comments, global ignores, and per-file ignores. Mypy-style production
 fallback ignores in `bootstrap.py` and `domain/labeler_export.py` were replaced
 with basedpyright-native rule names. Test-only mypy-style annotations remain
 because Ruff and pytest tooling also consume those explicit test adaptations.
+
+## Configured basedpyright exceptions
+
+`pyproject.toml` uses recommended mode, `failOnWarnings = true`, and the
+existing `.basedpyright/baseline.json`. The task recipe invokes basedpyright
+with `--level error`; do not describe that command as an unconditional gate on
+all warnings.
+
+`reportMissingTypeStubs = "none"` suppresses absent sibling-package stubs,
+as the configuration comment explains. `reportImportCycles = "none"` also
+suppresses cycle diagnostics. The latter has no recorded inline rationale;
+this catalogue records the inherited setting without adding a suppression or
+claiming that the documentation migration justified it.

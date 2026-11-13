@@ -2,7 +2,7 @@
 Status: active
 Owner: CT
 Created: 2026-07-21
-Last verified: 2026-11-12
+Last verified: 2026-11-13
 Kind: issue
 Level: I1
 ---
@@ -14,7 +14,7 @@ Level: I1
 - **Kind:** issue
 - **Status:** active
 - **Level:** I1
-- **Last verified:** 2026-11-12
+- **Last verified:** 2026-11-13
 - **Resolution:** Open
 - **Severity:** Medium — the toast hook is unmounted while the dock polls
 - **Affected version:** pdomain-ocr-trainer-spa master @ cutover 2026-07-21
@@ -43,9 +43,10 @@ Provenance: former GH #25. Still open on the
 
 ## Impact
 
-- Operators can see job progress in two places with different update models
-  (push toasts vs poll dock).
-- New shell work can double-wire notifications if roles stay undocumented.
+- The dock polls while run detail consumes SSE. Neither proves that terminal
+  toast notifications are delivered.
+- The unused notification hook can be mounted twice or misunderstood unless
+  the owner chooses whether to mount it or remove it.
 
 ## Environment / versions
 
@@ -65,30 +66,28 @@ not a regression of the AppShell migration itself.
 
 ### 2. Current code still splits channels
 
-`useNotificationStream` remains the toast path. `useTrainerJobs` remains the
-dock path. The 2026-07-14 decision keeps both. Trainer workflows already
-records that split.
+`useTrainerJobs` polls the dock. Run detail opens the job SSE stream.
+`useNotificationStream` has isolated unit tests but is not mounted by
+`App.tsx`. The 2026-11-12 correction in the decision log supersedes the old
+claim that terminal toasts already fire.
 
 ## Root-cause hypotheses
 
-1. **(Most likely) Deliberate dual UX, interim transport** — product keeps both
-   surfaces; dock still polls while toasts use SSE because the dock landed on
-   the jobs list API first.
-2. **Missing SSE→dock adapter** — dock could subscribe to the same event stream
-   without a second poller.
-3. **Toast noise still too high** — dual by design may still need quieter
-   completion/error rules so the dock stays primary for ongoing work.
+1. **Unconnected hook** — the toast helper is tested in isolation but has no
+   application call site.
+2. **Stale role description** — the earlier dual-surface description treated
+   a proposed notification path as mounted behavior.
 
 ## Defects to fix
 
-1. **Optional: feed dock from SSE, or quiet the toasts.** Architecture already
-   records the split. This follow-up is not built. It needs an owner decision
-   before anyone removes either surface.
+1. Decide whether to mount or remove the existing notification hook. This is
+   an owner choice; an SSE-fed dock is not a requirement.
 
 ## Next steps
 
-1. Treat dual surfaces as intentional unless the owner reopens that decision.
-2. Build an SSE-fed dock or quieter toasts only after that decision.
+1. Confirm the mount-or-remove decision.
+2. Implement only that choice and verify its terminal-event behavior.
+3. Keep the polling dock and run-detail stream documented as separate paths.
 
 ## What is NOT broken (to scope the fix)
 
@@ -98,6 +97,7 @@ records that split.
 
 ## Resolution
 
-_Open._ When fixed: set frontmatter + Agent Index `Status: retired`, add the
-resolving commit here, move the README pointer to Resolved, and route
-retirement through `doc-retirer`.
+_Open._ When this issue is fixed, route it through `doc-retirer` with the resolving
+commit and evidence. Promote durable behavior, update inbound references,
+remove the live README pointer, and append a tombstone to the decision log.
+Resolved reports are deleted; there is no resolved index to maintain.

@@ -2,7 +2,7 @@
 Status: active
 Owner: CT
 Created: 2026-07-13
-Last verified: 2026-11-12
+Last verified: 2026-11-13
 Kind: context
 ---
 
@@ -106,3 +106,16 @@ Standing open work lives only in [docs/roadmap.md](../roadmap.md).
   `docs/architecture/`. Remaining work is on the roadmap. `specs/13` stays in
   full because `tests/e2e/test_driver_contract.py` parses it. The old "specs
   are the source of truth" line is withdrawn.
+
+## 2026-11-13 verification and retirement
+
+Fresh source and test analysis retained both partial plans and all open issues.
+The [retirement record](../decisions/2026-11-13-architecture-retirement.md)
+replaces twenty reviewed superseded stubs with their architecture targets.
+The driver inventory remains live. The suite identity and preference migration
+are now explicit in [shell and jobs](../architecture/shell-and-jobs.md).
+
+Typeface apply still writes `labels.json` while its reader uses
+`metadata.jsonl`; keep that integration gap on the roadmap. The device, toast,
+and classifier scope decisions above are unchanged. No deferred driver or
+classifier package was authorized by this documentation pass.

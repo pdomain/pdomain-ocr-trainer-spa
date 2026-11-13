@@ -2,7 +2,7 @@
 Status: active
 Owner: CT
 Created: 2026-07-21
-Last verified: 2026-11-06
+Last verified: 2026-11-13
 Kind: issue
 Level: I1
 ---
@@ -14,7 +14,7 @@ Level: I1
 - **Kind:** issue
 - **Status:** active
 - **Level:** I1
-- **Last verified:** 2026-11-06
+- **Last verified:** 2026-11-13
 - **Resolution:** Open
 - **Severity:** Medium — glyph eval metrics lack annotation-keyed slices
 - **Affected version:** pdomain-ocr-trainer-spa master @ cutover 2026-07-21
@@ -28,8 +28,8 @@ Level: I1
 
 ## Summary
 
-M13 extends the evaluation pipeline with slicing keyed on `GlyphAnnotations`
-and adds per-feature rows to the eval metrics table.
+M13 must connect glyph-annotation slicing to production evaluation. The form
+and per-feature table already exist; the worker does not yet supply real slices.
 
 The open acceptance is on the [roadmap](../roadmap.md): a recognition eval
 with slicing writes `slices[]` for every labelled feature, the table sorts by
@@ -58,7 +58,8 @@ blocks: former GH #16 / M14
 ### 1. Original acceptance
 
 - Acceptance now recorded on the roadmap (formerly specs/07 §8)
-- Verification: `just ci` green; eval slicing acceptance tests pass
+- Required verification: `just ci` and real eval-slicing acceptance tests
+  must pass. Production slice transport remains unverified.
 
 ### 2. Roadmap placement
 
@@ -70,6 +71,10 @@ against installed `pdomain-ocr-training` 0.2.1, which already has
 `glyph_annotations_path` and `slice_glyph_features`.
 `tests/unit/worker/test_evaluate.py`
 `test_build_runner_surfaces_upstream_gap` locks the raise.
+
+The current lock resolves `pdomain-ocr-training` 0.3.0. Its installed
+recognition config and backend retain those glyph fields and slice support;
+the local worker adapter and result transport remain the missing path.
 
 ### 3. Spec authority
 
@@ -87,7 +92,8 @@ superseded spec stub.
 ## Defects to fix
 
 1. **Slicing logic on GlyphAnnotations** in the eval pipeline.
-2. **Per-feature rows** in the eval metrics table.
+2. **Real slice transport** to the existing per-feature table, including
+   correct support flags. The table already sorts by absolute CER delta.
 3. **Acceptance tests** for the roadmap glyph-slice acceptance.
 
 ## Next steps
@@ -105,6 +111,7 @@ superseded spec stub.
 
 ## Resolution
 
-_Open._ When fixed: set frontmatter + Agent Index `Status: retired`, add the
-resolving commit here, move the README pointer to Resolved, and route
-retirement through `doc-retirer`.
+_Open._ When this issue is fixed, route it through `doc-retirer` with the resolving
+commit and evidence. Promote durable behavior, update inbound references,
+remove the live README pointer, and append a tombstone to the decision log.
+Resolved reports are deleted; there is no resolved index to maintain.

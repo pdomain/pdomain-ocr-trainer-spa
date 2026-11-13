@@ -2,7 +2,7 @@
 Status: active
 Owner: CT
 Created: 2026-07-21
-Last verified: 2026-11-06
+Last verified: 2026-11-13
 Kind: issue
 Level: I1
 ---
@@ -14,7 +14,7 @@ Level: I1
 - **Kind:** issue
 - **Status:** active
 - **Level:** I1
-- **Last verified:** 2026-11-06
+- **Last verified:** 2026-11-13
 - **Resolution:** Open
 - **Severity:** High — production typeface train/eval not real end-to-end
 - **Affected version:** pdomain-ocr-trainer-spa master @ cutover 2026-07-21
@@ -31,11 +31,15 @@ Level: I1
 M12 wires typeface-classifier training from `pdomain-ocr-training`, adds the
 typeface kanban view and run form, and extends eval metrics per class.
 
-SPA-side work has shipped (kanban, run creation, per-class eval UI,
-driver-contract testids, Playwright coverage). The remaining gate is upstream:
-`TypefaceConfig`, `ITrainingRunner.train_typeface`, and
-`IEvalRunner.evaluate_typeface` in `pdomain-ocr-training`. Until then the SPA
-uses a local TypefaceConfig stub and FakeTrainingRunner.
+The SPA has kanban and run-creation seams, classification result schema,
+aggregate accuracy/F1 rendering, generic slice rows, and driver-contract tests.
+It does not render `overall.per_class` as a class table or prove production
+classification. The remaining classifier contract requires an owner scope
+decision before implementation in an upstream package. Production builds
+`LocalTrainingRunner` and calls `train_typeface` through a cast; the local
+`TypefaceConfig` and a fake runner prove only the test seam. Classifier-package
+scope remains an owner decision on the roadmap, not authorization to add those
+methods to the existing training package.
 
 Provenance: former GH #14. Tracks former GH #1. Still open on the
 [remaining-work list](../roadmap.md).
@@ -61,7 +65,8 @@ blocked_by_at_file: former GH #13 (now closed / shipped)
 ### 1. Original acceptance
 
 - Round-trip: ingest a typeface-classification/v1 dataset, train, eval, publish
-- Verification: `just ci` green; round-trip for typeface-classification/v1
+- Required verification: `just ci` must pass, plus a real round-trip for
+  typeface-classification/v1. That production round-trip remains unverified.
 
 ### 2. SPA-side progress (former GH comment, 2026-06-10)
 
@@ -78,22 +83,28 @@ train/eval as incomplete and blocked on upstream contracts.
 
 ## Root-cause hypotheses
 
-1. **(Most likely) Cross-repo gate** — SPA finished its side; training package
-   has not shipped the Protocol methods yet.
+1. **(Most likely) Missing classifier contract** — the local config and cast
+   do not supply a production classifier. Upstream package scope awaits the owner.
 2. **Stub masking gaps** — FakeTrainingRunner may hide contract mismatches until
    a real runner is wired.
 
 ## Defects to fix
 
-1. **Upstream TypefaceConfig + train/eval runners** in `pdomain-ocr-training`.
-2. **SPA cutover off stub** — dispatch real runners; keep acceptance tests.
-3. **Prove round-trip** for typeface-classification/v1 publish path.
+1. **Confirm classifier-package scope with the owner** before scheduling an
+   upstream implementation. Do not add methods to `pdomain-ocr-training`
+   merely because the historical plan names that package.
+2. **Integrate an approved classifier contract** in place of the local config
+   and cast seam, keeping acceptance tests and fixing the metadata apply path.
+3. **Prove the production round-trip**, including result rendering and publish,
+   for typeface-classification/v1.
 
 ## Next steps
 
-1. Track or implement upstream Protocol per
-   [M12 plan](../plans/2026-06-10-m12-typeface-classifier.md) §Cross-repo gate.
-2. Replace stub dispatch when upstream is available.
+1. Confirm scope against the [roadmap](../roadmap.md). The
+   [M12 plan](../plans/2026-06-10-m12-typeface-classifier.md) preserves an
+   earlier cross-repo proposal, not implementation authorization.
+2. Integrate real classifier dispatch only after its contract and package
+   ownership are approved.
 3. Run full ingest → train → eval → publish verification; then retire this
    issue.
 
@@ -105,6 +116,7 @@ train/eval as incomplete and blocked on upstream contracts.
 
 ## Resolution
 
-_Open._ When fixed: set frontmatter + Agent Index `Status: retired`, add the
-resolving commit/upstream refs here, move the README pointer to Resolved, and
-route retirement through `doc-retirer`.
+_Open._ When this issue is fixed, route it through `doc-retirer` with the resolving
+commit and evidence. Promote durable behavior, update inbound references,
+remove the live README pointer, and append a tombstone to the decision log.
+Resolved reports are deleted; there is no resolved index to maintain.

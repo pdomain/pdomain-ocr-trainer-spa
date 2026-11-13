@@ -2,7 +2,7 @@
 Status: partial
 Owner: CT
 Created: 2026-07-14
-Last verified: 2026-11-07
+Last verified: 2026-11-13
 Kind: plan
 ---
 
@@ -35,7 +35,7 @@ The original implementation used the pattern from
 ## Tech Stack
 
 Current dependency floors are Python 3.13, FastAPI 0.141, and
-`pdomain-ops>=0.11.2`. The frontend uses React 19, TypeScript, and Vitest.
+`pdomain-ops>=0.12.2`. The frontend uses React 19, TypeScript, and Vitest.
 Documentation uses docgraph. The old 0.11.1 FastAPI constraint no longer blocks
 this repository; `pyproject.toml` records that 0.11.2 loosened the pins.
 

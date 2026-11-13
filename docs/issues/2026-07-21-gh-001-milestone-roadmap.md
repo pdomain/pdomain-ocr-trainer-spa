@@ -2,7 +2,7 @@
 Status: active
 Owner: CT
 Created: 2026-07-21
-Last verified: 2026-11-06
+Last verified: 2026-11-13
 Kind: issue
 Level: I1
 ---
@@ -14,7 +14,7 @@ Level: I1
 - **Kind:** issue
 - **Status:** active
 - **Level:** I1
-- **Last verified:** 2026-11-06
+- **Last verified:** 2026-11-13
 - **Resolution:** Open
 - **Severity:** Medium — umbrella tracker for remaining post-core milestones
 - **Affected version:** pdomain-ocr-trainer-spa master @ cutover 2026-07-21
@@ -101,6 +101,7 @@ into architecture + intent map).
 
 ## Resolution
 
-_Open._ When M12–M14 are resolved or deferred: set `Status: retired`, link
-child resolutions, move the README pointer to Resolved, route through
-`doc-retirer`.
+_Open._ When M12–M14 are resolved or deferred, route it through `doc-retirer` with the resolving
+commit and evidence. Promote durable behavior, update inbound references,
+remove the live README pointer, and append a tombstone to the decision log.
+Resolved reports are deleted; there is no resolved index to maintain.

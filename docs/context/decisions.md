@@ -179,3 +179,11 @@ bodies are in git history.
   deferred, and dropped work
 - Remaining work: the roadmap. `specs/13-driver-contract.md` is not part of
   this retirement.
+
+## 2026-11-13: Retire reviewed stubs after architecture verification
+
+The [governed retirement record](../decisions/2026-11-13-architecture-retirement.md)
+records all twenty deleted stub paths, replacement architecture, evidence and
+recovery commits. The earlier entries above remain historical evidence.
+Spec 13 remains active test input; both partial plans and the owner decisions
+remain live. No unresolved feature was declared implemented by this migration.

@@ -2,7 +2,7 @@
 Status: active
 Owner: CT
 Created: 2026-07-14
-Last verified: 2026-11-12
+Last verified: 2026-11-13
 Kind: context
 ---
 
@@ -51,3 +51,15 @@ Lint exceptions live in one [catalogue](../conventions/lint-deviations.md).
   seam tests. Typeface training still depends on `train_typeface` existing on
   the typed runner. Production eval raises in `_build_runner` and never calls
   `LocalEvalRunner`. The publish worker is unimplemented in this repo.
+
+## Architecture verification and retirement
+
+The [retirement record](../decisions/2026-11-13-architecture-retirement.md)
+tracks the removal of twenty superseded stubs. Architecture now records the
+suite identity and preference migration, classification result serialization,
+and the current dependency and packaging boundaries. The driver inventory
+remains active at `specs/13-driver-contract.md`.
+
+Production typeface training, evaluation and publish are still incomplete.
+Neither partial plan was retired. Device mapping, the unmounted toast hook,
+and classifier-package scope remain owner decisions in the intent map.

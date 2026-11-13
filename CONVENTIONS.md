@@ -2,7 +2,7 @@
 Status: active
 Owner: CT
 Created: 2026-07-14
-Last verified: 2026-11-12
+Last verified: 2026-11-13
 Kind: process
 ---
 
@@ -125,10 +125,11 @@ permanent design record for shipped features. Mixing shipped and in-progress
 specs in one directory makes it unclear which specs are still authoritative for
 ongoing work.
 
-The historical numbered set under `specs/` at the repo root is not that
-working area. Those files are superseded stubs, except
-`specs/13-driver-contract.md`, which a conformance test still parses. Do not
-treat them as the source of truth. See [docs/roadmap.md](docs/roadmap.md).
+The historical numbered stubs under `specs/` were retired into architecture.
+The retained `specs/13-driver-contract.md` is still parsed by a conformance
+test. It is not a replacement for the current architecture or backlog. See
+[the retirement record](docs/decisions/2026-11-13-architecture-retirement.md)
+and [the roadmap](docs/roadmap.md).
 
 **Common high-confidence violations** (bot auto-fix candidates)
 

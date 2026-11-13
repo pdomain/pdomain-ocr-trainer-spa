@@ -2,7 +2,7 @@
 Status: active
 Owner: CT
 Created: 2026-05-21
-Last verified: 2026-11-07
+Last verified: 2026-11-13
 Kind: process
 ---
 
@@ -95,7 +95,7 @@ All variables use the `PD_OCR_TRAINER_SPA_` prefix.
 | `PD_OCR_TRAINER_SPA_LABELER_EXPORT_ROOT` | unset           | Explicit export root; otherwise discovered through shared paths |
 | `PD_OCR_TRAINER_SPA_APP_DATA_ROOT`     | OS-specific       | App data root            |
 | `PD_OCR_TRAINER_SPA_SHARED_MODELS_DIR` | `~/shared-models` | Trained model output     |
-| `PD_OCR_TRAINER_SPA_ENABLE_HF_PUBLISH` | `false`           | Enable HF publish routes |
+| `PD_OCR_TRAINER_SPA_ENABLE_HF_PUBLISH` | `false`           | Emitted UI flag; publish workers remain unimplemented |
 
 <!-- markdownlint-enable MD013 -->
 
@@ -153,6 +153,10 @@ uv tool install ./dist/pdomain_ocr_trainer_spa-*.whl
 pdomain-ocr-trainer-ui --port 8081
 ```
 
+The base wheel provides the web process. Training-capable hosts also need the
+package's `[train]` extra and the matching Torch/DocTR stack; installing the
+base wheel alone does not install that worker stack.
+
 ## Cut a release locally
 
 This repo has no GitHub Actions workflows.
@@ -167,6 +171,24 @@ Commit `f5437b31f3d44fddbfc8cf66f44fc3d0e7c6a6b8` removed `.github/workflows`,
 including the dated `dep-refresh` workflow.
 
 ---
+
+## CI tiers and browser prerequisites
+
+`just ci` is the ordinary gate. It includes Python and frontend checks but
+skips frontend-build, browser e2e and wheel packaging. `just ci-full` and
+`just ci-slow` add those release checks.
+
+The e2e recipe selects `/cache/shared-ai/ms-playwright` as its browser cache.
+`tests/e2e/test_shell_migration.py` also needs a running backend and a suitable
+`--base-url`. The other browser modules start their own test servers and write
+fake index pages into the generated static directory. Build the real frontend
+again after those fixtures before inspecting or publishing artifacts.
+
+On a host with a different browser-cache location, validate an explicit
+`RELEASE_PREFLIGHT` override that keeps every release check and uses an
+isolated test backend. Do not use a running operator service as a test fixture.
+The release driver pushes the tag before its final artifact build, so verify
+the build and archive contents locally before publication is authorized.
 
 ## Diagnostics
 
@@ -199,6 +221,11 @@ isolated from each other by two separate namespaces: **ports** and
 | App-data dir   | `PD_OCR_TRAINER_APP_DATA_ROOT` | `PD_OCR_TRAINER_SPA_APP_DATA_ROOT` |
 
 <!-- markdownlint-enable MD013 -->
+
+This separation describes the two application settings namespaces. The
+training worker also writes legacy `PD_OCR_TRAINER_ML_TRAINING_DIR` and
+`PD_OCR_TRAINER_ML_VALIDATION_DIR` keys for the training subprocess. It is not
+a claim that every worker or upstream library ignores legacy keys.
 
 Because the env-var prefixes differ by the `_SPA` segment, a variable set for
 one app is **never** read by the other — there is no shared key. A stray

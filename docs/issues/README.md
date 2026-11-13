@@ -2,7 +2,7 @@
 Status: active
 Owner: CT
 Created: 2026-07-21
-Last verified: 2026-11-06
+Last verified: 2026-11-13
 Kind: process
 Level: I1
 ---
@@ -14,7 +14,7 @@ Level: I1
 - **Kind:** process
 - **Status:** active
 - **Level:** I1
-- **Last verified:** 2026-11-06
+- **Last verified:** 2026-11-13
 - **Read when:** filing a bug / defect / investigation report, or looking up an
   open issue's status, evidence, or resolution.
 - **Search terms:** issues folder, bug report, defect report, issue template,
@@ -81,7 +81,7 @@ Lead with the **smallest decisive evidence**, separate **observation** from
 ## Open issues
 
 - Production typeface training builds a local `TypefaceConfig` and calls `train_typeface` through a cast. `FakeTrainingRunner` covers tests only. [M12 Typeface classifier](2026-07-21-gh-014-m12-typeface-classifier.md). Plan: [M12 plan](../plans/2026-06-10-m12-typeface-classifier.md).
-- The production eval worker raises `RuntimeError` in `_build_runner` and never calls `LocalEvalRunner`. The text inside that raise is stale against `pdomain-ocr-training` 0.2.1. [M13 Glyph eval slicing](2026-07-21-gh-015-m13-glyph-eval-slicing.md).
+- The production eval worker raises `RuntimeError` in `_build_runner` and never calls `LocalEvalRunner`. The text inside that raise is stale against the currently locked `pdomain-ocr-training` 0.3.0. [M13 Glyph eval slicing](2026-07-21-gh-015-m13-glyph-eval-slicing.md).
 - Glyph-classifier kanban still returns `dataset.task_unsupported`. [M14 Glyph classifier](2026-07-21-gh-016-m14-glyph-classifier.md).
 - The milestone umbrella stays open until M12–M14 close. [M0–M14 umbrella](2026-07-21-gh-001-milestone-roadmap.md).
 - The toast hook is not mounted. The dock polls `GET /api/jobs`. [Jobs surfaces](2026-07-21-gh-025-unify-jobs-surfaces.md).

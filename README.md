@@ -2,7 +2,7 @@
 Status: active
 Owner: CT
 Created: 2026-05-21
-Last verified: 2026-11-12
+Last verified: 2026-11-13
 Kind: architecture
 ---
 
@@ -31,9 +31,11 @@ are not wired. Glyph-classifier training is not implemented. Open work is
 - [Trainer workflows](docs/architecture/trainer-workflows.md) is the short map.
   Topic pages next to it cover profiles and models, runs and evaluation, the
   shell and jobs, Hugging Face, and labeler import.
-- Numbered files under `specs/` are superseded stubs, except
-  [specs/13-driver-contract.md](specs/13-driver-contract.md), which the driver
-  conformance test still parses. They are not the source of truth.
+- The superseded numbered stubs were retired into architecture.
+  [specs/13-driver-contract.md](specs/13-driver-contract.md) remains the driver
+  conformance test's input. The
+  [retirement record](docs/decisions/2026-11-13-architecture-retirement.md)
+  identifies each replacement and the recovery commits.
 - [Current state](docs/context/current-state.md),
   [intent map](docs/context/intent-map.md), and
   [decisions](docs/context/decisions.md) separate present truth, remaining work,

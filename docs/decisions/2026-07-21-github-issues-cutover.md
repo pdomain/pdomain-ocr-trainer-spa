@@ -107,3 +107,11 @@ supersede `docs/roadmap.md`, `specs/`, or architecture docs.
 | #16 | open | [gh-016](../issues/2026-07-21-gh-016-m14-glyph-classifier.md) + roadmap Later |
 | #25 | open | [gh-025](../issues/2026-07-21-gh-025-unify-jobs-surfaces.md) + roadmap Now |
 | #2–#13, #17–#19, #21, #24 | closed | Shipped rows in roadmap + full bodies in archive tombstone |
+
+## 2026-11-13 clarification: current design authority
+
+The cutover table and original source locations above describe July's state.
+The later [architecture retirement](2026-11-13-architecture-retirement.md)
+made architecture and the roadmap current truth and removed the superseded
+numbered stubs. The driver contract remains active test input. This does not
+rewrite the cutover evidence or reopen the deleted GitHub issue backlog.
