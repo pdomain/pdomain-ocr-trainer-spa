@@ -13,13 +13,13 @@ readme = "README.md"
 license = { text = "Unlicense" }
 requires-python = ">=3.13"
 dependencies = [
-    "pdomain-book-tools>=0.28.0",
-    "pdomain-book-contracts>=0.2.0",
-    "pdomain-ops>=0.11.2",  # 0.11.2 loosened fastapi/starlette pins (device-display fix)
+    "pdomain-book-tools>=0.31.0",
+    "pdomain-book-contracts>=0.3.1",
+    "pdomain-ops>=0.12.2",  # 0.11.2 loosened fastapi/starlette pins (device-display fix)
     # pdomain-ocr-training base install is torch-free: the FastAPI web process
     # imports only the typed config models + ITrainingRunner Protocol.
     # The training worker needs the heavy stack — see the `train` extra.
-    "pdomain-ocr-training>=0.2.3",
+    "pdomain-ocr-training>=0.3.0",
     "fastapi>=0.141",
     "uvicorn[standard]>=0.52",
     "pydantic>=2.13",
@@ -191,6 +191,10 @@ addopts = [
 testpaths = ["tests"]
 pythonpath = ["src", "."]
 asyncio_mode = "auto"
+# pytest-asyncio 1.5 warns when this is unset, and filterwarnings=error
+# turns that warning into a failure. fixture-scope keeps the previous
+# loop scope, which matches each fixture's own scope.
+asyncio_default_fixture_loop_scope = "fixture-scope"
 filterwarnings = [
     "error",
     # starlette 1.6.0 reads `anyio.abc.BlockingPortal` at import time, an
